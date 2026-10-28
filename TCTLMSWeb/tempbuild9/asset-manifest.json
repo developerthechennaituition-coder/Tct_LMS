@@ -1,0 +1,42 @@
+{
+  "files": {
+    "main.css": "/static/css/main.fe6c4b4c.css",
+    "main.js": "/static/js/main.f1567046.js",
+    "static/js/987.832709d9.chunk.js": "/static/js/987.832709d9.chunk.js",
+    "static/js/867.ab5b1465.chunk.js": "/static/js/867.ab5b1465.chunk.js",
+    "static/js/27.3cb77d71.chunk.js": "/static/js/27.3cb77d71.chunk.js",
+    "static/media/Nioicon.svg": "/static/media/Nioicon.3a683679c4d0ec1b9f41.svg",
+    "static/media/Nioicon.eot": "/static/media/Nioicon.9262cde92d7db9454cc9.eot",
+    "static/media/Nioicon.woff": "/static/media/Nioicon.08e5ad1d0d414bac92e7.woff",
+    "static/media/Nioicon.ttf": "/static/media/Nioicon.2223262e97e2128073db.ttf",
+    "static/media/slide-a.jpg": "/static/media/slide-a.1727dc5d2d25473a8354.jpg",
+    "static/media/slide-b.jpg": "/static/media/slide-b.74f94a2b907888345911.jpg",
+    "static/media/tctlogo.jpg": "/static/media/tctlogo.b371cfa03846eb1bcfda.jpg",
+    "static/media/slide-c.jpg": "/static/media/slide-c.b6b359170f8683415b92.jpg",
+    "static/media/DMSans-Regular.eot": "/static/media/DMSans-Regular.890933b02095eff6f0e8.eot",
+    "static/media/DMSans-Medium.eot": "/static/media/DMSans-Medium.8b543db8e1b70aa3a0d3.eot",
+    "static/media/DMSans-Bold.eot": "/static/media/DMSans-Bold.1a87ee523f119f136e14.eot",
+    "static/media/DMSans-Regular.ttf": "/static/media/DMSans-Regular.955c3f75bd785e7f5d9f.ttf",
+    "static/media/DMSans-Medium.ttf": "/static/media/DMSans-Medium.94265d62e849136126ec.ttf",
+    "static/media/DMSans-Bold.ttf": "/static/media/DMSans-Bold.1850fd237f7eb8215648.ttf",
+    "static/media/logo-dark2x.png": "/static/media/logo-dark2x.cbb0b695c78f6b7938c2.png",
+    "static/media/DMSans-Regular.woff": "/static/media/DMSans-Regular.6ef75e74b08091ab6a7e.woff",
+    "static/media/DMSans-Medium.woff": "/static/media/DMSans-Medium.b026e72d0f540039c1ae.woff",
+    "static/media/DMSans-Bold.woff": "/static/media/DMSans-Bold.8cfa0319eed913340b2b.woff",
+    "static/media/logo-dark.png": "/static/media/logo-dark.4efff1a5ed90169795e2.png",
+    "static/media/logo.png": "/static/media/logo.4b9628cf07f2cf94ec1f.png",
+    "static/media/TCTLoginPageLogo.png": "/static/media/TCTLoginPageLogo.a4c0b8f56fba5f04ed21.png",
+    "static/media/DMSans-Regular.woff2": "/static/media/DMSans-Regular.4555fe7259d925218fe0.woff2",
+    "static/media/DMSans-Medium.woff2": "/static/media/DMSans-Medium.e2ec01a3710d21590d81.woff2",
+    "static/media/DMSans-Bold.woff2": "/static/media/DMSans-Bold.98016a8cb7bf17842cf7.woff2",
+    "static/media/d.png": "/static/media/d.2be09573fba84a93e298.png",
+    "static/media/error-504.svg": "/static/media/error-504.8dee1d0c3799fb45dba1305a6f11bd1a.svg",
+    "static/media/error-404.svg": "/static/media/error-404.73bb52e5a998cf988318439985089d73.svg",
+    "static/media/tinymce-mobile.woff?8x92w3": "/static/media/tinymce-mobile.58fc024c65dca91a1dad.woff",
+    "index.html": "/index.html"
+  },
+  "entrypoints": [
+    "static/css/main.fe6c4b4c.css",
+    "static/js/main.f1567046.js"
+  ]
+}

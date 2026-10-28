@@ -1,0 +1,433 @@
+/* Tutor details page (/lms/user-details). Page rules are scoped to .tct-ud.
+   The Skills popup comes from the shared TutorSkillset component and is rendered outside the page,
+   so it is scoped with body:has(.tct-ud): the rules apply only while this page is open
+   (the only .totur-modal on this page is that popup). Other pages are not affected. */
+
+/* ─── Page header ───────────────────────────────────────────────────────── */
+.tct-ud .nk-block-title.page-title strong { font-size: 1.6rem; font-weight: 700; text-transform: capitalize; }
+.tct-ud .tct-ud-crumb { display: flex; align-items: center; gap: 8px; margin-top: 4px; font-size: 13px; color: #8094ae; }
+.tct-ud .tct-ud-crumb p { margin: 0; }
+.tct-ud .tct-ud-chip {
+  display: inline-flex; align-items: center; height: 22px; padding: 0 9px; border-radius: 6px;
+  font-size: 11.5px; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase;
+  color: #526484; background: #eef0f6;
+}
+.tct-ud .tct-ud-chip.is-code { color: #6a35e8; background: #f1ecff; }
+.tct-ud .nk-block-head .btn-outline-light { border-radius: 9px; }
+
+/* ─── Card + tabs ───────────────────────────────────────────────────────── */
+.tct-ud .card-bordered { border: 1px solid #e5e9f2; border-radius: 14px; overflow: hidden; box-shadow: 0 1px 3px rgba(28, 43, 70, 0.04); }
+.tct-ud .nav-tabs-card { padding: 0 24px; border-bottom: 1px solid #eef0f5; }
+.tct-ud .nav-tabs-card .nav-link {
+  display: inline-flex; align-items: center; gap: 8px; padding: 18px 2px;
+  font-size: 14px; font-weight: 600; color: #6b7a90;
+}
+.tct-ud .nav-tabs-card .nav-link .icon { font-size: 17px; margin: 0; }
+.tct-ud .nav-tabs-card .nav-link:hover { color: #6a35e8; }
+.tct-ud .nav-tabs-card .nav-link.active { color: #6a35e8; }
+.tct-ud .nav-tabs-card .nav-link.active::after { background: #854fff; height: 3px; border-radius: 3px 3px 0 0; }
+
+/* ─── Personal tab ──────────────────────────────────────────────────────── */
+.tct-ud .tct-ud-info { display: flex; flex-direction: column; gap: 22px; padding: 24px; }
+.tct-ud .tct-ud-section-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.tct-ud .tct-ud-section-icon {
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+  width: 36px; height: 36px; border-radius: 10px; font-size: 18px; color: #854fff; background: #f1ecff;
+}
+.tct-ud .tct-ud-section-head h6 { margin: 0; font-size: 15px; font-weight: 700; color: #1c2b46; }
+.tct-ud .tct-ud-section-head p { margin: 2px 0 0; font-size: 12.5px; color: #8094ae; }
+
+.tct-ud .tct-ud-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.tct-ud .tct-ud-item {
+  display: flex; flex-direction: column; gap: 4px; min-width: 0; padding: 12px 14px;
+  border: 1px solid #eef0f5; border-radius: 10px; background: #fafbfd;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.tct-ud .tct-ud-item:hover { border-color: #e3d8ff; background: #fcfbff; }
+.tct-ud .tct-ud-item.is-wide { grid-column: span 2; }
+.tct-ud .tct-ud-label { font-size: 12px; font-weight: 500; color: #8094ae; }
+.tct-ud .tct-ud-value { font-size: 14.5px; font-weight: 600; color: #1c2b46; overflow-wrap: anywhere; }
+.tct-ud .tct-ud-value.is-empty,
+.tct-ud .is-empty { font-weight: 500; font-style: italic; color: #b7c2d0; }
+
+/* ─── Side panel ────────────────────────────────────────────────────────── */
+.tct-ud .card-aside { border-left: 1px solid #eef0f5; }
+.tct-ud .tct-ud-side { display: flex; flex-direction: column; }
+.tct-ud .tct-ud-profile {
+  display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 28px 24px 22px; text-align: center;
+  border-bottom: 1px solid #eef0f5; background: linear-gradient(180deg, #faf8ff 0%, #ffffff 100%);
+}
+.tct-ud .tct-ud-profile .user-avatar.lg { width: 76px; height: 76px; font-size: 24px; box-shadow: 0 6px 16px rgba(133, 79, 255, 0.28); }
+.tct-ud .tct-ud-profile h5 { margin: 6px 0 0; font-size: 1.1rem; font-weight: 700; color: #1c2b46; text-transform: capitalize; }
+.tct-ud .tct-ud-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.tct-ud .tct-ud-side-section { padding: 18px 24px; border-bottom: 1px solid #eef0f5; }
+.tct-ud .tct-ud-side-section:last-child { border-bottom: 0; }
+.tct-ud .tct-ud-side-section h6 {
+  margin: 0 0 12px; font-size: 11.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #8094ae;
+}
+.tct-ud .tct-ud-contact { display: flex; align-items: center; gap: 10px; min-width: 0; font-size: 13.5px; color: #364a63; }
+.tct-ud .tct-ud-contact + .tct-ud-contact { margin-top: 10px; }
+.tct-ud .tct-ud-contact > span:last-child { overflow-wrap: anywhere; }
+.tct-ud .tct-ud-contact-icon {
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+  width: 30px; height: 30px; border-radius: 8px; font-size: 15px; color: #854fff; background: #f5f1ff;
+}
+.tct-ud .tct-ud-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 12px; margin: 0; }
+.tct-ud .tct-ud-facts dt { margin-bottom: 2px; font-size: 12px; font-weight: 500; color: #8094ae; }
+.tct-ud .tct-ud-facts dd { margin: 0; font-size: 13.5px; font-weight: 600; color: #1c2b46; overflow-wrap: anywhere; }
+
+.tct-ud .tct-ud-profile-email { font-size: 13px; color: #6b7a90; overflow-wrap: anywhere; }
+
+/* Icon toolbar */
+.tct-ud .tct-ud-tools { padding-top: 12px; padding-bottom: 12px; }
+.tct-ud .tct-ud-tools .btn-toolbar { margin: 0; }
+.tct-ud .tct-ud-tools .btn-trigger { width: 36px; height: 36px; border-radius: 9px; color: #6b7a90; }
+.tct-ud .tct-ud-tools .btn-trigger:hover { color: #6a35e8; background: #f1ecff; }
+.tct-ud .tct-ud-tools .btn-trigger.text-danger:hover { color: #e85347; background: #fdecea; }
+
+/* In Account */
+.tct-ud .tct-ud-balance { display: flex; align-items: flex-start; gap: 14px; }
+.tct-ud .tct-ud-balance-amount { font-size: 1.25rem; font-weight: 700; line-height: 1.2; color: #1c2b46; font-variant-numeric: tabular-nums; }
+.tct-ud .tct-ud-balance-amount small { font-size: 12px; font-weight: 600; color: #8094ae; }
+.tct-ud .tct-ud-balance-label { margin-top: 4px; font-size: 12px; color: #8094ae; }
+.tct-ud .tct-ud-balance-plus { margin-top: 4px; font-size: 14px; color: #b7c2d0; }
+
+/* Total Order / Complete / Progress */
+.tct-ud .tct-ud-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; text-align: center; }
+.tct-ud .tct-ud-stats > div { display: flex; flex-direction: column; gap: 2px; padding: 10px 6px; border-radius: 10px; background: #fafbfd; border: 1px solid #eef0f5; }
+.tct-ud .tct-ud-stat-value { font-size: 1.05rem; font-weight: 700; color: #1c2b46; }
+.tct-ud .tct-ud-stat-label { font-size: 12px; color: #8094ae; }
+
+/* Groups */
+.tct-ud .tct-ud-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.tct-ud .tct-ud-tags .btn { height: 26px; font-size: 12px; font-weight: 600; color: #526484; background: #f1f3f8; border-color: transparent; }
+.tct-ud .tct-ud-tags .btn:first-child { padding: 0 10px; border-radius: 6px 0 0 6px; }
+.tct-ud .tct-ud-tags .btn-icon { width: 26px; border-radius: 0 6px 6px 0; }
+.tct-ud .tct-ud-tags .btn:hover { color: #6a35e8; background: #f1ecff; }
+
+/* ─── Skill sets tab (shared TutorSkillset rendered inside .tct-ud-skills) ─ */
+.tct-ud .tct-ud-skills-wrap { position: relative; padding: 24px; }
+.tct-ud .tct-ud-skills-head { padding-right: 160px; min-height: 40px; }
+/* Its "Add Skills" header sits on the same line as the section title. */
+.tct-ud .tct-ud-skills > .nk-block-head { position: absolute; top: 24px; right: 24px; margin: 0; padding: 0; }
+.tct-ud .tct-ud-skills > .nk-block-head .btn-primary {
+  display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 16px; border-radius: 9px;
+  font-size: 14px; font-weight: 600;
+}
+.tct-ud .tct-ud-skills .rdt_Table { border: 1px solid #e5e9f2; border-radius: 10px; overflow: hidden; }
+.tct-ud .tct-ud-skills .rdt_TableHeadRow { min-height: 44px; background: #f5f6fa; border-bottom: 1px solid #e5e9f2; }
+.tct-ud .tct-ud-skills .rdt_TableCol { font-size: 11.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #526484; }
+.tct-ud .tct-ud-skills .rdt_TableRow { min-height: 54px; font-size: 14px; color: #364a63; border-bottom-color: #eef0f5; }
+.tct-ud .tct-ud-skills .rdt_TableRow:hover { background: #faf8ff; }
+.tct-ud .tct-ud-skills .rdt_TableRow .form-control {
+  max-width: 140px; height: 36px; padding: 0 12px; border: 1px solid #dbdfea; border-radius: 8px; font-size: 14px;
+}
+.tct-ud .tct-ud-skills .rdt_TableRow .form-control:focus { border-color: #854fff; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.15); }
+.tct-ud .tct-ud-skills .nk-tb-actions .btn-trigger { border-radius: 8px; }
+.tct-ud .tct-ud-skills .nk-tb-actions .btn-trigger:hover { color: #6a35e8; background: #f1ecff; }
+/* Empty state ("There are no records found") */
+.tct-ud .tct-ud-skills .dataTables_wrapper .p-2 {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;
+  padding: 40px 20px !important; border: 1px dashed #d9cbff; border-radius: 12px; background: #fcfbff;
+  font-size: 15px; font-weight: 700; color: #1c2b46; text-align: center;
+}
+.tct-ud .tct-ud-skills .dataTables_wrapper .p-2::after {
+  content: "Use \201C Add Skills\201D  to assign a board, grade and subjects to this tutor.";
+  margin-top: 4px; font-size: 13px; font-weight: 400; color: #8094ae;
+}
+
+/* ─── Availability tab (shared UserAvailability rendered inside .tct-ud-avail) ─ */
+/* "Add Slots" sits on the section title line, like Skill Sets. */
+.tct-ud .tct-ud-avail > .nk-block-head { position: absolute; top: 24px; right: 24px; margin: 0; padding: 0; }
+.tct-ud .tct-ud-avail > .nk-block-head .btn-primary {
+  display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 16px; border-radius: 9px;
+  font-size: 14px; font-weight: 600;
+}
+/* Toolbar row: full width, search box always visible on the left, settings on the right. */
+.tct-ud .tct-ud-avail > .nk-block > .row { margin: 0 0 14px; }
+.tct-ud .tct-ud-avail > .nk-block > .row > div:first-child:empty { display: none; }
+.tct-ud .tct-ud-avail > .nk-block > .row > div { flex: 1 1 100%; max-width: 100%; padding: 0; }
+.tct-ud .tct-ud-avail .entrolled-list.card-tools-toggle {
+  display: flex; align-items: center; gap: 10px; padding: 0; border: 0;
+}
+.tct-ud .tct-ud-avail .entrolled-list .card-search.search-wrap {
+  position: static; order: 0; flex: 0 1 380px; min-width: 0;
+  opacity: 1 !important; visibility: visible !important; transform: none !important; background: transparent; box-shadow: none;
+  /* The theme disables input on the closed search box (pointer-events: none); it is always open here. */
+  pointer-events: auto !important; z-index: 1;
+}
+.tct-ud .tct-ud-avail .entrolled-list .card-title-group { order: 1; margin-left: auto; }
+/* The search box no longer opens/closes: hide its open icon, divider and back arrow. */
+.tct-ud .tct-ud-avail .entrolled-list .card-tools li:has(> .toggle-search),
+.tct-ud .tct-ud-avail .entrolled-list .card-tools .btn-toolbar-sep,
+.tct-ud .tct-ud-avail .entrolled-list .search-back { display: none !important; }
+.tct-ud .tct-ud-avail .entrolled-list .card-search .card-body { padding: 0; }
+.tct-ud .tct-ud-avail .entrolled-list .search-content { position: relative; display: flex; align-items: center; }
+.tct-ud .tct-ud-avail .entrolled-list .search-content .form-control {
+  height: 40px; padding: 0 14px 0 40px !important; border: 1px solid #dbdfea !important; border-radius: 9px;
+  font-size: 14px; color: #1c2b46; background: #fff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.tct-ud .tct-ud-avail .entrolled-list .search-content .form-control::placeholder { color: #a7b2c3; }
+.tct-ud .tct-ud-avail .entrolled-list .search-content .form-control:hover { border-color: #c5cbe0 !important; }
+.tct-ud .tct-ud-avail .entrolled-list .search-content .form-control:focus {
+  border-color: #854fff !important; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.15);
+}
+.tct-ud .tct-ud-avail .entrolled-list .search-submit {
+  position: absolute; top: 50%; left: 6px; right: auto; transform: translateY(-50%);
+  width: 30px; height: 30px; padding: 0; border: 0; background: transparent; color: #8094ae; pointer-events: none;
+}
+.tct-ud .tct-ud-avail .entrolled-list .card-tools .btn-trigger,
+.tct-ud .tct-ud-avail .entrolled-list .card-tools .dropdown-toggle {
+  width: 40px; height: 40px; border: 1px solid #dbdfea; border-radius: 9px; color: #6b7a90; background: #fff;
+}
+.tct-ud .tct-ud-avail .entrolled-list .card-tools .btn-trigger:hover,
+.tct-ud .tct-ud-avail .entrolled-list .card-tools .dropdown-toggle:hover { color: #6a35e8; border-color: #d9cbff; background: #f5f1ff; }
+.tct-ud .tct-ud-avail .entrolled-list .card-tools .dropdown-menu { border: 1px solid #e5e9f2; border-radius: 10px; box-shadow: 0 12px 28px rgba(28, 43, 70, 0.14); }
+
+/* Slots table */
+.tct-ud .tct-ud-avail .rdt_Table { border: 1px solid #e5e9f2; border-radius: 10px; overflow: hidden; }
+.tct-ud .tct-ud-avail .rdt_TableHeadRow { min-height: 44px; background: #f5f6fa; border-bottom: 1px solid #e5e9f2; }
+.tct-ud .tct-ud-avail .rdt_TableCol { font-size: 11.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #526484; }
+.tct-ud .tct-ud-avail .rdt_TableRow { min-height: 50px; font-size: 14px; color: #364a63; border-bottom-color: #eef0f5; }
+.tct-ud .tct-ud-avail .rdt_TableRow:hover { background: #faf8ff; }
+.tct-ud .tct-ud-avail .dataTables_wrapper .p-2 {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;
+  padding: 40px 20px !important; border: 1px dashed #d9cbff; border-radius: 12px; background: #fcfbff;
+  font-size: 15px; font-weight: 700; color: #1c2b46; text-align: center;
+}
+.tct-ud .tct-ud-avail .dataTables_wrapper .p-2::after {
+  /* "\201C " and "\201D " are curly quotes; the space after each code ends the escape. */
+  content: "Use \201C Add Slots\201D  to add the days and hours this tutor is available.";
+  margin-top: 4px; font-size: 13px; font-weight: 400; color: #8094ae;
+}
+
+/* ─── Add / Edit Slots popup (shared UserAvailability, .custom-modal) ──── */
+body:has(.tct-ud) .modal-dialog.custom-modal { max-width: 920px; }
+body:has(.tct-ud) .custom-modal .modal-content {
+  border: 0; border-radius: 14px; box-shadow: 0 24px 60px rgba(28, 43, 70, 0.22); overflow: hidden;
+}
+body:has(.tct-ud) .custom-modal .modal-header {
+  align-items: center; padding: 20px 24px; border-bottom: 1px solid #eef0f5;
+  background: linear-gradient(180deg, #faf8ff 0%, #ffffff 100%);
+}
+body:has(.tct-ud) .custom-modal .modal-title { font-size: 1.2rem; font-weight: 700; color: #1c2b46; }
+body:has(.tct-ud) .custom-modal .modal-title::after {
+  content: "Pick the days, then drag the slider to set the available hours.";
+  display: block; margin-top: 3px; font-size: 13px; font-weight: 400; color: #8094ae;
+}
+body:has(.tct-ud) .custom-modal .modal-header .close {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; margin: 0 0 0 auto; padding: 0; border-radius: 10px;
+  font-size: 22px; color: #8094ae; opacity: 1; transition: background 0.15s ease, color 0.15s ease;
+}
+body:has(.tct-ud) .custom-modal .modal-header .close:hover { color: #1c2b46; background: #f1f3f8; }
+body:has(.tct-ud) .custom-modal .modal-body { padding: 0 !important; }
+body:has(.tct-ud) .custom-modal .card-preview { margin: 0; border: 0; box-shadow: none; }
+body:has(.tct-ud) .custom-modal .card-preview > .card-inner { padding: 20px 24px 12px; }
+body:has(.tct-ud) .custom-modal form > .row { margin-left: 0; margin-right: 0; }
+
+body:has(.tct-ud) .custom-modal .form-label { margin-bottom: 8px; font-size: 13px; font-weight: 600; color: #364a63; }
+body:has(.tct-ud) .custom-modal .custom-control-label { font-size: 13.5px; font-weight: 500; color: #364a63; cursor: pointer; }
+body:has(.tct-ud) .custom-modal .custom-control-input:checked ~ .custom-control-label::before { border-color: #854fff; background-color: #854fff; }
+body:has(.tct-ud) .custom-modal .custom-checkbox { margin-bottom: 6px; }
+
+/* Day chips */
+body:has(.tct-ud) .custom-modal .form-group > .row { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; }
+body:has(.tct-ud) .custom-modal .form-group > .row > .col { flex: 0 0 auto; max-width: none; padding: 0; }
+body:has(.tct-ud) .custom-modal .days-wrap { margin: 0 !important; }
+body:has(.tct-ud) .custom-modal .days-wrap .btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 52px; height: 40px; padding: 0 12px; border-radius: 10px;
+  font-size: 13.5px; font-weight: 600; box-shadow: none;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+body:has(.tct-ud) .custom-modal .days-wrap .btn-repeat { border: 1px solid #dbdfea; color: #526484; background: #fff; }
+body:has(.tct-ud) .custom-modal .days-wrap .btn-repeat:hover { border-color: #d9cbff; color: #6a35e8; background: #f5f1ff; }
+body:has(.tct-ud) .custom-modal .days-wrap .btn-primary {
+  border: 1px solid #854fff; color: #fff; background: #854fff; box-shadow: 0 4px 10px rgba(133, 79, 255, 0.25);
+}
+
+/* Dates */
+body:has(.tct-ud) .custom-modal .react-datepicker-wrapper { display: block; width: 100%; }
+body:has(.tct-ud) .custom-modal .date-picker.form-control {
+  height: 42px; padding: 0 14px; border: 1px solid #dbdfea; border-radius: 8px; font-size: 14px; color: #1c2b46;
+}
+body:has(.tct-ud) .custom-modal .date-picker.form-control:focus { border-color: #854fff; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.15); }
+
+/* Day slot rows */
+body:has(.tct-ud) .custom-modal .row.border.border-primary.rounded {
+  align-items: center; margin: 0 0 10px !important; padding: 10px 6px;
+  border: 1px solid #e5e9f2 !important; border-radius: 12px !important; background: #fafbfd;
+}
+body:has(.tct-ud) .custom-modal .row.border.border-primary.rounded:hover { border-color: #d9cbff !important; background: #fcfbff; }
+body:has(.tct-ud) .custom-modal .row.border.border-primary.rounded > .col-md-2 > div {
+  gap: 8px; font-size: 14px; font-weight: 700; color: #1c2b46;
+}
+body:has(.tct-ud) .custom-modal .row.border.border-primary.rounded > .col-md-2 > div::before {
+  content: ""; width: 8px; height: 8px; border-radius: 50%; background: #854fff; flex-shrink: 0;
+}
+body:has(.tct-ud) .custom-modal .row.border.border-primary.rounded .form-label { margin-bottom: 4px; font-size: 13px; font-weight: 700; color: #6a35e8; }
+body:has(.tct-ud) .custom-modal .row.border.border-primary.rounded .btn-trigger { border-radius: 8px; color: #6b7a90; }
+body:has(.tct-ud) .custom-modal .row.border.border-primary.rounded .btn-trigger:hover { color: #6a35e8; background: #f1ecff; }
+/* "Please select day to add." */
+body:has(.tct-ud) .custom-modal .row.border.border-primary.rounded:has(.text-warning) {
+  border-style: dashed !important; border-color: #d9cbff !important; background: #fcfbff;
+}
+body:has(.tct-ud) .custom-modal .row.border.border-primary.rounded .text-warning { font-size: 13.5px; font-weight: 500; color: #8094ae !important; }
+
+/* Time range slider (noUiSlider) */
+body:has(.tct-ud) .custom-modal .noUi-target { height: 6px; border: 0; border-radius: 6px; background: #e5e9f2; box-shadow: none; }
+body:has(.tct-ud) .custom-modal .noUi-connect { background: #854fff; }
+body:has(.tct-ud) .custom-modal .noUi-horizontal .noUi-handle {
+  top: -8px; right: -11px; width: 22px; height: 22px; border: 3px solid #854fff; border-radius: 50%;
+  background: #fff; box-shadow: 0 2px 6px rgba(28, 43, 70, 0.2); cursor: grab;
+}
+body:has(.tct-ud) .custom-modal .noUi-handle::before,
+body:has(.tct-ud) .custom-modal .noUi-handle::after { display: none; }
+body:has(.tct-ud) .custom-modal .noUi-handle:focus-visible { outline: none; box-shadow: 0 0 0 4px rgba(133, 79, 255, 0.25); }
+
+/* Footer: Cancel (outline) then the primary action, right aligned */
+body:has(.tct-ud) .custom-modal .modal-footer { padding: 14px 24px !important; border-top: 1px solid #eef0f5; background: #f8f9fc; }
+body:has(.tct-ud) .custom-modal .modal-footer > .row { margin: 0; padding: 0 !important; width: 100%; }
+body:has(.tct-ud) .custom-modal .modal-footer > .row > div { padding: 0; }
+body:has(.tct-ud) .custom-modal .modal-footer .d-flex { flex-direction: row-reverse; justify-content: flex-start; gap: 10px; }
+body:has(.tct-ud) .custom-modal .modal-footer .btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 120px; height: 42px; margin: 0 !important; padding: 0 20px; border-radius: 9px; font-size: 14px; font-weight: 600;
+}
+body:has(.tct-ud) .custom-modal .modal-footer .btn-secondary { border: 1px solid #dbdfea; color: #526484; background: #fff; }
+body:has(.tct-ud) .custom-modal .modal-footer .btn-secondary:hover { border-color: #c5cbe0; color: #1c2b46; background: #fff; }
+
+/* ─── Skills popup ──────────────────────────────────────────────────────── */
+body:has(.tct-ud) .modal-dialog.totur-modal { max-width: 560px; }
+body:has(.tct-ud) .totur-modal .modal-content {
+  border: 0; border-radius: 14px; box-shadow: 0 24px 60px rgba(28, 43, 70, 0.22);
+}
+body:has(.tct-ud) .totur-modal .totur-modal-body { position: relative; }
+body:has(.tct-ud) .totur-modal .totur-modal-body > .p-2 { padding: 0 !important; }
+body:has(.tct-ud) .totur-modal .totur-modal-body > .p-2 > .title {
+  margin: 0; padding: 22px 64px 18px 24px; border-bottom: 1px solid #eef0f5; border-radius: 14px 14px 0 0;
+  background: linear-gradient(180deg, #faf8ff 0%, #ffffff 100%);
+  font-size: 1.15rem; font-weight: 700; color: #1c2b46;
+}
+body:has(.tct-ud) .totur-modal .totur-modal-body > .p-2 > .title::after {
+  content: "Choose the board, grade and subjects for this tutor.";
+  display: block; margin-top: 3px; font-size: 13px; font-weight: 400; color: #8094ae;
+}
+body:has(.tct-ud) .totur-modal .totur-modal-body > .p-2 > .mt-4 { margin: 0 !important; padding: 20px 24px 24px; }
+/* Close button: the icon fills the box so the whole button closes the popup. */
+body:has(.tct-ud) .totur-modal .totur-modal-body > .close {
+  position: absolute; top: 20px; right: 20px; z-index: 2; width: 34px; height: 34px; padding: 0;
+  border-radius: 9px; color: #8094ae; opacity: 1; transition: background 0.15s ease, color 0.15s ease;
+}
+body:has(.tct-ud) .totur-modal .totur-modal-body > .close .icon {
+  display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 18px;
+}
+body:has(.tct-ud) .totur-modal .totur-modal-body > .close:hover { color: #1c2b46; background: #f1f3f8; }
+
+body:has(.tct-ud) .totur-modal .form-label { margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #364a63; }
+body:has(.tct-ud) .totur-modal .form-group { margin-bottom: 14px; }
+body:has(.tct-ud) .totur-modal .form-control {
+  height: 42px; padding: 0 14px; border: 1px solid #dbdfea; border-radius: 8px;
+  font-size: 14px; color: #1c2b46; background-color: #fff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+body:has(.tct-ud) .totur-modal .form-control:hover { border-color: #c5cbe0; }
+body:has(.tct-ud) .totur-modal .form-control:focus { border-color: #854fff; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.15); outline: none; }
+body:has(.tct-ud) .totur-modal .invalid { font-size: 12px; color: #e85347; }
+
+/* Board / Grade native selects */
+body:has(.tct-ud) .totur-modal select.form-control {
+  appearance: none; -webkit-appearance: none; -moz-appearance: none; padding-right: 40px; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%238094ae' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center; background-size: 12px 8px;
+}
+body:has(.tct-ud) .totur-modal select.form-control:focus {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23854fff' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+/* Styled option list where customizable <select> is supported (Chrome / Edge 135+); others keep the native list. */
+@supports (appearance: base-select) {
+  body:has(.tct-ud) .totur-modal select.form-control,
+  body:has(.tct-ud) .totur-modal select.form-control::picker(select) { appearance: base-select; }
+  body:has(.tct-ud) .totur-modal select.form-control { display: flex; align-items: center; }
+  body:has(.tct-ud) .totur-modal select.form-control::picker-icon { display: none; }
+  body:has(.tct-ud) .totur-modal select.form-control:open {
+    border-color: #854fff; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.15);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 6.5l5-5 5 5' fill='none' stroke='%23854fff' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  }
+  body:has(.tct-ud) .totur-modal select.form-control::picker(select) {
+    min-width: anchor-size(width); max-height: 330px; margin-top: 6px; padding: 6px; overflow-y: auto;
+    border: 1px solid #e5e9f2; border-radius: 10px; background: #fff; box-shadow: 0 12px 28px rgba(28, 43, 70, 0.14);
+    scrollbar-width: thin; scrollbar-color: #d9cbff transparent;
+  }
+  body:has(.tct-ud) .totur-modal select.form-control option {
+    display: flex; align-items: center; min-height: 38px; padding: 8px 12px;
+    border-radius: 7px; font-size: 14px; color: #364a63; cursor: pointer;
+  }
+  body:has(.tct-ud) .totur-modal select.form-control option::checkmark { display: none; }
+  body:has(.tct-ud) .totur-modal select.form-control option:hover,
+  body:has(.tct-ud) .totur-modal select.form-control option:focus-visible { outline: none; background: #f5f1ff; color: #6a35e8; }
+  body:has(.tct-ud) .totur-modal select.form-control option:checked { background: #854fff; color: #fff; font-weight: 600; }
+  body:has(.tct-ud) .totur-modal select.form-control option[value=""] { color: #a7b2c3; font-weight: 400; }
+  body:has(.tct-ud) .totur-modal select.form-control option[value=""]:checked { background: transparent; color: #a7b2c3; }
+}
+
+/* Subject (react-select) */
+body:has(.tct-ud) .totur-modal .react-select__control {
+  min-height: 42px; border: 1px solid #dbdfea; border-radius: 8px; box-shadow: none; cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+body:has(.tct-ud) .totur-modal .react-select__control:hover { border-color: #c5cbe0; }
+body:has(.tct-ud) .totur-modal .react-select__control--is-focused,
+body:has(.tct-ud) .totur-modal .react-select__control--is-focused:hover { border-color: #854fff; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.15); }
+body:has(.tct-ud) .totur-modal .react-select__value-container { padding: 2px 12px; }
+body:has(.tct-ud) .totur-modal .react-select__placeholder { font-size: 14px; color: #a7b2c3; }
+body:has(.tct-ud) .totur-modal .react-select__input input {
+  height: auto !important; min-height: 0 !important; margin: 0 !important; padding: 0 !important;
+  border: 0 !important; border-radius: 0 !important; box-shadow: none !important; background: transparent !important;
+  font-size: 14px !important; color: #1c2b46 !important;
+}
+body:has(.tct-ud) .totur-modal .react-select__indicator-separator { display: none; }
+body:has(.tct-ud) .totur-modal .react-select__indicator { color: #8094ae; }
+body:has(.tct-ud) .totur-modal .react-select__control--is-focused .react-select__dropdown-indicator { color: #854fff; }
+body:has(.tct-ud) .totur-modal .react-select__menu {
+  z-index: 20; margin-top: 6px; overflow: hidden;
+  border: 1px solid #e5e9f2; border-radius: 10px; box-shadow: 0 12px 28px rgba(28, 43, 70, 0.14);
+}
+body:has(.tct-ud) .totur-modal .react-select__menu-list {
+  max-height: 220px; padding: 6px; scrollbar-width: thin; scrollbar-color: #d9cbff transparent;
+}
+body:has(.tct-ud) .totur-modal .react-select__option { border-radius: 7px; padding: 9px 12px; font-size: 14px; color: #364a63; cursor: pointer; }
+body:has(.tct-ud) .totur-modal .react-select__option--is-focused { background: #f5f1ff; color: #6a35e8; }
+body:has(.tct-ud) .totur-modal .react-select__option--is-selected { background: #854fff; color: #fff; }
+body:has(.tct-ud) .totur-modal .react-select__multi-value { margin: 3px 6px 3px 0; border-radius: 6px; background: #f1ecff; }
+body:has(.tct-ud) .totur-modal .react-select__multi-value__label { padding: 3px 4px 3px 8px; font-size: 13px; font-weight: 600; color: #6a35e8; }
+body:has(.tct-ud) .totur-modal .react-select__multi-value__remove { border-radius: 0 6px 6px 0; color: #9a74ff; cursor: pointer; }
+body:has(.tct-ud) .totur-modal .react-select__multi-value__remove:hover { background: #e3d8ff; color: #5626c9; }
+
+/* Add Skills button */
+body:has(.tct-ud) .totur-modal .btn-primary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  width: 100%; height: 44px; margin-top: 4px; border-radius: 9px; font-size: 14px; font-weight: 600;
+}
+
+/* ─── Responsive ────────────────────────────────────────────────────────── */
+@media (max-width: 1199.98px) {
+  .tct-ud .tct-ud-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 767.98px) {
+  .tct-ud .nav-tabs-card { padding: 0 12px; }
+  .tct-ud .tct-ud-info,
+  .tct-ud .tct-ud-skills-wrap { padding: 18px 16px; }
+  .tct-ud .tct-ud-grid { grid-template-columns: minmax(0, 1fr); }
+  .tct-ud .tct-ud-item.is-wide { grid-column: auto; }
+  .tct-ud .tct-ud-skills-head { padding-right: 0; }
+  .tct-ud .tct-ud-skills > .nk-block-head,
+  .tct-ud .tct-ud-avail > .nk-block-head { position: static; margin-bottom: 14px; }
+  .tct-ud .tct-ud-avail .entrolled-list .card-search.search-wrap { flex: 1 1 auto; }
+  body:has(.tct-ud) .custom-modal .row.border.border-primary.rounded > .col-md-2 { margin-bottom: 6px; }
+  body:has(.tct-ud) .custom-modal .modal-footer .btn { flex: 1 1 0; min-width: 0; }
+  body:has(.tct-ud) .totur-modal .totur-modal-body > .p-2 > .title { padding: 18px 60px 14px 18px; }
+  body:has(.tct-ud) .totur-modal .totur-modal-body > .p-2 > .mt-4 { padding: 16px 18px 20px; }
+}

@@ -1,0 +1,98 @@
+/* Support → Help. Every selector is scoped under .tct-support-help (this page only).
+   Each card takes its colour from its tone class: --tone (accent), --tone-soft (tint), --tone-ink (text). */
+
+.tct-support-help .nk-block-head {
+  position: relative; padding: 2px 0 22px 16px;
+}
+.tct-support-help .nk-block-head:before {
+  content: ""; position: absolute; left: 0; top: 4px; bottom: 26px; width: 4px; border-radius: 4px;
+  background: linear-gradient(180deg, #8b6cf6 0%, #22a7b9 55%, #f0a020 100%);
+}
+.tct-support-help .nk-block-title.page-title { margin: 0; font-size: 1.6rem; font-weight: 700; color: #1c2b46; }
+.tct-support-help .sh-sub { margin: 4px 0 0; max-width: 760px; font-size: 14px; color: #6b7a90; }
+
+.tct-support-help .sh-tone-contact { --tone: #854fff; --tone-soft: #f3eeff; --tone-ink: #6a35e8; }
+.tct-support-help .sh-tone-chat    { --tone: #13a3b5; --tone-soft: #e6f7f9; --tone-ink: #0b7b8a; }
+.tct-support-help .sh-tone-mail    { --tone: #f0a020; --tone-soft: #fff5e3; --tone-ink: #a8650a; }
+
+.tct-support-help .sh-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; align-items: stretch; }
+
+.tct-support-help .sh-card {
+  position: relative; display: flex; flex-direction: column; min-width: 0; padding: 20px;
+  background: #fff; border: 1px solid #e5e9f2; border-radius: 14px; overflow: hidden;
+  box-shadow: 0 1px 3px rgba(31, 43, 58, 0.05);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.tct-support-help .sh-card:before {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 4px; background: var(--tone);
+}
+.tct-support-help .sh-card:hover { border-color: var(--tone-soft); box-shadow: 0 8px 22px rgba(31, 43, 58, 0.08); }
+
+.tct-support-help .sh-card-head { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px; }
+.tct-support-help .sh-chip {
+  flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; width: 46px; height: 46px;
+  border-radius: 12px; font-size: 22px; color: var(--tone-ink); background: var(--tone-soft);
+}
+.tct-support-help .sh-card-title { margin: 2px 0 4px; font-size: 1.05rem; font-weight: 700; color: #1c2b46; }
+.tct-support-help .sh-card-desc { margin: 0; font-size: 13px; line-height: 1.5; color: #6b7a90; }
+.tct-support-help .sh-card-fill { flex: 1 1 auto; }
+
+/* People list (Contact and Mail). */
+.tct-support-help .sh-people { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; max-height: 360px; overflow-y: auto; }
+.tct-support-help .sh-person {
+  display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 12px; text-align: left;
+  font: inherit; color: inherit; text-decoration: none; background: #fff;
+  border: 1px solid #e5e9f2; border-radius: 10px; cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+.tct-support-help .sh-person:hover { border-color: var(--tone); background: var(--tone-soft); text-decoration: none; }
+.tct-support-help .sh-person:focus-visible,
+.tct-support-help .sh-action:focus-visible {
+  outline: none; box-shadow: 0 0 0 3px var(--tone-soft), 0 0 0 4px var(--tone);
+}
+.tct-support-help .sh-avatar {
+  flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px;
+  border-radius: 50%; font-size: 13px; font-weight: 700; color: #fff; background: var(--tone);
+}
+.tct-support-help .sh-support { margin-bottom: 8px; }
+.tct-support-help .sh-team { margin-bottom: 18px; }
+.tct-support-help .sh-avatar.is-whatsapp { font-size: 20px; background: #25d366; }
+.tct-support-help .sh-person-text { display: flex; flex-direction: column; min-width: 0; flex: 1 1 auto; }
+.tct-support-help .sh-person-name { font-size: 14px; font-weight: 600; color: #1c2b46; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tct-support-help .sh-person-role { font-size: 12px; color: #8094ae; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tct-support-help .sh-email { color: var(--tone-ink); }
+.tct-support-help .sh-person-cta { flex-shrink: 0; font-size: 18px; color: var(--tone-ink); }
+
+/* Chat card. */
+.tct-support-help .sh-points { display: flex; flex-direction: column; gap: 10px; margin: 0 0 18px; padding: 0; list-style: none; }
+.tct-support-help .sh-points li { display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: #526484; }
+.tct-support-help .sh-points .icon { font-size: 16px; color: var(--tone); }
+.tct-support-help .sh-action {
+  align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; padding: 8px 18px;
+  font-weight: 600; color: #fff; background: var(--tone); border: 1px solid var(--tone); border-radius: 10px;
+}
+.tct-support-help .sh-action:hover { color: #fff; filter: brightness(0.95); }
+
+/* States. */
+.tct-support-help .sh-empty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; flex: 1 1 auto;
+  padding: 22px 12px; text-align: center; border: 1px dashed #dbdfea; border-radius: 10px; background: #fafbfd;
+}
+.tct-support-help .sh-empty .icon { font-size: 26px; color: var(--tone); }
+.tct-support-help .sh-empty p { margin: 0; font-size: 13px; color: #6b7a90; }
+.tct-support-help .sh-state { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 14px 0; font-size: 13.5px; color: #6b7a90; }
+.tct-support-help .sh-state.is-error { color: #e85347; }
+.tct-support-help .sh-locked {
+  display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 40px 16px; text-align: center;
+  background: #fff; border: 1px solid #e5e9f2; border-radius: 14px;
+}
+.tct-support-help .sh-locked .icon { font-size: 30px; color: #854fff; }
+.tct-support-help .sh-locked p { margin: 0; max-width: 520px; font-size: 14px; color: #526484; }
+
+@media (max-width: 1199px) {
+  .tct-support-help .sh-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 767px) {
+  .tct-support-help .sh-grid { grid-template-columns: 1fr; }
+  .tct-support-help .sh-card { padding: 16px; }
+}

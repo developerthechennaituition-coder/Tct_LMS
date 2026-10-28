@@ -1,0 +1,188 @@
+/* Attendance List / Completed Class Schedule Report (/lms/completed-class-details). Every rule is under .tct-cal,
+   which the page renders only on that route (the same component embedded elsewhere is not affected). */
+
+.tct-cal .nk-block-head { padding-bottom: 14px; }
+.tct-cal .nk-block-head .nk-block-title { margin: 0; font-size: 1.5rem; font-weight: 700; color: #1c2b46; }
+
+/* ─── Filter panel: one compact auto-fit grid instead of two loosely filled rows ─── */
+.tct-cal .tct-cal-filters {
+  margin-bottom: 16px !important; border: 1px solid #e5e9f2; border-radius: 14px; background: #fff;
+  box-shadow: 0 1px 3px rgba(28, 43, 70, 0.05);
+}
+.tct-cal .tct-cal-filters > .card-inner { padding: 16px 18px; }
+.tct-cal .tct-cal-filters .row {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); align-items: end;
+  gap: 12px 14px; margin: 0 !important;
+}
+.tct-cal .tct-cal-filters .row > [class*="col"] { flex: none; width: auto; max-width: none; padding: 0 !important; margin: 0 !important; }
+.tct-cal .tct-cal-filters .form-group { margin: 0; }
+.tct-cal .tct-cal-filters label {
+  margin-bottom: 6px; font-size: 11.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #6b7a90;
+}
+
+/* Inputs + selects (filters, search, rows per page) */
+.tct-cal .form-control,
+.tct-cal .form-select {
+  height: 40px; padding: 0 12px; border: 1px solid #dbdfea; border-radius: 10px;
+  font-size: 13.5px; color: #1c2b46; background-color: #fff; box-shadow: none;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.tct-cal .form-control::placeholder { color: #98a4b6; }
+.tct-cal .form-control:hover,
+.tct-cal .form-select:hover { border-color: #c5b3ff; }
+.tct-cal .form-control:focus,
+.tct-cal .form-select:focus { border-color: #854fff; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.14); outline: none; }
+.tct-cal select.form-control,
+.tct-cal select.form-select {
+  -webkit-appearance: none; appearance: none; padding-right: 34px; cursor: pointer; text-overflow: ellipsis;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23854fff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 13px center;
+}
+/* Dashlite draws its own arrow on .form-control-select; this page uses the background arrow above. */
+.tct-cal .form-control-select::after { display: none; }
+
+/* Option lists: styled where the browser supports customizable <select> (Chrome / Edge 135+). Same <select>,
+   same options, values and keyboard behaviour; other browsers keep their native list. */
+@supports (appearance: base-select) {
+  .tct-cal select.form-control,
+  .tct-cal select.form-select,
+  .tct-cal select.form-control::picker(select),
+  .tct-cal select.form-select::picker(select) { appearance: base-select; }
+  .tct-cal select.form-control,
+  .tct-cal select.form-select { display: flex; align-items: center; }
+  .tct-cal select.form-control::picker-icon,
+  .tct-cal select.form-select::picker-icon { display: none; }
+  .tct-cal select.form-control:open,
+  .tct-cal select.form-select:open {
+    border-color: #854fff; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.14);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 5l4-4 4 4' fill='none' stroke='%23854fff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  }
+  .tct-cal select.form-control::picker(select),
+  .tct-cal select.form-select::picker(select) {
+    min-width: anchor-size(width); max-height: 320px; margin-top: 6px; padding: 5px; overflow-y: auto;
+    border: 1px solid #e5e9f2; border-radius: 10px; background: #fff; box-shadow: 0 12px 28px rgba(28, 43, 70, 0.16);
+    scrollbar-width: thin; scrollbar-color: #d9cbff transparent;
+  }
+  .tct-cal select.form-control option,
+  .tct-cal select.form-select option {
+    min-height: 34px; padding: 7px 10px; border-radius: 7px; font-size: 13.5px; color: #364a63; cursor: pointer; white-space: normal;
+  }
+  .tct-cal select.form-control option::checkmark,
+  .tct-cal select.form-select option::checkmark { display: none; }
+  .tct-cal select.form-control option:hover,
+  .tct-cal select.form-control option:focus-visible,
+  .tct-cal select.form-select option:hover,
+  .tct-cal select.form-select option:focus-visible { outline: none; background: #f5f1ff; color: #6a35e8; }
+  .tct-cal select.form-control option:checked,
+  .tct-cal select.form-select option:checked { background: #854fff; color: #fff; font-weight: 600; }
+}
+
+/* Reset / View Attendance */
+.tct-cal .tct-cal-filters .btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 40px; border-radius: 10px; font-size: 13.5px; font-weight: 600;
+}
+.tct-cal .tct-cal-filters .btn-light { border: 1px solid #dbdfea; color: #526484; background: #f5f6fa; }
+.tct-cal .tct-cal-filters .btn-light:hover { border-color: #c5b3ff; color: #6a35e8; background: #f5f1ff; }
+.tct-cal .tct-cal-filters .btn .icon { margin: 0 !important; }
+
+/* ─── Search + counts, select-all ─────────────────────────────────────── */
+.tct-cal .tct-cal-toolbar { margin-bottom: 10px !important; }
+.tct-cal .tct-cal-toolbar .form-control {
+  padding-left: 38px;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='%238094ae' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-3.5-3.5'/%3E%3C/svg%3E") no-repeat 13px center;
+}
+.tct-cal .tct-cal-toolbar > .text-muted { font-size: 13px !important; font-weight: 500; color: #6b7a90 !important; }
+.tct-cal .tct-cal-selectall { margin-bottom: 10px !important; }
+.tct-cal .tct-cal-selectall input[type="checkbox"] { accent-color: #854fff; }
+
+/* ─── Table ───────────────────────────────────────────────────────────── */
+.tct-cal .tct-cal-table-wrap {
+  border: 1px solid #e5e9f2; border-radius: 12px; background: #fff; box-shadow: 0 1px 3px rgba(28, 43, 70, 0.05);
+  scrollbar-width: thin; scrollbar-color: #d9cbff transparent;
+}
+.tct-cal .tct-cal-table { margin: 0; border: 0; border-collapse: separate; border-spacing: 0; }
+.tct-cal .tct-cal-table > thead > tr > th {
+  padding: 12px 16px; border: 0; border-bottom: 1px solid #e5e9f2; background: #f5f6fa;
+  font-size: 11.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #6b7a90; white-space: nowrap;
+}
+.tct-cal .tct-cal-table > thead > tr { background: transparent !important; }
+.tct-cal .tct-cal-table > tbody > tr > td { padding: 11px 16px; border: 0; border-bottom: 1px solid #eef0f5; color: #364a63; }
+.tct-cal .tct-cal-table > tbody > tr:last-child > td { border-bottom: 0; }
+/* Group rows: white with a soft lavender hover instead of a solid lavender band */
+.tct-cal .tct-cal-table > tbody > tr[style] { background-color: #fff !important; transition: background-color .15s ease; }
+.tct-cal .tct-cal-table > tbody > tr[style]:hover { background-color: #faf8ff !important; }
+.tct-cal .tct-cal-table > tbody > tr[style] > td:first-child .icon {
+  display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 7px;
+  font-size: 14px; color: #854fff; background: #f1ecff;
+}
+.tct-cal .tct-cal-table > tbody > tr[style] > td:nth-child(2) { color: #1c2b46; }
+.tct-cal .tct-cal-table .badge { padding: 4px 8px; border-radius: 7px; font-weight: 700; }
+
+/* Expanded class table (react-data-table inside the group row): fits the content width, no sideways scroll */
+.tct-cal .tct-cal-table > tbody > tr:not([style]) > td { padding: 0 12px 12px !important; border-bottom: 1px solid #eef0f5; background: #fafbfd !important; }
+.tct-cal .tct-cal-table .tct-cal-detail {
+  border: 1px solid #e5e9f2; border-radius: 10px; background: #fff;
+  scrollbar-width: thin; scrollbar-color: #d9cbff transparent;
+}
+.tct-cal .tct-cal-detail .dataTables_wrapper > .row:empty { display: none; }
+.tct-cal .tct-cal-detail .rdt_Table { background: #fff; }
+.tct-cal .tct-cal-detail .rdt_TableHeadRow { min-height: 40px; background: #f5f6fa; border-bottom: 1px solid #e5e9f2; }
+.tct-cal .tct-cal-detail .rdt_TableCol {
+  padding-left: 10px; padding-right: 10px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #6b7a90;
+}
+.tct-cal .tct-cal-detail .rdt_TableCol > div > div,
+.tct-cal .tct-cal-detail .rdt_TableCol .rdt_TableCol_Sortable > div:first-child { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.3; }
+.tct-cal .tct-cal-detail .__rdt_custom_sort_icon__ { margin-left: 4px; font-size: 11px; color: #b7c2d0; }
+.tct-cal .tct-cal-detail .rdt_TableRow { min-height: 58px; border-bottom: 1px solid #f1f3f8 !important; font-size: 13px; color: #364a63; }
+.tct-cal .tct-cal-detail .rdt_TableRow:last-child { border-bottom: 0 !important; }
+.tct-cal .tct-cal-detail .rdt_TableRow:hover { background: #faf9ff; }
+.tct-cal .tct-cal-detail .rdt_TableCell { padding: 8px 10px; line-height: 1.4; overflow-wrap: anywhere; }
+.tct-cal .tct-cal-detail .rdt_TableCell .tb-status { font-size: 12.5px; font-weight: 600; }
+.tct-cal .tct-cal-detail .rdt_TableCell input[type="checkbox"] { accent-color: #854fff; }
+/* Actions: one aligned group; wraps onto a second line instead of being clipped (Accounts view) */
+.tct-cal .tct-cal-detail .rdt_TableCell:last-child > .d-flex { flex-wrap: wrap !important; justify-content: flex-end; gap: 6px !important; }
+.tct-cal .tct-cal-detail .rdt_TableCell .btn-sm { height: 30px; padding: 0 10px; font-size: 12px; }
+.tct-cal .tct-cal-detail .rdt_Pagination { min-height: 46px; border-top: 1px solid #eef0f5; font-size: 12.5px; }
+
+/* Row actions */
+.tct-cal .tct-cal-table .btn-sm {
+  display: inline-flex; align-items: center; gap: 4px; height: 32px; padding: 0 12px; border-radius: 8px;
+  font-size: 12.5px; font-weight: 600; box-shadow: none;
+}
+.tct-cal .tct-cal-table .btn-sm .icon { margin: 0 !important; font-size: 14px; }
+.tct-cal .tct-cal-table .btn-warning { border-color: #f4bd0e; background: #f4bd0e; }
+.tct-cal .tct-cal-table .btn-warning:disabled { opacity: 1; border-color: #f7e2a6; background: #fdf3d6; color: #b28a1d !important; }
+.tct-cal .tct-cal-table .btn-success { border-color: #1ee0ac; background: #1ee0ac; }
+
+/* ─── Pager: pages left · range centre · Rows per page right ─────────── */
+.tct-cal .tct-cal-pager {
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px 16px; margin-top: 12px;
+}
+.tct-cal .tct-cal-pager-nav { justify-self: start; display: flex; flex-wrap: wrap; gap: 4px; }
+.tct-cal .tct-cal-pager-nav .btn {
+  min-width: 34px; height: 34px; padding: 0 12px; justify-content: center; border: 1px solid #e5e9f2; border-radius: 9px;
+  font-size: 13px; font-weight: 600; color: #526484; background: #fff; box-shadow: none;
+}
+.tct-cal .tct-cal-pager-nav .btn:hover:not(:disabled) { color: #6a35e8; background: #f5f1ff; border-color: #d9cbff; }
+.tct-cal .tct-cal-pager-nav .btn-primary { color: #fff; background: #854fff; border-color: #854fff; }
+.tct-cal .tct-cal-pager-nav .btn-primary:hover:not(:disabled) { color: #fff; background: #6a35e8; border-color: #6a35e8; }
+.tct-cal .tct-cal-pager-nav .btn:disabled { color: #c1c9d6; background: #fafbfd; opacity: 1; }
+.tct-cal .tct-cal-pager-range {
+  justify-self: center; font-size: 13.5px !important; font-weight: 600; color: #526484 !important; white-space: nowrap; font-variant-numeric: tabular-nums;
+}
+.tct-cal .tct-cal-pager-size { justify-self: end; display: flex; align-items: center; gap: 10px; }
+.tct-cal .tct-cal-pager-size label { margin: 0; font-size: 13px; font-weight: 500; color: #6b7a90; white-space: nowrap; }
+.tct-cal .tct-cal-pager-size select.form-control { width: 80px; height: 34px; font-weight: 600; }
+
+/* ─── Responsive ──────────────────────────────────────────────────────── */
+@media (max-width: 767.98px) {
+  .tct-cal .tct-cal-filters > .card-inner { padding: 14px; }
+  .tct-cal .tct-cal-filters .row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tct-cal .tct-cal-toolbar .form-control { max-width: none !important; }
+  .tct-cal .tct-cal-pager { grid-template-columns: 1fr auto; }
+  .tct-cal .tct-cal-pager-nav { grid-column: 1 / -1; }
+  .tct-cal .tct-cal-pager-range { justify-self: start; }
+}
+@media (max-width: 420px) {
+  .tct-cal .tct-cal-filters .row { grid-template-columns: minmax(0, 1fr); }
+}

@@ -1,0 +1,4 @@
+.dashboard-date-range .react-datepicker-wrapper { width: 145px; }
+.dashboard-date-popper { z-index: 1050 !important; }
+.dashboard-calendar-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 8px; }
+.dashboard-calendar-header button { font-size: 22px; line-height: 1; padding: 4px 10px; }

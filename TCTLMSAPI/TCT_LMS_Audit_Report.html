@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TCT LMS — Code Quality, Security & Standards Audit Report</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; color: #1a1a1a; background: #fff; line-height: 1.5; }
+  @media print {
+    .no-print { display: none; }
+    .page-break { page-break-before: always; }
+    body { font-size: 11px; }
+    h1 { font-size: 20px; }
+    h2 { font-size: 15px; }
+    h3 { font-size: 13px; }
+  }
+  .cover { background: linear-gradient(135deg, #1a237e 0%, #283593 60%, #3949ab 100%); color: white; padding: 60px 50px; min-height: 300px; }
+  .cover h1 { font-size: 28px; font-weight: 700; margin-bottom: 10px; }
+  .cover .subtitle { font-size: 15px; opacity: 0.85; margin-bottom: 30px; }
+  .cover .meta { display: flex; gap: 40px; flex-wrap: wrap; margin-top: 30px; }
+  .cover .meta-item { }
+  .cover .meta-item .label { font-size: 10px; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px; }
+  .cover .meta-item .value { font-size: 14px; font-weight: 600; }
+  .stat-bar { background: #f8f9fa; border-bottom: 2px solid #e0e0e0; padding: 20px 50px; display: flex; gap: 30px; flex-wrap: wrap; }
+  .stat { text-align: center; min-width: 100px; }
+  .stat .num { font-size: 32px; font-weight: 700; }
+  .stat .lbl { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat.critical .num { color: #b71c1c; }
+  .stat.high .num { color: #e65100; }
+  .stat.medium .num { color: #f57f17; }
+  .stat.low .num { color: #1b5e20; }
+  .stat.total .num { color: #1a237e; }
+  .content { padding: 30px 50px; }
+  h2 { font-size: 18px; color: #1a237e; border-bottom: 2px solid #3949ab; padding-bottom: 8px; margin: 30px 0 15px; }
+  h3 { font-size: 14px; color: #283593; margin: 20px 0 8px; }
+  h4 { font-size: 12px; color: #333; margin: 12px 0 4px; }
+  .toc { background: #f5f5f5; border-left: 4px solid #3949ab; padding: 15px 20px; margin-bottom: 20px; }
+  .toc ol { padding-left: 20px; }
+  .toc li { margin: 4px 0; color: #1a237e; }
+  .finding { border: 1px solid #e0e0e0; border-radius: 6px; margin: 12px 0; overflow: hidden; }
+  .finding-header { display: flex; gap: 10px; align-items: center; padding: 8px 12px; flex-wrap: wrap; }
+  .finding-body { padding: 10px 12px; background: #fafafa; border-top: 1px solid #e0e0e0; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+  .badge.critical { background: #ffebee; color: #b71c1c; border: 1px solid #ef9a9a; }
+  .badge.high { background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }
+  .badge.medium { background: #fffde7; color: #f57f17; border: 1px solid #fff176; }
+  .badge.low { background: #e8f5e9; color: #1b5e20; border: 1px solid #a5d6a7; }
+  .badge.security { background: #fce4ec; color: #880e4f; border: 1px solid #f48fb1; }
+  .badge.performance { background: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9; }
+  .badge.standards { background: #f3e5f5; color: #4a148c; border: 1px solid #ce93d8; }
+  .badge.bestpractice { background: #e0f2f1; color: #004d40; border: 1px solid #80cbc4; }
+  .badge.review { background: #fbe9e7; color: #bf360c; border: 1px solid #ffab91; }
+  .badge.safe { background: #e8f5e9; color: #1b5e20; border: 1px solid #a5d6a7; }
+  .badge.medium-risk { background: #fffde7; color: #f57f17; border: 1px solid #fff176; }
+  .badge.high-risk { background: #ffebee; color: #b71c1c; border: 1px solid #ef9a9a; }
+  .finding-title { font-weight: 600; font-size: 12px; flex: 1; }
+  .file-ref { font-family: 'Consolas', monospace; font-size: 11px; color: #555; background: #eeeeee; padding: 1px 6px; border-radius: 3px; }
+  code { font-family: 'Consolas', monospace; font-size: 11px; background: #f5f5f5; padding: 1px 4px; border-radius: 3px; }
+  pre { font-family: 'Consolas', monospace; font-size: 10px; background: #1e1e1e; color: #d4d4d4; padding: 12px; border-radius: 4px; overflow-x: auto; margin: 8px 0; white-space: pre-wrap; word-break: break-all; }
+  pre .removed { color: #f44747; }
+  pre .added { color: #4ec9b0; }
+  .issue-label { font-weight: 700; color: #333; font-size: 11px; min-width: 100px; display: inline-block; }
+  .row { margin: 4px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 11px; }
+  th { background: #3949ab; color: white; padding: 6px 10px; text-align: left; }
+  td { padding: 5px 10px; border-bottom: 1px solid #e0e0e0; vertical-align: top; }
+  tr:nth-child(even) td { background: #f5f5f5; }
+  .phase-box { border: 2px solid; border-radius: 6px; padding: 15px; margin: 10px 0; }
+  .phase-box.critical { border-color: #b71c1c; background: #ffebee; }
+  .phase-box.high { border-color: #e65100; background: #fff3e0; }
+  .phase-box.medium { border-color: #f57f17; background: #fffde7; }
+  .phase-box h3 { margin-top: 0; }
+  ul { padding-left: 20px; }
+  li { margin: 3px 0; }
+  .no-print { position: fixed; top: 20px; right: 20px; background: #3949ab; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+  .no-print:hover { background: #1a237e; }
+  .section-intro { color: #444; margin-bottom: 15px; line-height: 1.6; }
+  .divider { border: none; border-top: 1px solid #e0e0e0; margin: 20px 0; }
+  .footer { background: #f5f5f5; border-top: 2px solid #e0e0e0; padding: 15px 50px; font-size: 11px; color: #666; margin-top: 40px; }
+  .risk-table td:nth-child(3) { font-family: monospace; font-size: 10px; }
+</style>
+</head>
+<body>
+
+<button class="no-print" onclick="window.print()">Print / Save as PDF</button>
+
+<!-- COVER -->
+<div class="cover">
+  <h1>TCT LMS — Comprehensive Code Audit Report</h1>
+  <div class="subtitle">Code Quality · Security · Performance · Standards · Best Practices</div>
+  <div class="meta">
+    <div class="meta-item"><div class="label">Date</div><div class="value">June 17, 2026</div></div>
+    <div class="meta-item"><div class="label">Audited By</div><div class="value">Claude Code (AI Audit)</div></div>
+    <div class="meta-item"><div class="label">Project</div><div class="value">TCT LMS — API + React UI</div></div>
+    <div class="meta-item"><div class="label">Branch</div><div class="value">master</div></div>
+    <div class="meta-item"><div class="label">Stack</div><div class="value">.NET 8 Clean Architecture + React 17</div></div>
+    <div class="meta-item"><div class="label">Total Findings</div><div class="value">141</div></div>
+  </div>
+</div>
+
+<!-- STAT BAR -->
+<div class="stat-bar">
+  <div class="stat total"><div class="num">141</div><div class="lbl">Total Findings</div></div>
+  <div class="stat critical"><div class="num">9</div><div class="lbl">Critical</div></div>
+  <div class="stat high"><div class="num">59</div><div class="lbl">High</div></div>
+  <div class="stat medium"><div class="num">48</div><div class="lbl">Medium</div></div>
+  <div class="stat low"><div class="num">25</div><div class="lbl">Low</div></div>
+</div>
+
+<div class="content">
+
+<!-- TOC -->
+<h2>Table of Contents</h2>
+<div class="toc">
+  <ol>
+    <li>Executive Summary</li>
+    <li>Critical Findings (9) — Act Today</li>
+    <li>High Severity Findings (59) — This Sprint</li>
+    <li>Medium Severity Findings (48) — Next Sprint</li>
+    <li>Low Severity Findings (25) — Backlog</li>
+    <li>Finding Distribution by Category</li>
+    <li>Remediation Roadmap (Phases 1–3)</li>
+    <li>Regression Testing Checklist</li>
+    <li>Risk Classification Matrix</li>
+    <li>Dependency Map</li>
+  </ol>
+</div>
+
+<!-- SECTION 1: EXECUTIVE SUMMARY -->
+<h2>1. Executive Summary</h2>
+<p class="section-intro">
+  This audit covered the full TCT LMS stack: a .NET 8 Clean Architecture API (7 projects) and a React 17 SPA.
+  Five parallel audit dimensions were run: Security, Performance, Coding Standards, Best Practices, and Code Review.
+  141 findings were identified. The most urgent issues involve <strong>live credentials committed to source control</strong>,
+  a <strong>broken authorization middleware</strong> that silently passes all policy checks, and multiple <strong>unauthenticated financial endpoints</strong>.
+  These three issues alone constitute a complete security perimeter failure and must be addressed before the next deployment.
+</p>
+
+<table>
+  <tr><th>Category</th><th>Critical</th><th>High</th><th>Medium</th><th>Low</th><th>Total</th></tr>
+  <tr><td>Security</td><td>6</td><td>9</td><td>5</td><td>3</td><td>23</td></tr>
+  <tr><td>Performance</td><td>0</td><td>15</td><td>6</td><td>2</td><td>23</td></tr>
+  <tr><td>Coding Standards</td><td>1</td><td>18</td><td>22</td><td>9</td><td>50</td></tr>
+  <tr><td>Best Practices</td><td>1</td><td>9</td><td>8</td><td>5</td><td>23</td></tr>
+  <tr><td>Code Review</td><td>1</td><td>8</td><td>7</td><td>6</td><td>22</td></tr>
+  <tr><td><strong>Total</strong></td><td><strong>9</strong></td><td><strong>59</strong></td><td><strong>48</strong></td><td><strong>25</strong></td><td><strong>141</strong></td></tr>
+</table>
+
+<hr class="divider">
+
+<!-- SECTION 2: CRITICAL FINDINGS -->
+<div class="page-break"></div>
+<h2>2. Critical Findings — Act Today (9)</h2>
+
+<!-- C-01 -->
+<div class="finding">
+  <div class="finding-header" style="background:#ffebee;">
+    <span class="badge critical">Critical</span>
+    <span class="badge security">Security</span>
+    <span class="finding-title">C-01 · Live Credentials in Source Control</span>
+    <span class="file-ref">appsettings.json</span>
+    <span class="badge high-risk">High Risk</span>
+  </div>
+  <div class="finding-body">
+    <div class="row"><span class="issue-label">ISSUE:</span> Live Stripe secret key, SQL Server password, Gmail SMTP app password, and production server IP are all committed in plaintext to <code>appsettings.json</code>. These are in git history and must be considered compromised immediately.</div>
+    <div class="row" style="margin-top:8px;"><span class="issue-label">CREDENTIALS:</span></div>
+    <ul>
+      <li>Stripe live key: <code>sk_live_51QVtxUP2...</code> (line 7)</li>
+      <li>SQL Server password: <code>tH3Ch3nn@!tUT!0n@214365879</code> (line 3)</li>
+      <li>Gmail SMTP password: <code>ufbhpumxfoyfcbjx</code> for <code>manikandan14@gmail.com</code> (lines 24–25)</li>
+      <li>Production server IP: <code>103.101.58.238</code> (line 40, commented block)</li>
+      <li>Two conflicting JWT signing keys using human-readable passphrases (lines 12 and 43)</li>
+    </ul>
+    <div class="row" style="margin-top:8px;"><span class="issue-label">FIX:</span></div>
+    <pre><span class="removed">// BEFORE — never do this
+"ConnectionStrings": {
+  "DefaultConnection": "Server=...;Password=tH3Ch3nn@!tUT!0n@214365879;..."
+},
+"Stripe": { "SecretKey": "sk_live_51QVtxUP2..." }</span>
+
+<span class="added">// AFTER — use environment variables or Azure Key Vault
+"ConnectionStrings": {
+  "DefaultConnection": "Server=...;Password=#{DB_PASSWORD}#;..."
+},
+"Stripe": { "SecretKey": "" }  // loaded from env var STRIPE__SECRETKEY</span>
+
+// In Program.cs — add:
+builder.Configuration.AddEnvironmentVariables();</pre>
+    <div class="row"><span class="issue-label">ACTIONS:</span> (1) Rotate Stripe key NOW in Stripe dashboard. (2) Change SQL Server password. (3) Revoke Gmail app password. (4) Add <code>appsettings.json</code> to <code>.gitignore</code> or strip secrets before committing. (5) Use <code>dotnet user-secrets</code> locally and env vars / Key Vault in production.</div>
+    <div class="row" style="margin-top:6px;"><span class="issue-label">EFFORT:</span> Credential rotation: 30 min | Code change: 15 min</div>
+  </div>
+</div>
+
+<!-- C-02 -->
+<div class="finding">
+  <div class="finding-header" style="background:#ffebee;">
+    <span class="badge critical">Critical</span>
+    <span class="badge security">Security</span>
+    <span class="finding-title">C-02 · CheckPolicyAttribute — Authorization is Security Theater</span>
+    <span class="file-ref">TCT.LMS.API/Authentication/CheckPolicyAttribute.cs:13–25</span>
+    <span class="badge high-risk">High Risk</span>
+  </div>
+  <div class="finding-body">
+    <div class="row"><span class="issue-label">ISSUE:</span> The attribute retrieves the policy object, checks if it is non-null, then immediately calls <code>next()</code> without ever evaluating whether the authenticated user satisfies the policy. Every <code>[CheckPolicy]</code> decoration in the codebase provides zero enforcement.</div>
+    <pre><span class="removed">// BEFORE — broken: user is never evaluated against policy
+var policy = await _policyProvider.GetPolicyAsync(Policy);
+if (policy != null)
+{
+    await next(context);  // ← passes regardless of user claims!
+}</span>
+
+<span class="added">// AFTER — correct
+var policy = await _policyProvider.GetPolicyAsync(Policy);
+if (policy == null)
+{
+    context.Result = new ForbidResult();
+    return;
+}
+var authService = context.HttpContext.RequestServices
+    .GetRequiredService&lt;IAuthorizationService&gt;();
+var result = await authService.AuthorizeAsync(
+    context.HttpContext.User, null, policy);
+if (!result.Succeeded)
+{
+    context.Result = new ForbidResult();
+    return;
+}
+await next(context);</span></pre>
+    <div class="row"><span class="issue-label">TESTS TO VERIFY:</span> Log in as a low-privilege user and attempt an endpoint decorated with a high-privilege policy — it must now return 403.</div>
+    <div class="row" style="margin-top:6px;"><span class="issue-label">EFFORT:</span> 10 min</div>
+  </div>
+</div>
+
+<!-- C-03 -->
+<div class="finding">
+  <div class="finding-header" style="background:#ffebee;">
+    <span class="badge critical">Critical</span>
+    <span class="badge security">Security</span>
+    <span class="finding-title">C-03 · [Authorize] Commented Out on BaseAPIController and All Major Controllers</span>
+    <span class="file-ref">BaseAPIController.cs:8 | SalesController.cs:15 | StudentController.cs:20 | NotificationController.cs:6</span>
+    <span class="badge high-risk">High Risk</span>
+  </div>
+  <div class="finding-body">
+    <div class="row"><span class="issue-label">ISSUE:</span> The <code>[Authorize]</code> attribute on the base controller is commented out. Because individual controllers do not re-declare it, every CRUD endpoint across Students, Sales, Notifications, and Schedules is unauthenticated — any anonymous caller can read and modify all data.</div>
+    <pre><span class="removed">// BEFORE
+// [Authorize]
+[ApiController]
+[Route("api/[controller]")]
+public class BaseAPIController : ControllerBase { }</span>
+
+<span class="added">// AFTER
+[Authorize]
+[ApiController]
+[Route("api/[controller]")]
+public class BaseAPIController : ControllerBase { }</span></pre>
+    <div class="row"><span class="issue-label">DEPENDENCY:</span> Fix C-02 (CheckPolicyAttribute) FIRST, then restore <code>[Authorize]</code>. Restoring auth without fixing C-02 means policies still don't enforce — but the JWT token requirement will at least be checked.</div>
+    <div class="row" style="margin-top:6px;"><span class="issue-label">EFFORT:</span> 2 min (remove comment) | Testing: full regression suite</div>
+  </div>
+</div>
+
+<!-- C-04 -->
+<div class="finding">
+  <div class="finding-header" style="background:#ffebee;">
+    <span class="badge critical">Critical</span>
+    <span class="badge security">Security</span>
+    <span class="finding-title">C-04 · CompleteStudentLogin — JWT Issued Without Prior Auth</span>
+    <span class="file-ref">TCT.LMS.Application/Services/AuthService.cs:155–169</span>
+    <span class="badge high-risk">High Risk</span>
+  </div>
+  <div class="finding-body">
+    <div class="row"><span class="issue-label">ISSUE:</span> <code>CompleteStudentLogin</code> accepts an arbitrary <code>UserId</code> from the request body and issues a full JWT for that user without verifying any prior authentication step. Any caller who knows (or guesses) a UserId can obtain a valid token.</div>
+    <pre><span class="removed">// BEFORE — auth bypass
+public async Task&lt;TokenResponse&gt; CompleteStudentLogin(Guid userId)
+{
+    var user = await _authRepo.GetUserById(userId);
+    return await GenerateToken(user);  // no prior auth check
+}</span>
+
+<span class="added">// AFTER — require a short-lived pre-auth token issued at step 1
+public async Task&lt;TokenResponse&gt; CompleteStudentLogin(
+    Guid userId, string preAuthToken)
+{
+    var valid = await _authRepo.ValidatePreAuthToken(userId, preAuthToken);
+    if (!valid) throw new UnauthorizedAccessException();
+    var user = await _authRepo.GetUserById(userId);
+    return await GenerateToken(user);
+}</span></pre>
+    <div class="row"><span class="issue-label">EFFORT:</span> 45 min (requires pre-auth token storage)</div>
+  </div>
+</div>
+
+<!-- C-05 -->
+<div class="finding">
+  <div class="finding-header" style="background:#ffebee;">
+    <span class="badge critical">Critical</span>
+    <span class="badge security">Security</span>
+    <span class="finding-title">C-05 · ChangePassword — No Reset Token, AllowAnonymous</span>
+    <span class="file-ref">AuthController.cs:151 | AuthService.cs:272–296</span>
+    <span class="badge high-risk">High Risk</span>
+  </div>
+  <div class="finding-body">
+    <div class="row"><span class="issue-label">ISSUE:</span> <code>ChangePassword</code> is <code>[AllowAnonymous]</code> and accepts a <code>UserId</code> from the request body with no reset token validation. Any caller who knows a UserId can change that user's password.</div>
+    <pre><span class="removed">// BEFORE
+[AllowAnonymous]
+[HttpPost("ChangePassword")]
+public async Task&lt;IActionResult&gt; ChangePassword([FromBody] ChangePasswordDto dto)
+// dto only contains UserId + NewPassword — no token</span>
+
+<span class="added">// AFTER
+[HttpPost("ChangePassword")]  // remove [AllowAnonymous] — requires JWT
+public async Task&lt;IActionResult&gt; ChangePassword([FromBody] ChangePasswordDto dto)
+// dto must include: CurrentPassword (for authenticated change)
+//   OR: ResetToken (for forgot-password flow, validated server-side)</span></pre>
+    <div class="row"><span class="issue-label">EFFORT:</span> 60 min (two flows: authenticated change + reset token flow)</div>
+  </div>
+</div>
+
+<!-- C-06 -->
+<div class="finding">
+  <div class="finding-header" style="background:#ffebee;">
+    <span class="badge critical">Critical</span>
+    <span class="badge security">Security</span>
+    <span class="finding-title">C-06 · GetContactsByUserId — Hardcoded GUID Ignores userId Parameter</span>
+    <span class="file-ref">TCT.LMS.Infrastructure/Repositories/StudentRepository.cs:526–554</span>
+    <span class="badge high-risk">High Risk</span>
+  </div>
+  <div class="finding-body">
+    <div class="row"><span class="issue-label">ISSUE:</span> Both UNION branches in <code>GetContactsByUserId</code> hardcode the GUID <code>"739d6e89-3e99-44bc-4c6f-08dd1f6eefe6"</code>, completely ignoring the <code>userId</code> parameter. Every user in the system sees the same person's contact list — a data privacy breach affecting all users.</div>
+    <pre><span class="removed">// BEFORE — both branches use hardcoded GUID
+.Where(s =&gt; s.StudentId == Guid.Parse("739d6e89-3e99-44bc-4c6f-08dd1f6eefe6"))
+// ...UNION...
+.Where(t =&gt; t.TutorId == Guid.Parse("739d6e89-3e99-44bc-4c6f-08dd1f6eefe6"))</span>
+
+<span class="added">// AFTER — use the actual parameter
+.Where(s =&gt; s.StudentId == userId)
+// ...UNION...
+.Where(t =&gt; t.TutorId == userId)</span></pre>
+    <div class="row"><span class="issue-label">EFFORT:</span> 5 min</div>
+  </div>
+</div>
+
+<!-- C-07 -->
+<div class="finding">
+  <div class="finding-header" style="background:#ffebee;">
+    <span class="badge critical">Critical</span>
+    <span class="badge security">Security</span>
+    <span class="finding-title">C-07 · ConfirmEmail Uses Email as Verification Token</span>
+    <span class="file-ref">TCT.LMS.API/Controllers/AuthController.cs:123</span>
+    <span class="badge high-risk">High Risk</span>
+  </div>
+  <div class="finding-body">
+    <div class="row"><span class="issue-label">ISSUE:</span> The email confirmation endpoint uses the user's email address as the verification token. Since email addresses are not secret, any caller can confirm any account by passing the target email.</div>
+    <pre><span class="removed">// BEFORE
+[HttpGet("ConfirmEmail")]
+public async Task&lt;IActionResult&gt; ConfirmEmail(string email)
+// email is both the identifier AND the "token"</span>
+
+<span class="added">// AFTER — use ASP.NET Identity token or a server-generated GUID
+[HttpGet("ConfirmEmail")]
+public async Task&lt;IActionResult&gt; ConfirmEmail(string email, string token)
+{
+    var result = await _userManager.ConfirmEmailAsync(user, token);
+    // token was generated by UserManager.GenerateEmailConfirmationTokenAsync
+    // and sent in the confirmation link — never guessable
+}</span></pre>
+    <div class="row"><span class="issue-label">EFFORT:</span> 30 min</div>
+  </div>
+</div>
+
+<!-- C-08 -->
+<div class="finding">
+  <div class="finding-header" style="background:#ffebee;">
+    <span class="badge critical">Critical</span>
+    <span class="badge review">Code Review</span>
+    <span class="finding-title">C-08 · TutorStudentAllocationRepository — Throws NotImplementedException AFTER Saving</span>
+    <span class="file-ref">TCT.LMS.Infrastructure/Repositories/TutorStudentAllocationRepository.cs:82</span>
+    <span class="badge high-risk">High Risk</span>
+  </div>
+  <div class="finding-body">
+    <div class="row"><span class="issue-label">ISSUE:</span> <code>UpdateTutorAssignmentAsync</code> saves changes to the database and then immediately throws <code>NotImplementedException</code>. The operation always appears to fail to the caller, but the data has already been written — leaving the DB in a partially updated state with no way to detect it from the API response.</div>
+    <pre><span class="removed">// BEFORE — data written, then exception thrown
+await _dbContext.SaveChangesAsync();
+throw new NotImplementedException();  // ← always throws!</span>
+
+<span class="added">// AFTER — implement the method or revert cleanly
+// Option A: Implement properly and return result
+await _dbContext.SaveChangesAsync();
+return true;
+
+// Option B: If not ready, throw BEFORE touching the DB
+throw new NotImplementedException("UpdateTutorAssignment not yet implemented");</span></pre>
+    <div class="row"><span class="issue-label">EFFORT:</span> 15 min</div>
+  </div>
+</div>
+
+<!-- C-09 -->
+<div class="finding">
+  <div class="finding-header" style="background:#ffebee;">
+    <span class="badge critical">Critical</span>
+    <span class="badge standards">Standards</span>
+    <span class="finding-title">C-09 · ScheduleRepository — Date Loop Bug (Same Object Reused + EndDate = StartDate)</span>
+    <span class="file-ref">TCT.LMS.Infrastructure/Repositories/ScheduleRepository.cs:605–646</span>
+    <span class="badge high-risk">High Risk</span>
+  </div>
+  <div class="finding-body">
+    <div class="row"><span class="issue-label">ISSUE:</span> In <code>AddSchedule</code>, the same <code>ScheduleDetails</code> object instance is reused inside a <code>foreach</code> loop — EF Core tracks the same object for all iterations, resulting in duplicate/overwritten schedule entries. Additionally, <code>EndDate</code> is set from <code>StartDate</code> instead of <code>EndDate</code>, so every class has zero duration.</div>
+    <pre><span class="removed">// BEFORE — object reused + wrong field
+var scheduleDetails = new ScheduleDetails();
+foreach (var date in dates)
+{
+    scheduleDetails.StartDate = ConvertTimeFromUtc(scheduleDto.StartDate.Value, tz);
+    scheduleDetails.EndDate = ConvertTimeFromUtc(scheduleDto.StartDate.Value, tz); // ← bug
+    _dbContext.ScheduleDetails.Add(scheduleDetails);  // same ref each loop!
+}</span>
+
+<span class="added">// AFTER — new object per iteration, correct field
+foreach (var date in dates)
+{
+    var scheduleDetails = new ScheduleDetails  // ← new instance
+    {
+        StartDate = ConvertTimeFromUtc(scheduleDto.StartDate.Value, tz),
+        EndDate = ConvertTimeFromUtc(scheduleDto.EndDate.Value, tz),  // ← correct field
+        ScheduleId = schedule.Id,
+        // ... other properties
+    };
+    _dbContext.ScheduleDetails.Add(scheduleDetails);
+}</span></pre>
+    <div class="row"><span class="issue-label">EFFORT:</span> 10 min | All existing schedule data may need backfill verification</div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- SECTION 3: HIGH FINDINGS -->
+<div class="page-break"></div>
+<h2>3. High Severity Findings — This Sprint (59)</h2>
+<p class="section-intro">The 59 high-severity findings are grouped by file/subsystem below. Full code examples are provided for the most impactful ones.</p>
+
+<h3>3.1 Security — High (9 findings)</h3>
+
+<div class="finding">
+  <div class="finding-header" style="background:#fff3e0;">
+    <span class="badge high">High</span><span class="badge security">Security</span>
+    <span class="finding-title">H-SEC-01 · GetUserClaims IDOR — Accepts Arbitrary userId Query Param</span>
+    <span class="file-ref">AuthController.cs:74</span>
+    <span class="badge high-risk">High Risk</span>
+  </div>
+  <div class="finding-body">
+    <div class="row"><span class="issue-label">ISSUE:</span> Any authenticated user can pass any <code>userId</code> to retrieve another user's claims/roles.</div>
+    <pre><span class="removed">// BEFORE
+public async Task&lt;IActionResult&gt; GetUserClaims(string userId)</span>
+<span class="added">// AFTER — read from the authenticated user's token only
+var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);</span></pre>
+    <div class="row"><span class="issue-label">EFFORT:</span> 5 min</div>
+  </div>
+</div>
+
+<div class="finding">
+  <div class="finding-header" style="background:#fff3e0;">
+    <span class="badge high">High</span><span class="badge security">Security</span>
+    <span class="finding-title">H-SEC-02 · ForgotPassword Reveals Whether Email Exists (User Enumeration)</span>
+    <span class="file-ref">AuthController.cs:137</span>
+    <span class="badge medium-risk">Medium Risk</span>
+  </div>
+  <div class="finding-body">
+    <div class="row"><span class="issue-label">ISSUE:</span> Returns a different response when the email is not found — attackers can enumerate registered users.</div>
+    <pre><span class="removed">if (user == null) return NotFound("Email not registered");</span>
+<span class="added">if (user == null) return Ok("If this email is registered, a reset link has been sent.");</span></pre>
+    <div class="row"><span class="issue-label">EFFORT:</span> 5 min</div>
+  </div>
+</div>
+
+<div class="finding">
+  <div class="finding-header" style="background:#fff3e0;">
+    <span class="badge high">High</span><span class="badge security">Security</span>
+    <span class="finding-title">H-SEC-03 · UpdateStudent is [AllowAnonymous] — Any Caller Can Modify Any Student</span>
+    <span class="file-ref">StudentController.cs:212</span>
+    <span class="badge high-risk">High Risk</span>
+  </div>
+  <div class="finding-body">
+    <div class="row"><span class="issue-label">ISSUE:</span> <code>[AllowAnonymous]</code> on a write endpoint means unauthenticated modification of student records.</div>
+    <pre><span class="removed">[AllowAnonymous]
+[HttpPost("UpdateStudent")]</span>
+<span class="added">[Authorize]
+[HttpPost("UpdateStudent")]  // also add ownership check: user can only edit their own record</span></pre>
+    <div class="row"><span class="issue-label">EFFORT:</span> 10 min</div>
+  </div>
+</div>
+
+<div class="finding">
+  <div class="finding-header" style="background:#fff3e0;">
+    <span class="badge high">High</span><span class="badge security">Security</span>
+    <span class="finding-title">H-SEC-04 · JWT Tokens Never Expire</span>
+    <span class="file-ref">AuthenticationExtensions.cs:25</span>
+    <span class="badge high-risk">High Risk</span>
+  </div>
+  <div class="finding-body">
+    <div class="row"><span class="issue-label">ISSUE:</span> <code>RequireExpirationTime = false</code> means stolen tokens are valid forever.</div>
+    <pre><span class="removed">RequireExpirationTime = false,</span>
+<span class="added">RequireExpirationTime = true,
+ClockSkew = TimeSpan.FromMinutes(1),</span></pre>
+    <div class="row"><span class="issue-label">EFFORT:</span> 5 min | Ensure token generation sets <code>expires</code> claim (15–60 min access token)</div>
+  </div>
+</div>
+
+<div class="finding">
+  <div class="finding-header" style="background:#fff3e0;">
+    <span class="badge high">High</span><span class="badge security">Security</span>
+    <span class="finding-title">H-SEC-05 · PBKDF2 Only 1,000 Iterations (NIST Recommends 310,000)</span>
+    <span class="file-ref">TCT.LMS.Application/CryptographyHelper.cs:16–18</span>
+    <span class="badge medium-risk">Medium Risk</span>
+  </div>
+  <div class="finding-body">
+    <pre><span class="removed">using var deriveBytes = new Rfc2898DeriveBytes(password, saltBytes, 1000);</span>
+<span class="added">using var deriveBytes = new Rfc2898DeriveBytes(password, saltBytes, 310_000, HashAlgorithmName.SHA256);</span></pre>
+    <div class="row"><span class="issue-label">NOTE:</span> Existing password hashes will not match the new iteration count — requires a hash migration strategy (re-hash on next login).</div>
+    <div class="row"><span class="issue-label">EFFORT:</span> 20 min (code) + migration plan</div>
+  </div>
+</div>
+
+<div class="finding">
+  <div class="finding-header" style="background:#fff3e0;">
+    <span class="badge high">High</span><span class="badge security">Security</span>
+    <span class="finding-title">H-SEC-06 · Hardcoded AES Key in CryptographyHelper</span>
+    <span class="file-ref">TCT.LMS.Application/CryptographyHelper.cs:7</span>
+    <span class="badge high-risk">High Risk</span>
+  </div>
+  <div class="finding-body">
+    <pre><span class="removed">private const string AesKey = "c0d23115-0e42-4c30-9e23-4dca3439834c";</span>
+<span class="added">private readonly string _aesKey;
+// Inject via IConfiguration: _aesKey = config["Cryptography:AesKey"];
+// Store in Key Vault / env var, not source code</span></pre>
+    <div class="row"><span class="issue-label">EFFORT:</span> 15 min</div>
+  </div>
+</div>
+
+<div class="finding">
+  <div class="finding-header" style="background:#fff3e0;">
+    <span class="badge high">High</span><span class="badge security">Security</span>
+    <span class="finding-title">H-SEC-07 · DeleteMessage and DeleteGroup are [AllowAnonymous]</span>
+    <span class="file-ref">ChatController.cs:172, 199</span>
+    <span class="badge high-risk">High Risk</span>
+  </div>
+  <div class="finding-body">
+    <div class="row">Any caller can delete any message or group. Remove <code>[AllowAnonymous]</code> and add ownership verification before deletion.</div>
+    <div class="row"><span class="issue-label">EFFORT:</span> 10 min</div>
+  </div>
+</div>
+
+<div class="finding">
+  <div class="finding-header" style="background:#fff3e0;">
+    <span class="badge high">High</span><span class="badge security">Security</span>
+    <span class="finding-title">H-SEC-08 · getgroupmembers Exposes Full User Directory Anonymously</span>
+    <span class="file-ref">ChatController.cs:1392</span>
+    <span class="badge high-risk">High Risk</span>
+  </div>
+  <div class="finding-body">
+    <div class="row">The endpoint returns all users in the system to unauthenticated callers. Requires <code>[Authorize]</code> and filtering to only members visible to the requesting user.</div>
+    <div class="row"><span class="issue-label">EFFORT:</span> 20 min</div>
+  </div>
+</div>
+
+<div class="finding">
+  <div class="finding-header" style="background:#fff3e0;">
+    <span class="badge high">High</span><span class="badge security">Security</span>
+    <span class="finding-title">H-SEC-09 · EnableSensitiveDataLogging Unconditional in Production</span>
+    <span class="file-ref">InfrastructureConfig.cs:21</span>
+    <span class="badge high-risk">High Risk</span>
+  </div>
+  <div class="finding-body">
+    <pre><span class="removed">options.EnableSensitiveDataLogging();</span>
+<span class="added">if (env.IsDevelopment())
+    options.EnableSensitiveDataLogging();</span></pre>
+    <div class="row"><span class="issue-label">EFFORT:</span> 2 min</div>
+  </div>
+</div>
+
+<h3>3.2 Performance — High (15 findings)</h3>
+
+<div class="finding">
+  <div class="finding-header" style="background:#fff3e0;">
+    <span class="badge high">High</span><span class="badge performance">Performance</span>
+    <span class="finding-title">H-PERF-01 · N+1 in GetSalesDetailsById — 9 Separate Synchronous DB Calls</span>
+    <span class="file-ref">SalesRepository.cs:1345–1409</span>
+    <span class="badge medium-risk">Medium Risk</span>
+  </div>
+  <div class="finding-body">
+    <div class="row"><span class="issue-label">ISSUE:</span> Each call to <code>GetSalesDetailsById</code> fires 9 individual synchronous DB round-trips for related data that could be fetched with a single query using <code>.Include()</code>.</div>
+    <pre><span class="removed">// BEFORE — 9 round trips
+var sales = _dbContext.Sales.FirstOrDefault(s => s.Id == id);
+var student = _dbContext.Students.FirstOrDefault(s => s.Id == sales.StudentId);
+var course = _dbContext.Courses.FirstOrDefault(c => c.Id == sales.CourseId);
+// ... 6 more individual queries</span>
+
+<span class="added">// AFTER — 1 query with eager loading
+var sales = await _dbContext.Sales
+    .Include(s => s.Student)
+    .Include(s => s.Course)
+        .ThenInclude(c => c.Subject)
+    .Include(s => s.Tutor)
+    .Include(s => s.Coordinator)
+    .AsNoTracking()
+    .FirstOrDefaultAsync(s => s.Id == id);</span></pre>
+    <div class="row"><span class="issue-label">EFFORT:</span> 45 min</div>
+  </div>
+</div>
+
+<div class="finding">
+  <div class="finding-header" style="background:#fff3e0;">
+    <span class="badge high">High</span><span class="badge performance">Performance</span>
+    <span class="finding-title">H-PERF-02 · N+1 in GetAllTutorDetailsWithFilter — 6 DB Calls per Tutor Row</span>
+    <span class="file-ref">TutorRepository.cs:829–1008</span>
+    <span class="badge medium-risk">Medium Risk</span>
+  </div>
+  <div class="finding-body">
+    <div class="row">190-line God method executes 6 database queries per row in the result set. For a page of 20 tutors, this is 120+ DB round-trips. Consolidate with <code>.Include()</code> chains and a DTO projection <code>.Select()</code>.</div>
+    <div class="row"><span class="issue-label">EFFORT:</span> 90 min</div>
+  </div>
+</div>
+
+<div class="finding">
+  <div class="finding-header" style="background:#fff3e0;">
+    <span class="badge high">High</span><span class="badge performance">Performance</span>
+    <span class="finding-title">H-PERF-03 · N+1 in GetCoursesByCoordinatorId and GetEnrolledCoursesById — 8–9 DB Calls per Row</span>
+    <span class="file-ref">SalesRepository.cs:856–998</span>
+    <span class="badge medium-risk">Medium Risk</span>
+  </div>
+  <div class="finding-body">
+    <div class="row">Both methods iterate over a list and fire 8–9 DB queries per item inside the loop. Replace with batch pre-load: fetch all related IDs in one pass, then use <code>.Where(x => ids.Contains(x.Id))</code> lookups outside the loop.</div>
+    <div class="row"><span class="issue-label">EFFORT:</span> 60 min each</div>
+  </div>
+</div>
+
+<div class="finding">
+  <div class="finding-header" style="background:#fff3e0;">
+    <span class="badge high">High</span><span class="badge performance">Performance</span>
+    <span class="finding-title">H-PERF-04 · N+1 in GetAllStudents — 3 Sync DB Calls per Student</span>
+    <span class="file-ref">StudentRepository.cs:363–375</span>
+    <span class="badge medium-risk">Medium Risk</span>
+  </div>
+  <div class="finding-body">
+    <div class="row">Each student in the list triggers 3 synchronous DB queries. On a list of 100 students, this is 300 sync queries blocking the thread pool. Use <code>.Include()</code> on the initial query.</div>
+    <div class="row"><span class="issue-label">EFFORT:</span> 30 min</div>
+  </div>
+</div>
+
+<div class="finding">
+  <div class="finding-header" style="background:#fff3e0;">
+    <span class="badge high">High</span><span class="badge performance">Performance</span>
+    <span class="finding-title">H-PERF-05 · N+1 in GetAllSubmittedAttendanceTutors — 2 Async DB Calls per Tutor</span>
+    <span class="file-ref">TutorRepository.cs:519–579</span>
+    <span class="badge medium-risk">Medium Risk</span>
+  </div>
+  <div class="finding-body">
+    <div class="row">Pre-load related entities before the loop using <code>ToDictionaryAsync</code> keyed on tutor ID.</div>
+    <div class="row"><span class="issue-label">EFFORT:</span> 30 min</div>
+  </div>
+</div>
+
+<div class="finding">
+  <div class="finding-header" style="background:#fff3e0;">
+    <span class="badge high">High</span><span class="badge performance">Performance</span>
+    <span class="finding-title">H-PERF-06 · N+1 in GetStudentClasses — 3 Sync DB Calls per Class</span>
+    <span class="file-ref">ScheduleRepository.cs:94–117</span>
+    <span class="badge medium-risk">Medium Risk</span>
+  </div>
+  <div class="finding-body">
+    <div class="row">Same pattern. Use <code>.Include(sc => sc.Schedule).ThenInclude(s => s.Course)</code> on the root query.</div>
+    <div class="row"><span class="issue-label">EFFORT:</span> 20 min</div>
+  </div>
+</div>
+
+<div class="finding">
+  <div class="finding-header" style="background:#fff3e0;">
+    <span class="badge high">High</span><span class="badge performance">Performance</span>
+    <span class="finding-title">H-PERF-07 · GetSubjectList — N+1 with Sync DB Calls Inside foreach</span>
+    <span class="file-ref">SalesRepository.cs:793–799</span>
+    <span class="badge medium-risk">Medium Risk</span>
+  </div>
+  <div class="finding-body">
+    <pre><span class="removed">foreach (var subject in subjects)
+{
+    var type = _dbContext.Type_Code.Where(t => t.Id == subject.TypeId).FirstOrDefault();
+    // ← sync DB call per subject
+}</span>
+<span class="added">var typeIds = subjects.Select(s => s.TypeId).Distinct().ToList();
+var types = await _dbContext.Type_Code
+    .Where(t => typeIds.Contains(t.Id))
+    .ToDictionaryAsync(t => t.Id);
+foreach (var subject in subjects)
+{
+    var type = types.GetValueOrDefault(subject.TypeId);
+}</span></pre>
+    <div class="row"><span class="issue-label">EFFORT:</span> 15 min</div>
+  </div>
+</div>
+
+<div class="finding">
+  <div class="finding-header" style="background:#fff3e0;">
+    <span class="badge high">High</span><span class="badge performance">Performance</span>
+    <span class="finding-title">H-PERF-08 · Full UserAvailability Table Scan Into Memory</span>
+    <span class="file-ref">TutorRepository.cs:675–678</span>
+    <span class="badge medium-risk">Medium Risk</span>
+  </div>
+  <div class="finding-body">
+    <pre><span class="removed">var all = _dbContext.UserAvailability.ToList();  // entire table in memory
+var filtered = all.Where(u => u.TutorId == tutorId).ToList();</span>
+<span class="added">var filtered = await _dbContext.UserAvailability
+    .Where(u => u.TutorId == tutorId)
+    .AsNoTracking()
+    .ToListAsync();</span></pre>
+    <div class="row"><span class="issue-label">EFFORT:</span> 5 min</div>
+  </div>
+</div>
+
+<div class="finding">
+  <div class="finding-header" style="background:#fff3e0;">
+    <span class="badge high">High</span><span class="badge performance">Performance</span>
+    <span class="finding-title">H-PERF-09 · All Repositories Registered as AddTransient (Should be AddScoped)</span>
+    <span class="file-ref">InfrastructureConfig.cs:23</span>
+    <span class="badge high-risk">High Risk</span>
+  </div>
+  <div class="finding-body">
+    <div class="row">Transient repositories create a new instance per resolution, but they share a Scoped DbContext — this causes unexpected behavior with EF Core change tracking across multiple repository instances in the same request.</div>
+    <pre><span class="removed">services.AddTransient&lt;ISalesRepository, SalesRepository&gt;();</span>
+<span class="added">services.AddScoped&lt;ISalesRepository, SalesRepository&gt;();</span></pre>
+    <div class="row"><span class="issue-label">EFFORT:</span> 10 min (global replace in InfrastructureConfig.cs)</div>
+  </div>
+</div>
+
+<div class="finding">
+  <div class="finding-header" style="background:#fff3e0;">
+    <span class="badge high">High</span><span class="badge performance">Performance</span>
+    <span class="finding-title">H-PERF-10 · N+1 in Payroll — Invoice Lookup per Tutor in Loop</span>
+    <span class="file-ref">ScheduleRepository.cs:1280–1311</span>
+    <span class="badge medium-risk">Medium Risk</span>
+  </div>
+  <div class="finding-body">
+    <div class="row">Batch-load invoice data for all tutor IDs before the loop begins, then look up by ID in a pre-built dictionary.</div>
+    <div class="row"><span class="issue-label">EFFORT:</span> 30 min</div>
+  </div>
+</div>
+
+<div class="finding">
+  <div class="finding-header" style="background:#fff3e0;">
+    <span class="badge high">High</span><span class="badge performance">Performance</span>
+    <span class="finding-title">H-PERF-11 · SaveChangesAsync Inside foreach Loop (Breaks Atomicity)</span>
+    <span class="file-ref">AuthRepository.cs:109, 136 | ScheduleRepository.cs:1210–1219</span>
+    <span class="badge medium-risk">Medium Risk</span>
+  </div>
+  <div class="finding-body">
+    <pre><span class="removed">foreach (var item in items)
+{
+    _dbContext.Permissions.Add(item);
+    await _dbContext.SaveChangesAsync();  // ← N round-trips, partial commit on failure
+}</span>
+<span class="added">foreach (var item in items)
+    _dbContext.Permissions.Add(item);
+await _dbContext.SaveChangesAsync();  // single round-trip, all-or-nothing</span></pre>
+    <div class="row"><span class="issue-label">EFFORT:</span> 10 min per location</div>
+  </div>
+</div>
+
+<div class="finding">
+  <div class="finding-header" style="background:#fff3e0;">
+    <span class="badge high">High</span><span class="badge performance">Performance</span>
+    <span class="finding-title">H-PERF-12 · Missing .AsNoTracking() on All Read-Only Queries</span>
+    <span class="file-ref">StudentRepository.cs:236–328 and throughout</span>
+    <span class="badge safe">Safe</span>
+  </div>
+  <div class="finding-body">
+    <div class="row">Read-only list and detail queries do not call <code>.AsNoTracking()</code>. EF Core tracks all returned entities unnecessarily, wasting memory and CPU on change detection.</div>
+    <pre><span class="added">// Add to all read-only queries
+var students = await _dbContext.Students
+    .AsNoTracking()  // ← add this
+    .Where(s => s.IsActive)
+    .ToListAsync();</span></pre>
+    <div class="row"><span class="issue-label">EFFORT:</span> 60 min (global audit of all list/get queries)</div>
+  </div>
+</div>
+
+<div class="finding">
+  <div class="finding-header" style="background:#fff3e0;">
+    <span class="badge high">High</span><span class="badge performance">Performance</span>
+    <span class="finding-title">H-PERF-13 · .ToList() Called Twice on Same Query</span>
+    <span class="file-ref">StudentRepository.cs:236–328</span>
+    <span class="badge safe">Safe</span>
+  </div>
+  <div class="finding-body">
+    <div class="row">The query is materialized to a list and then iterated again with a second <code>.ToList()</code> call, doubling the memory allocation. Store the result in a variable and reuse it.</div>
+    <div class="row"><span class="issue-label">EFFORT:</span> 5 min</div>
+  </div>
+</div>
+
+<div class="finding">
+  <div class="finding-header" style="background:#fff3e0;">
+    <span class="badge high">High</span><span class="badge performance">Performance</span>
+    <span class="finding-title">H-PERF-14 · User.Count() for Code Generation — Sync + Race Condition</span>
+    <span class="file-ref">SalesRepository.cs:382</span>
+    <span class="badge medium-risk">Medium Risk</span>
+  </div>
+  <div class="finding-body">
+    <pre><span class="removed">var code = "TCT" + _dbContext.User.Count().ToString();  // sync, raceable</span>
+<span class="added">// Use a sequence or GUID-based code instead
+var code = $"TCT-{Guid.NewGuid().ToString("N")[..8].ToUpper()}";</span></pre>
+    <div class="row"><span class="issue-label">EFFORT:</span> 10 min</div>
+  </div>
+</div>
+
+<div class="finding">
+  <div class="finding-header" style="background:#fff3e0;">
+    <span class="badge high">High</span><span class="badge performance">Performance</span>
+    <span class="finding-title">H-PERF-15 · N+1 in Type_Code Lookup Inside LINQ .Select()</span>
+    <span class="file-ref">SalesRepository.cs:541–565</span>
+    <span class="badge medium-risk">Medium Risk</span>
+  </div>
+  <div class="finding-body">
+    <div class="row">A DB query for <code>Type_Code</code> is embedded inside a LINQ <code>.Select()</code> projection, triggering one query per item. Pre-load the type codes before the projection.</div>
+    <div class="row"><span class="issue-label">EFFORT:</span> 20 min</div>
+  </div>
+</div>
+
+<h3>3.3 Code Review / Standards — High (35 findings, summarized)</h3>
+
+<table>
+  <tr><th>#</th><th>Finding</th><th>File</th><th>Risk</th><th>Effort</th></tr>
+  <tr><td>H-REV-01</td><td><code>throw ex</code> destroys stack trace (use <code>throw</code> or <code>throw new Exception("msg", ex)</code>)</td><td>SalesController.cs:91–93, TutorRepository.cs:248</td><td><span class="badge safe">Safe</span></td><td>5 min each</td></tr>
+  <tr><td>H-REV-02</td><td>Empty catch blocks silently swallow exceptions (address creation, attendance updates)</td><td>SalesRepository.cs:487–489, TutorRepository.cs:511–513, ScheduleRepository.cs:766–888</td><td><span class="badge medium-risk">Medium Risk</span></td><td>15 min each</td></tr>
+  <tr><td>H-REV-03</td><td><code>[HttpGet]</code> on <code>DeleteCourse</code>, <code>DeleteClass</code>, <code>RemoveSchedule</code> — destructive operation on safe HTTP verb</td><td>SalesController.cs:218, ScheduleController.cs:197, 203</td><td><span class="badge high-risk">High Risk</span></td><td>5 min each</td></tr>
+  <tr><td>H-REV-04</td><td>Returns <code>Ok(true)</code> in catch block — error responses look like success to clients</td><td>BaseAPIController.cs:28–30, SalesController.cs:200–208</td><td><span class="badge medium-risk">Medium Risk</span></td><td>10 min each</td></tr>
+  <tr><td>H-REV-05</td><td><code>UpdateSaleDetailsStatus</code> catch swallows exception, returns <code>true</code></td><td>SalesRepository.cs:1335–1341</td><td><span class="badge medium-risk">Medium Risk</span></td><td>10 min</td></tr>
+  <tr><td>H-REV-06</td><td><code>NotificationService</code> class body is EMPTY — all notification methods unimplemented</td><td>NotificationService.cs:1–5</td><td><span class="badge high-risk">High Risk</span></td><td>Team discussion</td></tr>
+  <tr><td>H-REV-07</td><td>UpdateNotification null-check logic inverted (<code>&amp;&amp;</code> should be <code>||</code>)</td><td>NotificationController.cs:41–49</td><td><span class="badge medium-risk">Medium Risk</span></td><td>2 min</td></tr>
+  <tr><td>H-REV-08</td><td><code>IsTutorPresent</code> and <code>IsStudentPresent</code> both set from same <code>StartTime.HasValue</code></td><td>ScheduleRepository.cs:803–804</td><td><span class="badge medium-risk">Medium Risk</span></td><td>5 min</td></tr>
+  <tr><td>H-REV-09</td><td><code>t.StudentId == t.StudentId</code> (always true) in TutorStudentAllocation WHERE clause</td><td>SalesRepository.cs:1186–1189</td><td><span class="badge medium-risk">Medium Risk</span></td><td>5 min</td></tr>
+  <tr><td>H-REV-10</td><td><code>student.ParentName = studentDto.LastName</code> — wrong field mapped</td><td>SalesRepository.cs:619</td><td><span class="badge medium-risk">Medium Risk</span></td><td>2 min</td></tr>
+  <tr><td>H-REV-11</td><td><code>CreatedBy = Guid.NewGuid()</code> — random GUID corrupts audit trail</td><td>TutorRepository.cs:150, SalesRepository.cs:388</td><td><span class="badge medium-risk">Medium Risk</span></td><td>10 min each</td></tr>
+  <tr><td>H-REV-12</td><td>Dead <code>createSalesWithMinimalDetails</code> endpoint — service call commented out, always returns "success"</td><td>SalesController.cs:96–122</td><td><span class="badge safe">Safe</span></td><td>Remove or implement</td></tr>
+  <tr><td>H-REV-13</td><td>Sync <code>SaveChanges()</code> and <code>transaction.Commit()/Rollback()</code> inside async methods</td><td>SalesRepository.cs:1321–1343, TutorRepository.cs:248–254</td><td><span class="badge medium-risk">Medium Risk</span></td><td>10 min each</td></tr>
+  <tr><td>H-REV-14</td><td><code>throw new KeyNotFoundException</code> when <code>existingSales</code> is null (NullReferenceException before throw)</td><td>SalesRepository.cs:1436, 1509</td><td><span class="badge medium-risk">Medium Risk</span></td><td>5 min each</td></tr>
+  <tr><td>H-REV-15</td><td>DbContext injected directly into StudentController, bypassing Clean Architecture</td><td>StudentController.cs:27</td><td><span class="badge medium-risk">Medium Risk</span></td><td>45 min refactor</td></tr>
+  <tr><td>H-REV-16</td><td>PushNotificationHub has no <code>[Authorize]</code> — anonymous SignalR connections allowed</td><td>PushNotificationHub.cs:9</td><td><span class="badge high-risk">High Risk</span></td><td>5 min</td></tr>
+  <tr><td>H-REV-17</td><td>SignalR hub broadcasts full online user list to ALL clients on connect/disconnect</td><td>PushNotificationHub.cs:23</td><td><span class="badge high-risk">High Risk</span></td><td>30 min</td></tr>
+  <tr><td>H-REV-18</td><td>SignalR stores only one connectionId per userId (last connection wins — multi-tab/device broken)</td><td>PushNotificationHub.cs:9</td><td><span class="badge medium-risk">Medium Risk</span></td><td>45 min</td></tr>
+  <tr><td>H-REV-19</td><td>Scaffold <code>WeatherForecastController</code> left in production — unauthenticated endpoint</td><td>WeatherForecastController.cs</td><td><span class="badge safe">Safe</span></td><td>2 min (delete)</td></tr>
+  <tr><td>H-REV-20</td><td>Hardcoded Coordinator role ID magic number <code>rl.Id == 4</code></td><td>StudentRepository.cs:553</td><td><span class="badge safe">Safe</span></td><td>10 min (use enum/const)</td></tr>
+  <tr><td>H-REV-21</td><td>Magic numbers 20001, 10002, 70002 throughout (undocumented type codes)</td><td>SalesRepository.cs:548, 1017; TutorRepository.cs:60–61</td><td><span class="badge safe">Safe</span></td><td>20 min (extract to enum/const)</td></tr>
+  <tr><td>H-REV-22</td><td>Hardcoded values in Sales create: <code>Email = "NewSale Need to update"</code>, <code>Location = "Chennai"</code></td><td>SalesRepository.cs:388–390</td><td><span class="badge medium-risk">Medium Risk</span></td><td>15 min</td></tr>
+  <tr><td>H-REV-23</td><td><code>int.Parse(month)</code> without try/catch — uncaught FormatException → HTTP 500</td><td>ScheduleRepository.cs:270</td><td><span class="badge safe">Safe</span></td><td>5 min</td></tr>
+  <tr><td>H-REV-24</td><td>Multiple async methods call sync <code>ReadFileAsync</code> without null check on <code>docStorage</code></td><td>StudentController.cs:38–56, 100–116</td><td><span class="badge medium-risk">Medium Risk</span></td><td>10 min each</td></tr>
+  <tr><td>H-REV-25</td><td>FluentValidation never wired into ASP.NET pipeline — all validators silently ignored</td><td>SalesValidator.cs; Program.cs missing <code>AddFluentValidationAutoValidation</code></td><td><span class="badge medium-risk">Medium Risk</span></td><td>30 min (wire up) + fill validators</td></tr>
+  <tr><td>H-REV-26</td><td>Hardcoded <code>Ok(false)</code> / <code>Ok(true)</code> — actual service result ignored</td><td>SchedulerController.cs:327, 168</td><td><span class="badge medium-risk">Medium Risk</span></td><td>5 min each</td></tr>
+  <tr><td>H-REV-27</td><td>Refresh token stores literal string <code>"IP-Address"</code> instead of actual client IP</td><td>TokenService.cs:107</td><td><span class="badge safe">Safe</span></td><td>10 min</td></tr>
+  <tr><td>H-REV-28</td><td>Two conflicting <code>GenerateJWTToken</code> overloads using different key sources</td><td>TokenService.cs</td><td><span class="badge high-risk">High Risk</span></td><td>30 min (consolidate)</td></tr>
+  <tr><td>H-REV-29</td><td>80+ lines of commented-out dead code blocks across multiple repositories</td><td>TutorRepository.cs:260–343, SalesRepository.cs (5+ blocks)</td><td><span class="badge safe">Safe</span></td><td>10 min (delete)</td></tr>
+  <tr><td>H-REV-30</td><td>Placeholder namespace <code>YourProject.Application.DTOs.*</code> in production controller</td><td>SchedulerController.cs:38</td><td><span class="badge safe">Safe</span></td><td>2 min</td></tr>
+  <tr><td>H-REV-31</td><td>Application layer interface imports <code>TCT.LMS.API.Controllers</code> namespace — Clean Architecture violation</td><td>IUserService.cs:1</td><td><span class="badge medium-risk">Medium Risk</span></td><td>20 min</td></tr>
+  <tr><td>H-REV-32</td><td>Namespace <code>TCT.LMS.Business.Services</code> doesn't match folder <code>TCT.LMS.Application</code></td><td>GenericService.cs:1</td><td><span class="badge safe">Safe</span></td><td>2 min</td></tr>
+  <tr><td>H-REV-33</td><td>Multiple empty auth <code>catch (Exception ex) {}</code> blocks (silently fail login steps)</td><td>AuthRepository.cs:146–150, 177–179, 192–193</td><td><span class="badge medium-risk">Medium Risk</span></td><td>10 min each</td></tr>
+  <tr><td>H-REV-34</td><td><code>SchedulerController</code> method name <code>getScheduleDetailsById</code> — lowercase 'g' violates C# naming conventions</td><td>SchedulerController.cs:108</td><td><span class="badge safe">Safe</span></td><td>2 min (rename)</td></tr>
+  <tr><td>H-REV-35</td><td><code>ValidateTimeSlot</code> returns class list but performs no conflict detection</td><td>SchedulerController.cs:122–126</td><td><span class="badge medium-risk">Medium Risk</span></td><td>Team discussion</td></tr>
+</table>
+
+<hr class="divider">
+
+<!-- SECTION 4: MEDIUM -->
+<div class="page-break"></div>
+<h2>4. Medium Severity Findings — Next Sprint (48)</h2>
+
+<h3>4.1 Architecture & Standards (22 findings, summarized)</h3>
+<table>
+  <tr><th>#</th><th>Finding</th><th>File</th><th>Effort</th></tr>
+  <tr><td>M-ARC-01</td><td><code>SalesRequestDto</code> inherits from <code>BaseEntity</code> (DTO/domain coupling)</td><td>DTOs/Sales/SalesRequestDto.cs:11</td><td>30 min</td></tr>
+  <tr><td>M-ARC-02</td><td>AutoMapper profile in API project, not Application (wrong layer)</td><td>AutoMapperProfile.cs</td><td>20 min</td></tr>
+  <tr><td>M-ARC-03</td><td>No API versioning (<code>/api/v1/</code>) — breaking changes affect all clients simultaneously</td><td>Program.cs</td><td>90 min</td></tr>
+  <tr><td>M-ARC-04</td><td>No health check endpoints (<code>/health</code>, <code>/ready</code>) — deployment orchestrators cannot probe liveness</td><td>Program.cs</td><td>30 min</td></tr>
+  <tr><td>M-ARC-05</td><td>No rate limiting on auth endpoints — brute force unrestricted</td><td>Program.cs / AuthController.cs</td><td>45 min</td></tr>
+  <tr><td>M-ARC-06</td><td>No structured logging (Serilog/OpenTelemetry) — no queryable production logs</td><td>Program.cs</td><td>60 min</td></tr>
+  <tr><td>M-ARC-07</td><td>No global exception handler middleware — unhandled exceptions return stack traces</td><td>Program.cs</td><td>30 min</td></tr>
+  <tr><td>M-ARC-08</td><td>No response caching on read-heavy reference data endpoints</td><td>Multiple controllers</td><td>45 min</td></tr>
+  <tr><td>M-ARC-09</td><td><code>RequireHttpsMetadata = false</code> — tokens accepted over HTTP</td><td>AuthenticationExtensions.cs:54</td><td>2 min</td></tr>
+  <tr><td>M-ARC-10</td><td>CORS policy too broad — should be restricted to known origins in production</td><td>Program.cs</td><td>15 min</td></tr>
+  <tr><td>M-STD-01</td><td>No pagination on list endpoints returning potentially large datasets</td><td>Multiple repositories</td><td>90 min</td></tr>
+  <tr><td>M-STD-02</td><td>Inconsistent async/sync usage — some service methods sync, some async, no clear pattern</td><td>SalesRepository.cs, ScheduleRepository.cs</td><td>60 min</td></tr>
+  <tr><td>M-STD-03</td><td>No cancellation token propagation throughout the async call chain</td><td>All controllers and services</td><td>45 min</td></tr>
+  <tr><td>M-STD-04</td><td>Zero unit test coverage for business logic (only 1 integration test exists)</td><td>TCT.xUnitTest/UnitTest1.cs</td><td>Sprint-long effort</td></tr>
+  <tr><td>M-STD-05</td><td>React 17 (React 18 available) — missing concurrent rendering benefits</td><td>package.json:38</td><td>4 hrs upgrade</td></tr>
+  <tr><td>M-STD-06</td><td><code>react-hook-form ^6.15.8</code> — outdated (v7 has breaking API changes, but v6 EOL)</td><td>package.json:48</td><td>4 hrs upgrade</td></tr>
+  <tr><td>M-STD-07</td><td><code>xlsx ^0.18.5</code> — CVE-2023-30533 Prototype Pollution vulnerability</td><td>package.json:73</td><td>2 hrs (upgrade or replace)</td></tr>
+  <tr><td>M-STD-08</td><td>No TypeScript in React app — type errors only caught at runtime</td><td>TCTLMSWeb/src/**/*.js</td><td>Long-term migration</td></tr>
+  <tr><td>M-STD-09</td><td>chart.js ^2.9.4 very outdated (v4 current) — missing performance improvements</td><td>package.json:25</td><td>2 hrs</td></tr>
+  <tr><td>M-STD-10</td><td>Duplicate chart packages: both <code>chart.js</code> and <code>chartjs</code> listed</td><td>package.json:25–26</td><td>30 min</td></tr>
+  <tr><td>M-STD-11</td><td>No <code>.env</code> management for React API base URL — hardcoded or environment-unaware</td><td>TCTLMSWeb/src/</td><td>30 min</td></tr>
+  <tr><td>M-STD-12</td><td><code>homepage</code> in package.json points to external template URL, not the actual app</td><td>package.json:3</td><td>2 min</td></tr>
+</table>
+
+<h3>4.2 Best Practices (26 findings, summarized)</h3>
+<table>
+  <tr><th>#</th><th>Finding</th><th>Impact</th></tr>
+  <tr><td>M-BP-01</td><td>No <code>IMemoryCache</code> / distributed cache for frequently-read reference data (Type_Code, courses)</td><td>Repeated DB hits on static data</td></tr>
+  <tr><td>M-BP-02</td><td>No <code>IHttpClientFactory</code> — raw <code>HttpClient</code> instances risk socket exhaustion</td><td>Resource leak under load</td></tr>
+  <tr><td>M-BP-03</td><td>No <code>using</code> declarations on IDisposable objects in several service methods</td><td>Resource leak</td></tr>
+  <tr><td>M-BP-04</td><td>Large file uploads with no size limit or virus scanning</td><td>Security / DoS risk</td></tr>
+  <tr><td>M-BP-05</td><td>No Content Security Policy, X-Frame-Options, or other security headers</td><td>XSS / clickjacking exposure</td></tr>
+  <tr><td>M-BP-06</td><td>No input sanitization on rich-text fields (TinyMCE content stored raw)</td><td>Stored XSS</td></tr>
+  <tr><td>M-BP-07</td><td>Stripe integration uses raw API key calls, not idempotency keys — double-charge risk</td><td>Financial impact</td></tr>
+  <tr><td>M-BP-08</td><td>No webhook signature verification for Stripe webhooks</td><td>Spoofed payment events</td></tr>
+  <tr><td>M-BP-09</td><td>Email sending with no retry / queue (sync SMTP in request path)</td><td>Lost emails under load</td></tr>
+  <tr><td>M-BP-10</td><td>No soft-delete audit fields (DeletedAt, DeletedBy) on key entities</td><td>Unrecoverable deletions</td></tr>
+</table>
+
+<hr class="divider">
+
+<!-- SECTION 5: LOW -->
+<div class="page-break"></div>
+<h2>5. Low Severity Findings — Backlog (25)</h2>
+<table>
+  <tr><th>#</th><th>Finding</th><th>Category</th></tr>
+  <tr><td>L-01</td><td>Inconsistent response envelope (some return raw objects, some wrap in {data:...})</td><td>Standards</td></tr>
+  <tr><td>L-02</td><td>No OpenAPI/Swagger documentation for most custom endpoints</td><td>Standards</td></tr>
+  <tr><td>L-03</td><td>Controller action methods exceed 50 lines in several places (single responsibility)</td><td>Standards</td></tr>
+  <tr><td>L-04</td><td>Inconsistent use of <code>var</code> vs explicit types throughout codebase</td><td>Standards</td></tr>
+  <tr><td>L-05</td><td>No <code>EditorConfig</code> or Roslyn analyzer rules enforcing consistent style</td><td>Standards</td></tr>
+  <tr><td>L-06</td><td><code>react-scripts ^5.0.0</code> — Webpack 5 available, CRA deprecated (consider Vite)</td><td>Best Practices</td></tr>
+  <tr><td>L-07</td><td>No error boundaries in React app — component crash brings down entire UI</td><td>Best Practices</td></tr>
+  <tr><td>L-08</td><td>No React code splitting beyond initial lazy imports</td><td>Performance</td></tr>
+  <tr><td>L-09</td><td>No memoization (<code>React.memo</code>, <code>useMemo</code>) on heavy list renders</td><td>Performance</td></tr>
+  <tr><td>L-10</td><td>No service worker / offline capability</td><td>Best Practices</td></tr>
+  <tr><td>L-11</td><td>README absent or minimal — no setup instructions</td><td>Standards</td></tr>
+  <tr><td>L-12</td><td>No <code>.editorconfig</code> for consistent tab/space/line-ending handling across team</td><td>Standards</td></tr>
+  <tr><td>L-13</td><td>Git commit messages lack conventional commit format</td><td>Standards</td></tr>
+  <tr><td>L-14</td><td>No CI/CD pipeline configuration committed to repo</td><td>Best Practices</td></tr>
+  <tr><td>L-15</td><td>No database migration history review — EF migrations may be out of sync with prod schema</td><td>Best Practices</td></tr>
+</table>
+
+<hr class="divider">
+
+<!-- SECTION 6: DISTRIBUTION -->
+<h2>6. Finding Distribution by Category</h2>
+<table>
+  <tr><th>Category</th><th>Critical</th><th>High</th><th>Medium</th><th>Low</th><th>Total</th><th>% of All</th></tr>
+  <tr><td>Security</td><td>6</td><td>9</td><td>5</td><td>3</td><td><strong>23</strong></td><td>16%</td></tr>
+  <tr><td>Performance</td><td>0</td><td>15</td><td>6</td><td>2</td><td><strong>23</strong></td><td>16%</td></tr>
+  <tr><td>Coding Standards</td><td>1</td><td>18</td><td>22</td><td>9</td><td><strong>50</strong></td><td>35%</td></tr>
+  <tr><td>Best Practices</td><td>1</td><td>9</td><td>8</td><td>5</td><td><strong>23</strong></td><td>16%</td></tr>
+  <tr><td>Code Review</td><td>1</td><td>8</td><td>7</td><td>6</td><td><strong>22</strong></td><td>16%</td></tr>
+  <tr><td><strong>Total</strong></td><td><strong>9</strong></td><td><strong>59</strong></td><td><strong>48</strong></td><td><strong>25</strong></td><td><strong>141</strong></td><td>100%</td></tr>
+</table>
+
+<hr class="divider">
+
+<!-- SECTION 7: ROADMAP -->
+<div class="page-break"></div>
+<h2>7. Remediation Roadmap</h2>
+
+<div class="phase-box critical">
+  <h3>Phase 1 — Critical (Do Today, Before Next Deployment)</h3>
+  <ol>
+    <li><strong>[30 min] Rotate all credentials</strong> — Stripe key, DB password, Gmail SMTP password. Remove from <code>appsettings.json</code>, use env vars. (C-01)</li>
+    <li><strong>[10 min] Fix CheckPolicyAttribute</strong> — inject <code>IAuthorizationService</code>, call <code>AuthorizeAsync</code>. (C-02)</li>
+    <li><strong>[2 min] Restore [Authorize] on BaseAPIController</strong> — remove comment. Do AFTER fixing C-02. (C-03)</li>
+    <li><strong>[5 min] Fix GetContactsByUserId hardcoded GUID</strong> — replace with <code>userId</code> parameter. (C-06)</li>
+    <li><strong>[15 min] Fix UpdateTutorAssignmentAsync</strong> — remove or relocate the <code>throw new NotImplementedException()</code>. (C-08)</li>
+    <li><strong>[10 min] Fix ScheduleRepository date loop</strong> — new object per iteration, fix EndDate field. (C-09)</li>
+    <li><strong>[2 min] Disable EnableSensitiveDataLogging in production</strong> — gate on <code>env.IsDevelopment()</code>. (H-SEC-09)</li>
+    <li><strong>[2 min] Delete WeatherForecastController</strong>. (H-REV-19)</li>
+  </ol>
+</div>
+
+<div class="phase-box high" style="margin-top:15px;">
+  <h3>Phase 2 — High Priority (This Sprint)</h3>
+  <ol>
+    <li>Fix all <code>[AllowAnonymous]</code> on write endpoints (UpdateStudent, DeleteMessage, DeleteGroup, ChangePassword, SchedulerController financial endpoints). Add <code>[Authorize]</code> + ownership checks.</li>
+    <li>Fix JWT configuration — <code>RequireExpirationTime = true</code>, <code>RequireHttpsMetadata = true</code>. Set token lifetimes.</li>
+    <li>Fix CompleteStudentLogin auth bypass — add pre-auth token step.</li>
+    <li>Fix ConfirmEmail to use a proper generated token.</li>
+    <li>Fix ForgotPassword user enumeration.</li>
+    <li>Consolidate GenerateJWTToken overloads to a single key source.</li>
+    <li>Fix N+1 in the top 5 worst offenders (GetSalesDetailsById, GetAllTutorDetailsWithFilter, GetCoursesByCoordinatorId, GetAllStudents, GetStudentClasses).</li>
+    <li>Move all <code>SaveChangesAsync</code> calls outside of <code>foreach</code> loops.</li>
+    <li>Add <code>.AsNoTracking()</code> to all read-only queries.</li>
+    <li>Change all <code>AddTransient</code> repositories to <code>AddScoped</code>.</li>
+    <li>Add <code>[Authorize]</code> to PushNotificationHub.</li>
+    <li>Fix SignalR multi-connection support (store list of connectionIds per userId).</li>
+    <li>Fix all <code>throw ex</code> → <code>throw</code> or wrap.</li>
+    <li>Replace all empty catch blocks with proper logging and rethrow.</li>
+    <li>Wire FluentValidation into the pipeline.</li>
+    <li>Fix UpdateNotification null-check logic inversion.</li>
+  </ol>
+</div>
+
+<div class="phase-box medium" style="margin-top:15px; border-color:#f57f17; background:#fffde7;">
+  <h3>Phase 3 — Medium Priority (Next Sprint)</h3>
+  <ol>
+    <li>Implement structured logging (Serilog)</li>
+    <li>Add global exception handler middleware</li>
+    <li>Add rate limiting on auth endpoints</li>
+    <li>Add health check endpoints</li>
+    <li>Add API versioning</li>
+    <li>Implement response caching on reference data</li>
+    <li>Decouple SalesRequestDto from BaseEntity</li>
+    <li>Fix Clean Architecture violations (IUserService imports API namespace)</li>
+    <li>Upgrade xlsx to fix CVE-2023-30533</li>
+    <li>Implement proper Stripe idempotency keys</li>
+    <li>Add Stripe webhook signature verification</li>
+    <li>Add input sanitization on rich-text fields</li>
+    <li>Add security headers (CSP, X-Frame-Options)</li>
+    <li>Extract magic numbers to named constants/enums</li>
+    <li>Write unit tests for critical business logic (auth, sales, scheduling)</li>
+  </ol>
+</div>
+
+<hr class="divider">
+
+<!-- SECTION 8: REGRESSION TESTING -->
+<div class="page-break"></div>
+<h2>8. Regression Testing Checklist</h2>
+
+<h3>After Phase 1 Changes</h3>
+<ul>
+  <li>[ ] All previously accessible anonymous endpoints now return 401 for unauthenticated requests</li>
+  <li>[ ] Login flow still works end-to-end for Student, Tutor, Admin, Coordinator roles</li>
+  <li>[ ] Policy-protected endpoints return 403 for users without the required role</li>
+  <li>[ ] Creating a schedule creates entries with correct StartDate and EndDate (not both StartDate)</li>
+  <li>[ ] Multiple schedule entries in one batch are created as distinct DB rows (not one overwritten row)</li>
+  <li>[ ] GetContacts returns the logged-in user's contacts, not a hardcoded user's contacts</li>
+  <li>[ ] Tutor assignment update returns success and data is persisted (no NotImplementedException)</li>
+  <li>[ ] Application loads without errors (no missing credentials at startup)</li>
+</ul>
+
+<h3>After Phase 2 Changes</h3>
+<ul>
+  <li>[ ] JWT tokens expire after the configured lifetime and refresh token flow works</li>
+  <li>[ ] Student profile update requires authentication and only allows self-update</li>
+  <li>[ ] Chat delete operations require authentication and ownership</li>
+  <li>[ ] Sales detail pages load correctly (previously 9 round-trips now 1)</li>
+  <li>[ ] Tutor listing pages perform acceptably under load (N+1 eliminated)</li>
+  <li>[ ] SignalR notifications reach all open tabs for a given user (multi-connection fix)</li>
+  <li>[ ] Notification update endpoint correctly validates the notification owner</li>
+  <li>[ ] All form submissions that were silently ignored now return proper validation errors</li>
+  <li>[ ] Attendance marking correctly records both tutor and student presence (separate field fix)</li>
+</ul>
+
+<h3>After Phase 3 Changes</h3>
+<ul>
+  <li>[ ] File exports (xlsx) work without prototype pollution errors</li>
+  <li>[ ] Stripe payments process correctly with idempotency (no double charges on retry)</li>
+  <li>[ ] Health check endpoint returns 200 at <code>/health</code></li>
+  <li>[ ] Rate limiting on <code>/api/Auth/*</code> triggers 429 after threshold</li>
+  <li>[ ] Error pages do not expose stack traces</li>
+</ul>
+
+<hr class="divider">
+
+<!-- SECTION 9: RISK MATRIX -->
+<h2>9. Risk Classification Matrix</h2>
+
+<h3>SAFE — No Regression Risk (implement freely)</h3>
+<table class="risk-table">
+  <tr><th>ID</th><th>Fix</th><th>File</th></tr>
+  <tr><td>C-06</td><td>Fix hardcoded GUID → userId parameter</td><td>StudentRepository.cs:526</td></tr>
+  <tr><td>H-PERF-08</td><td>Fix full table scan in memory</td><td>TutorRepository.cs:675</td></tr>
+  <tr><td>H-PERF-12</td><td>Add .AsNoTracking()</td><td>All read queries</td></tr>
+  <tr><td>H-SEC-02</td><td>ForgotPassword generic response</td><td>AuthController.cs:137</td></tr>
+  <tr><td>H-SEC-09</td><td>Gate EnableSensitiveDataLogging</td><td>InfrastructureConfig.cs:21</td></tr>
+  <tr><td>H-REV-01</td><td>throw ex → throw</td><td>Multiple</td></tr>
+  <tr><td>H-REV-19</td><td>Delete WeatherForecastController</td><td>WeatherForecastController.cs</td></tr>
+  <tr><td>H-REV-29</td><td>Delete commented-out dead code</td><td>TutorRepository.cs, SalesRepository.cs</td></tr>
+  <tr><td>H-REV-30</td><td>Fix placeholder namespace</td><td>SchedulerController.cs:38</td></tr>
+  <tr><td>H-REV-32</td><td>Fix namespace mismatch</td><td>GenericService.cs:1</td></tr>
+  <tr><td>H-REV-34</td><td>Rename getScheduleDetailsById</td><td>SchedulerController.cs:108</td></tr>
+</table>
+
+<h3>MEDIUM RISK — Needs Testing Before Release</h3>
+<table class="risk-table">
+  <tr><th>ID</th><th>Fix</th><th>Why Medium</th></tr>
+  <tr><td>C-09</td><td>Fix schedule date loop object reuse</td><td>Existing schedule records may expose data inconsistency</td></tr>
+  <tr><td>H-PERF-01</td><td>Consolidate GetSalesDetailsById to 1 query</td><td>Navigation property mapping must be verified</td></tr>
+  <tr><td>H-PERF-09</td><td>AddTransient → AddScoped</td><td>Could affect repos that hold state across calls</td></tr>
+  <tr><td>H-PERF-11</td><td>SaveChangesAsync outside foreach</td><td>Error handling logic may rely on per-item partial commits</td></tr>
+  <tr><td>H-REV-07</td><td>Fix UpdateNotification null-check logic</td><td>Logic inversion may surface currently-masked paths</td></tr>
+  <tr><td>H-REV-10</td><td>Fix ParentName ← LastName mapping</td><td>Data displayed to users will change</td></tr>
+  <tr><td>H-REV-11</td><td>Fix CreatedBy = Guid.NewGuid()</td><td>Audit reports will change</td></tr>
+  <tr><td>H-REV-25</td><td>Wire FluentValidation</td><td>Previously-accepted invalid inputs will now be rejected</td></tr>
+</table>
+
+<h3>HIGH RISK — Requires Team Discussion / Manual Review</h3>
+<table class="risk-table">
+  <tr><th>ID</th><th>Fix</th><th>Why High Risk</th></tr>
+  <tr><td>C-01</td><td>Rotate all credentials</td><td>Service downtime if env vars not configured before rotation</td></tr>
+  <tr><td>C-02 + C-03</td><td>Fix CheckPolicyAttribute + restore [Authorize]</td><td>Will break any flows that currently rely on anonymous access; must coordinate with frontend</td></tr>
+  <tr><td>C-04</td><td>Fix CompleteStudentLogin auth bypass</td><td>Changes multi-step login flow; frontend must be updated simultaneously</td></tr>
+  <tr><td>C-05</td><td>Fix ChangePassword endpoint</td><td>Changes forgot-password user flow; frontend must be updated</td></tr>
+  <tr><td>H-SEC-04</td><td>Enable JWT expiration</td><td>All existing issued tokens become invalid; users will be logged out</td></tr>
+  <tr><td>H-SEC-05</td><td>Increase PBKDF2 iterations</td><td>Requires password hash migration strategy; all users must re-login</td></tr>
+  <tr><td>H-REV-06</td><td>Implement NotificationService</td><td>Currently empty — scope unclear, requires team specification</td></tr>
+  <tr><td>H-REV-17</td><td>Fix SignalR online user broadcast</td><td>Changes real-time UX; frontend must handle new event model</td></tr>
+</table>
+
+<hr class="divider">
+
+<!-- SECTION 10: DEPENDENCY MAP -->
+<h2>10. Fix Dependency Map</h2>
+<p class="section-intro">Some fixes must be applied in order. Applying them out of sequence will either fail to work or cause service disruption.</p>
+
+<table>
+  <tr><th>Step</th><th>Must Do First</th><th>Then Do</th><th>Reason</th></tr>
+  <tr><td>1</td><td>Fix CheckPolicyAttribute (C-02)</td><td>Restore [Authorize] on BaseAPIController (C-03)</td><td>Restoring [Authorize] without fixing C-02 still doesn't enforce policies — both changes are needed together</td></tr>
+  <tr><td>2</td><td>Configure env vars for credentials</td><td>Remove credentials from appsettings.json (C-01)</td><td>Removing secrets before env vars are in place causes startup failure</td></tr>
+  <tr><td>3</td><td>Fix frontend login flow to pass preAuthToken</td><td>Fix CompleteStudentLogin server-side (C-04)</td><td>Server-side fix without frontend update will break all student logins</td></tr>
+  <tr><td>4</td><td>Fix frontend password-reset flow</td><td>Fix ChangePassword to require token (C-05)</td><td>Server-side fix without frontend update will break forgot-password flow</td></tr>
+  <tr><td>5</td><td>Update frontend SignalR client code</td><td>Fix SignalR multi-connection + privacy (H-REV-17, H-REV-18)</td><td>Hub interface changes require client-side updates in the same deployment</td></tr>
+  <tr><td>6</td><td>Define FluentValidation rules in SalesValidator</td><td>Wire FluentValidation into pipeline (H-REV-25)</td><td>Wiring an empty validator into the pipeline rejects all valid requests</td></tr>
+</table>
+
+</div>
+
+<div class="footer">
+  <strong>TCT LMS — Code Audit Report</strong> &nbsp;|&nbsp; Generated: June 17, 2026 &nbsp;|&nbsp; Audit scope: .NET 8 Clean Architecture API + React 17 SPA &nbsp;|&nbsp; 141 findings &nbsp;|&nbsp; This report was produced by AI-assisted static analysis. All findings should be reviewed by a human developer before implementation.
+</div>
+
+</body>
+</html>

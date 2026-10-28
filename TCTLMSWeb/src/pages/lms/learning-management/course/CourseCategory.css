@@ -1,0 +1,779 @@
+/* =========================================
+   COURSE CATEGORY PAGE
+========================================= */
+
+.course-category-page {
+  padding: 85px 24px 24px;
+  background: #f5f6fa;
+  min-height: 100%;
+  box-sizing: border-box;
+}
+
+
+/* =========================================
+   HEADER
+========================================= */
+
+.course-category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.course-category-header h2 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #294263;
+}
+
+.course-category-header p {
+  margin: 6px 0 0;
+  color: #7590ad;
+  font-size: 14px;
+}
+
+.course-category-actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.filter-btn,
+.add-category-btn {
+  height: 38px;
+  border-radius: 5px;
+  padding: 0 18px;
+  font-weight: 600;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.filter-btn {
+  background: white;
+  border: 1px solid #d6deea;
+  color: #405878;
+  min-width: 145px;
+}
+
+.add-category-btn {
+  border: none;
+  background: #8150f6;
+  color: white;
+  min-width: 160px;
+}
+
+
+/* =========================================
+   CATEGORY GRID
+========================================= */
+
+.category-grid {
+  display: grid;
+
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+
+  /*
+     IMPORTANT:
+     Every card gets the same height.
+  */
+  grid-auto-rows: 280px;
+
+  gap: 28px;
+
+  /*
+     Make items stretch to their grid row.
+  */
+  align-items: stretch;
+}
+
+
+/* =========================================
+   CARD LINK
+========================================= */
+
+.category-card-link {
+  display: block;
+
+  /*
+     Make Link occupy the complete grid cell.
+  */
+  width: 100%;
+  height: 100%;
+
+  text-decoration: none;
+  color: inherit;
+
+  min-width: 0;
+}
+
+.category-card-link:hover {
+  text-decoration: none;
+  color: inherit;
+}
+
+
+/* =========================================
+   CARD
+========================================= */
+
+.category-card {
+  width: 100%;
+  height: 100%;
+
+  background: white;
+  border-radius: 5px;
+
+  padding: 26px 24px;
+
+  /*
+     Important for correct sizing.
+  */
+  box-sizing: border-box;
+
+  /*
+     Remove different heights caused by content.
+  */
+  min-height: 0;
+
+  /*
+     Flex layout keeps card content organized.
+  */
+  display: flex;
+  flex-direction: column;
+
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.category-card-link:hover .category-card {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+
+/* =========================================
+   CARD HEADER
+========================================= */
+
+.category-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  flex-shrink: 0;
+}
+
+.category-title-section {
+  display: flex;
+  align-items: center;
+
+  gap: 16px;
+
+  min-width: 0;
+}
+
+
+/* =========================================
+   CATEGORY ICON
+========================================= */
+
+.category-icon {
+  width: 40px;
+  height: 40px;
+
+  flex-shrink: 0;
+
+  border-radius: 4px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: white;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  background: #8150f6;
+}
+
+.category-icon.WD {
+  background: #f9b900;
+}
+
+.category-icon.MA {
+  background: #11bad4;
+}
+
+
+/* =========================================
+   TITLE
+========================================= */
+
+.category-title-section h3 {
+  margin: 0;
+
+  color: #294263;
+
+  font-size: 17px;
+  font-weight: 600;
+
+  line-height: 1.3;
+}
+
+.category-title-section span {
+  display: block;
+
+  margin-top: 5px;
+
+  color: #7890aa;
+
+  font-size: 13px;
+}
+
+
+/* =========================================
+   THREE DOT MENU
+========================================= */
+
+.category-menu-btn {
+  border: none;
+  background: transparent;
+
+  color: #55708e;
+
+  font-size: 15px;
+
+  cursor: pointer;
+
+  flex-shrink: 0;
+
+  padding: 2px 0 0 10px;
+}
+
+
+/* =========================================
+   DESCRIPTION
+========================================= */
+
+.category-description {
+  margin: 24px 0 18px;
+
+  color: #45617f;
+
+  font-size: 14px;
+  line-height: 1.8;
+
+  /*
+     Keep description area consistent.
+  */
+  min-height: 50px;
+}
+
+
+/* =========================================
+   TAGS
+========================================= */
+
+.category-tags {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 7px;
+
+  /*
+     Keep tags at the bottom of the card.
+  */
+  margin-top: auto;
+
+  align-content: flex-start;
+}
+
+.category-tag {
+  padding: 4px 7px;
+
+  border-radius: 3px;
+
+  font-size: 11px;
+
+  line-height: 1.3;
+
+  white-space: nowrap;
+}
+
+
+/* =========================================
+   TAG COLORS
+========================================= */
+
+.tag-0 {
+  color: #7344e8;
+  background: #f1eaff;
+}
+
+.tag-1 {
+  color: #ef5350;
+  background: #ffeded;
+}
+
+.tag-2 {
+  color: #00a6c4;
+  background: #e5f9fc;
+}
+
+.tag-3 {
+  color: #e6a900;
+  background: #fff7df;
+}
+
+.tag-4 {
+  color: #405878;
+  background: #edf0f3;
+}
+
+
+/* =========================================
+   MODAL
+========================================= */
+
+.category-modal-overlay {
+  position: fixed;
+  inset: 0;
+
+  background: rgba(37, 52, 70, 0.48);
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+
+  padding-top: 15px;
+
+  z-index: 9999;
+}
+
+.category-modal {
+  width: 520px;
+
+  background: white;
+
+  border-radius: 5px;
+
+  padding: 36px 40px;
+
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+
+  box-sizing: border-box;
+}
+
+.category-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 24px;
+}
+
+.category-modal-header h2 {
+  margin: 0;
+
+  color: #344b67;
+
+  font-size: 21px;
+}
+
+.modal-close-btn {
+  border: none;
+  background: transparent;
+
+  color: #a4b2c2;
+
+  font-size: 25px;
+
+  cursor: pointer;
+}
+
+
+/* =========================================
+   FORM
+========================================= */
+
+.form-group {
+  margin-bottom: 22px;
+}
+
+.form-group label {
+  display: block;
+
+  margin-bottom: 10px;
+
+  color: #344b67;
+
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  border: 1px solid #d5deeb;
+
+  border-radius: 4px;
+
+  padding: 11px 15px;
+
+  color: #405878;
+
+  font-size: 14px;
+
+  outline: none;
+}
+
+.form-group textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: #8150f6;
+}
+
+
+/* =========================================
+   FILE INPUT
+========================================= */
+
+.file-input-wrapper {
+  display: flex;
+}
+
+.file-input-wrapper input {
+  border-radius: 4px 0 0 4px;
+}
+
+.browse-btn {
+  width: 80px;
+
+  flex-shrink: 0;
+
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+
+  background: #eef1f5;
+
+  border: 1px solid #d5deeb;
+  border-left: none;
+
+  border-radius: 0 4px 4px 0;
+
+  cursor: pointer;
+}
+
+
+/* =========================================
+   SUBCATEGORY
+========================================= */
+
+.subcategory-input {
+  display: flex;
+  gap: 16px;
+}
+
+.subcategory-input input {
+  flex: 1;
+}
+
+.subcategory-input button {
+  width: 36px;
+  height: 36px;
+
+  border: 1px solid #d5deeb;
+
+  background: white;
+
+  border-radius: 4px;
+
+  color: #647d99;
+
+  font-size: 22px;
+
+  cursor: pointer;
+}
+
+.added-subcategories {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 7px;
+
+  margin-top: 12px;
+}
+
+.added-subcategories span {
+  background: #f1eaff;
+  color: #7344e8;
+
+  padding: 5px 8px;
+
+  border-radius: 3px;
+
+  font-size: 12px;
+}
+
+.added-subcategories button {
+  border: none;
+  background: transparent;
+
+  color: inherit;
+
+  cursor: pointer;
+
+  margin-left: 5px;
+}
+
+
+/* =========================================
+   SAVE
+========================================= */
+
+.save-category-btn {
+  margin-top: 4px;
+
+  border: none;
+
+  background: #8150f6;
+
+  color: white;
+
+  padding: 11px 20px;
+
+  border-radius: 4px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 1400px) {
+
+  .category-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-auto-rows: 280px;
+  }
+}
+
+
+@media (max-width: 1100px) {
+
+  .category-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: 280px;
+  }
+
+  .course-category-header {
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+}
+
+
+@media (max-width: 700px) {
+
+  .course-category-page {
+    padding: 80px 15px 20px;
+  }
+
+  .course-category-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .course-category-actions {
+    width: 100%;
+  }
+
+  .filter-btn,
+  .add-category-btn {
+    flex: 1;
+  }
+
+  .category-grid {
+    grid-template-columns: 1fr;
+    grid-auto-rows: auto;
+  }
+
+  .category-card-link {
+    height: auto;
+  }
+
+  .category-card {
+    min-height: 280px;
+    height: auto;
+  }
+}
+/* =========================================
+   THREE DOT MENU WRAPPER
+========================================= */
+
+.category-menu-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+
+/* =========================================
+   THREE DOT BUTTON
+========================================= */
+
+.category-menu-btn {
+  border: none;
+  background: transparent;
+  color: #55708e;
+  font-size: 15px;
+  cursor: pointer;
+  padding: 3px 4px;
+  line-height: 1;
+  border-radius: 4px;
+}
+
+.category-menu-btn:hover {
+  background: #f1f3f7;
+}
+
+
+/* =========================================
+   DROPDOWN
+========================================= */
+
+.category-dropdown {
+  position: absolute;
+  top: 28px;
+  right: 0;
+
+  width: 155px;
+
+  background: #ffffff;
+
+  border-radius: 4px;
+
+  box-shadow:
+    0 4px 15px rgba(40, 60, 90, 0.12),
+    0 1px 4px rgba(40, 60, 90, 0.08);
+
+  border: 1px solid #edf0f5;
+
+  padding: 7px 0;
+
+  z-index: 100;
+
+  animation: categoryDropdownOpen 0.15s ease;
+}
+
+
+/* =========================================
+   DROPDOWN ITEM
+========================================= */
+
+.category-dropdown-item {
+  width: 100%;
+
+  min-height: 40px;
+
+  border: none;
+  background: transparent;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 0 15px;
+
+  color: #405878;
+
+  font-size: 12px;
+
+  cursor: pointer;
+
+  text-align: left;
+}
+
+.category-dropdown-item:hover {
+  background: #f7f8fb;
+  color: #8150f6;
+}
+
+
+/* =========================================
+   DROPDOWN ICON
+========================================= */
+
+.dropdown-icon {
+  width: 17px;
+
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  font-size: 15px;
+}
+
+.edit-icon {
+  color: #8150f6;
+}
+
+.delete-icon {
+  color: #6d7f95;
+}
+
+.delete-item:hover {
+  color: #ef5350;
+}
+
+.delete-item:hover .delete-icon {
+  color: #ef5350;
+}
+
+
+/* =========================================
+   DROPDOWN ANIMATION
+========================================= */
+
+@keyframes categoryDropdownOpen {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

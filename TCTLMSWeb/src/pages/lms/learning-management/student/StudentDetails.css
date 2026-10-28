@@ -1,0 +1,754 @@
+/* =========================================================
+   STUDENT DETAILS PAGE
+========================================================= */
+
+.student-details-page {
+  width: 100%;
+  min-height: 100vh;
+
+  padding: 25px 22px 40px;
+
+  box-sizing: border-box;
+
+  background: #f5f6fa;
+
+  color: #526484;
+}
+
+/* =========================================================
+   TOP BAR
+========================================================= */
+
+.student-details-topbar {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 22px;
+}
+
+.student-details-breadcrumb {
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+
+  font-size: 18px;
+  font-weight: 500;
+
+  color: #8150f6;
+}
+
+.breadcrumb-link {
+  color: #364a63;
+
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.breadcrumb-link:hover {
+  color: #8150f6;
+}
+
+.breadcrumb-separator {
+  color: #8091a5;
+}
+
+.breadcrumb-current {
+  color: #8150f6;
+}
+
+/* =========================================================
+   BACK BUTTON
+========================================================= */
+
+.student-back-btn {
+  height: 36px;
+
+  padding: 0 14px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  border: 1px solid #d9deea;
+
+  border-radius: 4px;
+
+  background: #ffffff;
+
+  color: #526484;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.student-back-btn:hover {
+  background: #f7f8fb;
+
+  border-color: #8150f6;
+
+  color: #8150f6;
+}
+
+/* =========================================================
+   MAIN CARD
+========================================================= */
+
+.student-details-card {
+  width: 100%;
+
+  display: flex;
+
+  background: #ffffff;
+
+  border: 1px solid #e5e9f2;
+
+  border-radius: 4px;
+
+  overflow: hidden;
+
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   LEFT SIDEBAR
+========================================================= */
+
+.student-details-sidebar {
+  width: 305px;
+
+  flex: 0 0 305px;
+
+  border-right: 1px solid #dfe4ed;
+
+  background: #ffffff;
+}
+
+/* =========================================================
+   PROFILE
+========================================================= */
+
+.student-profile-summary {
+  min-height: 73px;
+
+  padding: 18px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  border-bottom: 1px solid #dfe4ed;
+
+  box-sizing: border-box;
+}
+
+.student-details-avatar {
+  width: 38px;
+  height: 38px;
+
+  flex: 0 0 38px;
+
+  border-radius: 50%;
+
+  object-fit: cover;
+}
+
+.student-profile-name {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+.student-profile-name strong {
+  color: #364a63;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.student-profile-name span {
+  color: #8091a5;
+
+  font-size: 10px;
+}
+
+/* =========================================================
+   BILLING
+========================================================= */
+
+.student-billing-box {
+  min-height: 98px;
+
+  padding: 18px;
+
+  display: flex;
+  flex-direction: column;
+
+  border-bottom: 1px solid #dfe4ed;
+
+  box-sizing: border-box;
+}
+
+.billing-label {
+  margin-bottom: 6px;
+
+  color: #8091a5;
+
+  font-size: 9px;
+  font-weight: 700;
+
+  letter-spacing: 1px;
+}
+
+.billing-paid {
+  margin-bottom: 5px;
+
+  color: #8150f6;
+
+  font-size: 14px;
+}
+
+.billing-due {
+  color: #e85347;
+
+  font-size: 11px;
+}
+
+/* =========================================================
+   SIDE MENU
+========================================================= */
+
+.student-side-menu {
+  padding: 12px 0;
+
+  border-bottom: 1px solid #dfe4ed;
+}
+
+.student-side-menu-item {
+  width: 100%;
+
+  height: 42px;
+
+  padding: 0 18px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 11px;
+
+  border: none;
+
+  background: transparent;
+
+  color: #526484;
+
+  font-size: 12px;
+
+  text-align: left;
+
+  cursor: pointer;
+}
+
+.student-side-menu-item:hover {
+  background: #f7f8fb;
+
+  color: #8150f6;
+}
+
+.student-side-menu-item.active {
+  color: #8150f6;
+}
+
+.side-menu-icon {
+  width: 16px;
+
+  color: #91a1b5;
+
+  font-size: 13px;
+}
+
+.student-side-menu-item.active .side-menu-icon {
+  color: #8150f6;
+}
+
+.side-menu-arrow {
+  margin-left: auto;
+
+  color: #8150f6;
+
+  font-size: 18px;
+}
+
+/* =========================================================
+   LOGIN INFORMATION
+========================================================= */
+
+.student-login-info {
+  padding: 18px;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.login-label {
+  color: #8091a5;
+
+  font-size: 9px;
+  font-weight: 700;
+
+  letter-spacing: 1px;
+}
+
+.login-value {
+  margin-top: 6px;
+
+  color: #526484;
+
+  font-size: 10px;
+}
+
+.login-ip-label {
+  margin-top: 17px;
+}
+
+/* =========================================================
+   RIGHT CONTENT
+========================================================= */
+
+.student-details-content {
+  flex: 1;
+
+  min-width: 0;
+
+  padding: 30px 32px 35px;
+
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   INFORMATION HEADER
+========================================================= */
+
+.student-information-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  margin-bottom: 16px;
+}
+
+.student-information-header h2 {
+  margin: 0;
+
+  color: #364a63;
+
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.student-information-header p {
+  margin: 6px 0 0;
+
+  color: #8091a5;
+
+  font-size: 11px;
+}
+
+.student-edit-details-btn {
+  width: 32px;
+  height: 32px;
+
+  border: none;
+
+  background: transparent;
+
+  color: #526484;
+
+  font-size: 17px;
+
+  cursor: pointer;
+}
+
+.student-edit-details-btn:hover {
+  color: #8150f6;
+}
+
+/* =========================================================
+   SECTION TITLE
+========================================================= */
+
+.student-section-title {
+  width: 100%;
+
+  height: 24px;
+
+  padding: 0 16px;
+
+  display: flex;
+  align-items: center;
+
+  background: #e9edf2;
+
+  color: #8091a5;
+
+  font-size: 9px;
+  font-weight: 700;
+
+  letter-spacing: 1.5px;
+
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   INFORMATION TABLE
+========================================================= */
+
+.student-information-table {
+  width: 100%;
+}
+
+.student-information-row {
+  min-height: 59px;
+
+  display: grid;
+
+  grid-template-columns: 44% 56%;
+
+  align-items: center;
+
+  border-bottom: 1px solid #e1e6ef;
+
+  box-sizing: border-box;
+}
+
+.information-label {
+  padding-left: 16px;
+
+  color: #8091a5;
+
+  font-size: 11px;
+}
+
+.information-value {
+  padding: 10px 16px;
+
+  color: #526484;
+
+  font-size: 11px;
+}
+
+/* =========================================================
+   DETAILS STATUS
+========================================================= */
+
+.details-status {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 6px;
+
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.details-status-dot {
+  width: 6px;
+  height: 6px;
+
+  border-radius: 50%;
+}
+
+.details-status.active {
+  color: #1ca774;
+}
+
+.details-status.active .details-status-dot {
+  background: #1ca774;
+}
+
+.details-status.inactive {
+  color: #e85347;
+}
+
+.details-status.inactive .details-status-dot {
+  background: #e85347;
+}
+
+/* =========================================================
+   ENROLLED COURSES HEADER
+========================================================= */
+
+.enrolled-courses-header {
+  margin-top: 30px;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.enrolled-courses-header h2 {
+  margin: 0;
+
+  color: #364a63;
+
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.enrolled-courses-header p {
+  margin: 6px 0 16px;
+
+  color: #8091a5;
+
+  font-size: 11px;
+}
+
+.course-add-icon {
+  color: #526484;
+
+  font-size: 17px;
+
+  cursor: pointer;
+}
+
+.course-add-icon:hover {
+  color: #8150f6;
+}
+
+/* =========================================================
+   COURSES TABLE
+========================================================= */
+
+.enrolled-courses-table-wrapper {
+  width: 100%;
+
+  border: 1px solid #dfe4ed;
+
+  box-sizing: border-box;
+
+  overflow-x: auto;
+}
+
+.enrolled-courses-table {
+  width: 100%;
+
+  border-collapse: collapse;
+
+  font-size: 11px;
+}
+
+.enrolled-courses-table th {
+  height: 32px;
+
+  padding: 0 18px;
+
+  background: #ffffff;
+
+  border-bottom: 1px solid #dfe4ed;
+
+  color: #526484;
+
+  font-size: 10px;
+
+  text-align: left;
+}
+
+.enrolled-courses-table td {
+  height: 38px;
+
+  padding: 0 18px;
+
+  border-bottom: 1px solid #e1e6ef;
+
+  color: #8091a5;
+}
+
+.enrolled-courses-table tr:last-child td {
+  border-bottom: none;
+}
+
+.course-name {
+  color: #526484 !important;
+}
+
+.course-status {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 6px;
+
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.course-status-dot {
+  width: 6px;
+  height: 6px;
+
+  border-radius: 50%;
+}
+
+.course-status.active {
+  color: #1ca774;
+}
+
+.course-status.active .course-status-dot {
+  background: #1ca774;
+}
+
+.course-status.pending {
+  color: #e7a600;
+}
+
+.course-status.pending .course-status-dot {
+  background: #e7a600;
+}
+
+.course-status.canceled {
+  color: #e85347;
+}
+
+.course-status.canceled .course-status-dot {
+  background: #e85347;
+}
+
+.course-delete {
+  width: 50px;
+
+  color: #e85347 !important;
+
+  text-align: center;
+
+  cursor: pointer;
+}
+
+.no-courses {
+  height: 70px !important;
+
+  text-align: center;
+
+  color: #8091a5 !important;
+}
+
+/* =========================================================
+   NOT FOUND
+========================================================= */
+
+.student-details-not-found {
+  padding: 60px 30px;
+
+  background: #ffffff;
+
+  border: 1px solid #e5e9f2;
+
+  text-align: center;
+}
+
+.student-details-not-found h3 {
+  margin: 0 0 8px;
+
+  color: #364a63;
+}
+
+.student-details-not-found p {
+  margin: 0 0 20px;
+
+  color: #8091a5;
+}
+
+.student-details-not-found button {
+  height: 38px;
+
+  padding: 0 18px;
+
+  border: none;
+  border-radius: 4px;
+
+  background: #8150f6;
+
+  color: #ffffff;
+
+  cursor: pointer;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+  .student-details-card {
+    flex-direction: column;
+  }
+
+  .student-details-sidebar {
+    width: 100%;
+
+    flex: none;
+
+    border-right: none;
+
+    border-bottom: 1px solid #dfe4ed;
+  }
+
+  .student-side-menu {
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .student-details-content {
+    padding: 25px 20px;
+  }
+}
+
+@media (max-width: 600px) {
+  .student-details-page {
+    padding: 18px 12px 30px;
+  }
+
+  .student-details-topbar {
+    align-items: flex-start;
+  }
+
+  .student-details-breadcrumb {
+    font-size: 15px;
+  }
+
+  .student-side-menu {
+    grid-template-columns: 1fr;
+  }
+
+  .student-information-row {
+    grid-template-columns: 1fr;
+
+    padding: 12px 0;
+  }
+
+  .information-label {
+    padding-left: 16px;
+
+    margin-bottom: 5px;
+  }
+
+  .information-value {
+    padding: 0 16px;
+  }
+
+  .student-details-content {
+    padding: 20px 14px;
+  }
+}

@@ -1,0 +1,365 @@
+/* Tutors → Tutor List. Every selector is scoped under .tct-tutor-list (this page only). */
+
+/* ── Page head: title on the left; search, filter, columns and Add on the right ── */
+.tct-tutor-list .tutor-list-head {
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+}
+.tct-tutor-list .tutor-list-head .nk-block-title {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #1c2b46;
+}
+.tct-tutor-list .tutor-list-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px 12px;
+  margin-left: auto;
+}
+.tct-tutor-list .tutor-list-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+.tct-tutor-list .tutor-list-search .form-control-wrap {
+  width: 280px;
+}
+.tct-tutor-list .tutor-list-search .form-control {
+  height: 38px;
+  border-radius: 8px;
+  border-color: #dbdfea;
+  box-shadow: none;
+}
+.tct-tutor-list .tutor-list-search .form-control:focus {
+  border-color: #854fff;
+  box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.12);
+}
+.tct-tutor-list .tutor-list-search .form-icon {
+  height: 38px;
+  color: #8094ae;
+}
+.tct-tutor-list .tutor-list-search .btn {
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 8px;
+}
+.tct-tutor-list .tutor-list-toolbar .nk-block-tools {
+  align-items: center;
+  margin: 0;
+}
+.tct-tutor-list .tutor-list-toolbar .nk-block-tools .btn-primary {
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 8px;
+}
+.tct-tutor-list .tutor-filter-toggle.is-open {
+  color: #854fff;
+  background: #f5f1ff;
+}
+
+/* Tools (filter / columns / Add) are always visible from tablet width up; the menu button toggles them on phones. */
+@media (min-width: 768px) {
+  .tct-tutor-list .tutor-list-toolbar .toggle-expand {
+    display: none;
+  }
+  .tct-tutor-list .tutor-list-toolbar .toggle-expand-content {
+    display: block;
+  }
+}
+@media (max-width: 767.98px) {
+  .tct-tutor-list .tutor-list-toolbar {
+    width: 100%;
+    justify-content: space-between;
+    margin-left: 0;
+  }
+  .tct-tutor-list .tutor-list-search {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .tct-tutor-list .tutor-list-search .form-control-wrap {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+  }
+}
+
+/* ── Card and advanced filter panel ── */
+.tct-tutor-list .tutor-list-card {
+  border: 1px solid #e5e9f2;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(31, 43, 58, 0.05);
+}
+.tct-tutor-list .tutor-filter-panel {
+  margin-bottom: 16px;
+  padding: 16px 18px 14px;
+  border: 1px solid #e5e9f2;
+  border-radius: 10px;
+  background: #fbfcfe;
+  animation: tutor-filter-panel-in 0.18s ease-out;
+}
+.tct-tutor-list .tutor-filter-panel .form-group {
+  margin-bottom: 0;
+}
+.tct-tutor-list .tutor-filter-panel .form-label {
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #8094ae;
+}
+.tct-tutor-list .tutor-filter-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 14px;
+}
+.tct-tutor-list .tutor-filter-actions .btn {
+  min-width: 88px;
+  justify-content: center;
+  border-radius: 8px;
+}
+@keyframes tutor-filter-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tct-tutor-list .tutor-filter-panel {
+    animation: none;
+  }
+}
+
+/* ── Tables ── */
+.tct-tutor-list .tutor-list-table {
+  min-width: 0;
+}
+/* The global .rdt_Table rule (vendors/react-datatable) adds a 1rem top/bottom margin and its own border.
+   With fixedHeader the table sits in a max-height scroll box and the head is position: sticky; top: 0, so
+   that margin is a 1rem band inside the scroll box above the head: scrolled rows pass through it, above
+   and behind the header. Here the margin is removed and the border moves to the scroll box. */
+.tct-tutor-list .tutor-list-table .rdt_Table {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+}
+.tct-tutor-list .tutor-list-table > div:first-child {
+  border: 1px solid #e5e9f2;
+  border-radius: 10px;
+}
+.tct-tutor-list .tutor-list-table .rdt_TableHeadRow {
+  min-height: 44px !important;
+  background: #f8f9fc;
+  border-bottom: 1px solid #e5e9f2;
+}
+.tct-tutor-list .tutor-list-table .rdt_TableCol {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #8094ae !important;
+  background: #f8f9fc;
+}
+.tct-tutor-list .tutor-list-table .rdt_TableRow {
+  min-height: 56px;
+  border-bottom-color: #eef0f5 !important;
+}
+.tct-tutor-list .tutor-list-table .rdt_TableRow:hover {
+  background: #faf8ff;
+}
+.tct-tutor-list .tutor-list-table .rdt_TableCell {
+  align-items: center;
+}
+
+/* Action icons: one aligned row, centred in the column. */
+.tct-tutor-list .tutor-list-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+.tct-tutor-list .tutor-list-actions > span,
+.tct-tutor-list .tutor-list-actions > a {
+  display: inline-flex;
+}
+.tct-tutor-list .tutor-list-table .nk-tb-action,
+.tct-tutor-list .tutor-list-table .nk-tb-actions {
+  margin: 0;
+  padding: 0;
+}
+.tct-tutor-list .tutor-list-table .nk-tb-actions {
+  justify-content: center;
+  list-style: none;
+}
+
+/* ── Loading / empty / error states ── */
+.tct-tutor-list .tutor-list-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 180px;
+  padding: 32px 16px;
+  text-align: center;
+  font-size: 14px;
+  color: #8094ae;
+}
+.tct-tutor-list .tutor-list-state p {
+  margin: 0;
+}
+.tct-tutor-list .tutor-list-state .icon {
+  font-size: 30px;
+}
+
+/* ── Rows per page + range + page buttons ── */
+.tct-tutor-list .tutor-list-pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  padding-top: 14px;
+}
+.tct-tutor-list .tutor-list-pager-size {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #6b7a90;
+}
+.tct-tutor-list .tutor-list-pager-size label {
+  margin: 0;
+  white-space: nowrap;
+}
+.tct-tutor-list .tutor-list-pager-size .form-control {
+  width: 76px;
+  height: 32px;
+  padding: 0 8px;
+  border-radius: 8px;
+  border-color: #dbdfea;
+}
+.tct-tutor-list .tutor-list-pager-range {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.tct-tutor-list .tutor-list-pager .page-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 34px;
+  height: 32px;
+  justify-content: center;
+  cursor: pointer;
+}
+.tct-tutor-list .tutor-list-pager .page-item:first-child .page-link {
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+.tct-tutor-list .tutor-list-pager .page-item:last-child .page-link {
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+.tct-tutor-list .tutor-list-pager .page-item.disabled .page-link {
+  cursor: default;
+}
+
+/* ── Tutor list: row-click expansion, polish and footer layout ── */
+
+/* Header row */
+.tct-tutor-list .tutor-list-table .rdt_TableHeadRow { background: #f6f7fb; }
+.tct-tutor-list .tutor-list-table .rdt_TableCol { background: transparent; color: #526484 !important; font-weight: 700 !important; }
+
+/* Whole row is the expand/collapse target: hover + cursor show it (pointerOnHover / highlightOnHover). */
+.tct-tutor-list .tutor-list-table .rdt_TableRow { transition: background-color 0.15s ease; }
+.tct-tutor-list .tutor-list-table .rdt_TableRow:hover { background: #f8f5ff !important; outline: none !important; }
+.tct-tutor-list .tutor-list-table .rdt_TableRow:hover .tb-lead { color: #6a35e8; }
+.tct-tutor-list .tutor-list-table .user-card { cursor: pointer; }
+
+/* Expand indicator (same toggle as clicking the row) */
+.tct-tutor-list .tutor-list-table .rdt_TableRow button[aria-label="Expand Row"],
+.tct-tutor-list .tutor-list-table .rdt_TableRow button[aria-label="Collapse Row"] {
+  width: 30px; height: 30px; margin: 0 auto; border-radius: 8px; color: #8094ae; background: transparent; transition: background-color .15s ease, color .15s ease;
+}
+.tct-tutor-list .tutor-list-table .rdt_TableRow:hover button[aria-label="Expand Row"] { color: #6a35e8; background: #efe9ff; }
+.tct-tutor-list .tutor-list-table .rdt_TableRow button[aria-label="Collapse Row"] { color: #fff; background: #854fff; }
+.tct-tutor-list .tutor-list-table .rdt_TableRow button:focus { outline: none; }
+.tct-tutor-list .tutor-list-table .rdt_TableRow button:focus-visible { box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.25); }
+.tct-tutor-list .tutor-list-table .rdt_TableRow button svg { fill: currentColor; }
+/* Expanded row: tinted with an accent edge, and its details panel directly below. */
+.tct-tutor-list .tutor-list-table .rdt_TableRow:has(button[aria-label="Collapse Row"]) { background: #f8f5ff; box-shadow: inset 3px 0 0 #854fff; }
+.tct-tutor-list .tutor-list-table .rdt_ExpanderRow {
+  padding: 4px 20px 16px 64px; background: #fbfaff; border-bottom: 1px solid #eef0f5; box-shadow: inset 3px 0 0 #854fff;
+}
+.tct-tutor-list .tutor-list-table .rdt_ExpanderRow > div { padding: 8px 0 0 !important; background: transparent !important; }
+/* Details panel (the skills component's wrapper div): fixed max height, scrolls inside with the scrollbar
+   hidden (wheel / trackpad / touch / keyboard still scroll), column header pinned. Border sits on the
+   scroll box so the sticky header is not clipped. */
+.tct-tutor-list .tutor-list-table .rdt_ExpanderRow > div:has(table) {
+  max-width: 640px; max-height: 280px; margin-top: 8px; padding: 0 !important; overflow: auto;
+  background: #fff !important; border: 1px solid #e5e9f2; border-radius: 10px;
+  scrollbar-width: none; -ms-overflow-style: none;
+}
+.tct-tutor-list .tutor-list-table .rdt_ExpanderRow > div:has(table)::-webkit-scrollbar { display: none; }
+.tct-tutor-list .tutor-list-table .rdt_ExpanderRow > div:has(table):focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.2); }
+.tct-tutor-list .tutor-list-table .rdt_ExpanderRow table {
+  width: 100%; max-width: none !important; margin: 0 !important; border: 0 !important; border-collapse: separate; border-spacing: 0;
+  background: #fff; font-size: 13px;
+}
+.tct-tutor-list .tutor-list-table .rdt_ExpanderRow table thead,
+.tct-tutor-list .tutor-list-table .rdt_ExpanderRow table thead th { background: #f3f5fa !important; }
+.tct-tutor-list .tutor-list-table .rdt_ExpanderRow table th {
+  position: sticky; top: 0; z-index: 1;
+  padding: 9px 14px; border: 0 !important; border-bottom: 1px solid #e5e9f2 !important;
+  font-size: 11.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #526484;
+}
+.tct-tutor-list .tutor-list-table .rdt_ExpanderRow table td { height: 40px; padding: 9px 14px; border: 0 !important; border-top: 1px solid #eef1f6 !important; color: #364a63; white-space: nowrap; }
+.tct-tutor-list .tutor-list-table .rdt_ExpanderRow table tbody tr:first-child td { border-top: 0 !important; }
+.tct-tutor-list .tutor-list-table .rdt_ExpanderRow table td:last-child { font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* Action icons */
+.tct-tutor-list .tutor-list-actions .btn-trigger { border-radius: 8px; }
+.tct-tutor-list .tutor-list-actions .btn-trigger:hover { color: #6a35e8; background: #f1ecff; }
+
+/* Footer: page numbers at the left edge, then the record range; Rows per page at the far right.
+   Shared TutorListPagination markup reordered with CSS for this page only (Reports pages are unaffected). */
+.tct-tutor-list .tutor-list-pager { justify-content: flex-start; padding: 16px 4px 2px; border-top: 1px solid #eef0f5; margin-top: 2px; }
+.tct-tutor-list .tutor-list-pager-size { display: contents; }
+.tct-tutor-list .tutor-list-pager > nav { order: 1; margin-left: 0; }
+.tct-tutor-list .tutor-list-pager-range { order: 2; margin-left: 8px; font-size: 13.5px; font-weight: 600; color: #526484; }
+.tct-tutor-list .tutor-list-pager-size label { order: 3; margin-left: auto; font-size: 13px; color: #6b7a90; }
+.tct-tutor-list .tutor-list-pager-size .form-control-select { order: 4; }
+.tct-tutor-list .tutor-list-pager .page-item.active .page-link { background: #854fff; border-color: #854fff; }
+/* The theme draws a top border on .pagination (stray line above the page buttons); not needed here. */
+.tct-tutor-list .tutor-list-pager .pagination { border-top: 0; padding-top: 0; margin-top: 0; }
+
+/* Toolbar polish */
+.tct-tutor-list .tutor-list-head .nk-block-title { font-size: 1.5rem; }
+.tct-tutor-list .tutor-list-toolbar .btn-trigger.btn-icon:not(.toggle-expand) { width: 38px; height: 38px; border-radius: 10px; }
+.tct-tutor-list .tutor-list-toolbar .btn-trigger.btn-icon:hover { color: #6a35e8; background: #f1ecff; }
+
+@media (max-width: 767.98px) {
+  .tct-tutor-list .tutor-list-pager { justify-content: space-between; }
+  .tct-tutor-list .tutor-list-pager-range { order: 1; margin-left: 0; }
+  .tct-tutor-list .tutor-list-pager > nav { order: 4; margin-left: 0; width: 100%; }
+  .tct-tutor-list .tutor-list-pager > nav .pagination { justify-content: flex-start; }
+  .tct-tutor-list .tutor-list-pager-size label { order: 2; margin-left: auto; }
+  .tct-tutor-list .tutor-list-pager-size .form-control-select { order: 3; }
+  .tct-tutor-list .tutor-list-table .rdt_ExpanderRow { padding-left: 16px; padding-right: 16px; }
+  /* Keep columns readable on small screens (the table scrolls sideways) instead of squeezing Name/email
+     into a narrow column that wraps one letter per line. */
+  .tct-tutor-list .tutor-list-table .rdt_Table { min-width: 860px; }
+  /* The menu button's mr-n1 pushed it 2px past the screen edge on phones. */
+  .tct-tutor-list .tutor-list-toolbar .toggle-expand { margin-right: 0 !important; }
+}

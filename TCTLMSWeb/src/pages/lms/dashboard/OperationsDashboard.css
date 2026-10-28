@@ -1,0 +1,224 @@
+/* Operations Dashboard (also used by Operations Admin via adminMode). Presentation only.
+   Every selector is scoped under .tct-ops-dash so no other page is affected.
+   Tones: --tone accent, --tone-soft pastel tint, --tone-ink readable accent text on white. */
+
+.tct-ops-dash .ops-tone-violet, .ops-modal.ops-tone-violet { --tone: #8b6cf6; --tone-soft: #f4f0ff; --tone-ink: #6a4fd8; --tone-shadow: rgba(139, 108, 246, 0.16); }
+.tct-ops-dash .ops-tone-blue, .ops-modal.ops-tone-blue   { --tone: #4f8ef7; --tone-soft: #edf4ff; --tone-ink: #2f6fd6; --tone-shadow: rgba(79, 142, 247, 0.16); }
+.tct-ops-dash .ops-tone-mint, .ops-modal.ops-tone-mint   { --tone: #2bb58a; --tone-soft: #e9f9f2; --tone-ink: #12805f; --tone-shadow: rgba(43, 181, 138, 0.16); }
+.tct-ops-dash .ops-tone-amber, .ops-modal.ops-tone-amber  { --tone: #e0a422; --tone-soft: #fff7e2; --tone-ink: #8f6200; --tone-shadow: rgba(224, 164, 34, 0.18); }
+.tct-ops-dash .ops-tone-coral, .ops-modal.ops-tone-coral  { --tone: #ef6b5b; --tone-soft: #fff0ee; --tone-ink: #c03e2e; --tone-shadow: rgba(239, 107, 91, 0.16); }
+.tct-ops-dash .ops-tone-indigo, .ops-modal.ops-tone-indigo { --tone: #6672e8; --tone-soft: #eff1ff; --tone-ink: #4652c9; --tone-shadow: rgba(102, 114, 232, 0.16); }
+.tct-ops-dash .ops-tone-peach, .ops-modal.ops-tone-peach  { --tone: #f2915a; --tone-soft: #fff3eb; --tone-ink: #b4561a; --tone-shadow: rgba(242, 145, 90, 0.18); }
+.tct-ops-dash .ops-tone-slate, .ops-modal.ops-tone-slate  { --tone: #94a3b8; --tone-soft: #f1f4f8; --tone-ink: #526484; --tone-shadow: rgba(148, 163, 184, 0.18); }
+
+/* ── Header ── */
+.tct-ops-dash .ops-head { padding-bottom: 20px; }
+.tct-ops-dash .ops-head-row { flex-wrap: wrap; align-items: flex-end; gap: 14px 24px; }
+.tct-ops-dash .ops-head .nk-block-title.page-title { margin: 0; font-size: 1.75rem; font-weight: 700; letter-spacing: -0.01em; color: #1c2b46; }
+.tct-ops-dash .ops-head-sub p { margin: 6px 0 0; font-size: 14.5px; color: #6b7a90; }
+.tct-ops-dash .ops-head-controls { min-width: 0; max-width: 100%; }
+
+/* ── Group titles ── */
+.tct-ops-dash .ops-group-title {
+  display: flex; align-items: center; gap: 8px; margin: 4px 0 12px;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #8094ae;
+}
+.tct-ops-dash .ops-group-title:after { content: ""; flex: 1 1 auto; height: 1px; background: #e5e9f2; }
+
+/* ── Card grids ── */
+.tct-ops-dash .ops-grid { display: grid; gap: 16px; margin-bottom: 28px; }
+.tct-ops-dash .ops-grid > div { min-width: 0; }
+.tct-ops-dash .ops-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.tct-ops-dash .ops-grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+/* ── Summary cards ── */
+.tct-ops-dash .ops-stat {
+  position: relative; display: flex; flex-direction: row; align-items: flex-start; gap: 14px; height: 100%; min-height: 96px; margin: 0;
+  padding: 18px 18px 16px; background: #fff; border: 1px solid #e8ebf3; border-top: 3px solid var(--tone); border-radius: 14px;
+  box-shadow: 0 1px 2px rgba(31, 43, 58, 0.04), 0 2px 8px rgba(31, 43, 58, 0.03);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+.tct-ops-dash .ops-stat.is-clickable { cursor: pointer; }
+.tct-ops-dash .ops-stat.is-clickable:hover {
+  transform: translateY(-2px); border-color: var(--tone);
+  box-shadow: 0 10px 22px var(--tone-shadow), 0 2px 6px rgba(31, 43, 58, 0.05);
+}
+.tct-ops-dash .ops-stat-icon {
+  flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px;
+  border-radius: 12px; font-size: 19px; color: var(--tone-ink); background: var(--tone-soft);
+}
+.tct-ops-dash .ops-stat-body { flex: 1 1 auto; min-width: 0; }
+.tct-ops-dash .ops-stat-value { font-size: 1.6rem; font-weight: 700; line-height: 1.15; color: #1c2b46; font-variant-numeric: tabular-nums; }
+.tct-ops-dash .ops-stat-label { margin-top: 2px; font-size: 14px; font-weight: 600; color: #364a63; }
+.tct-ops-dash .ops-stat-label.is-strong { font-weight: 700; color: #1c2b46; }
+.tct-ops-dash .ops-stat-note { display: block; margin-top: 4px; font-size: 12.5px; line-height: 1.45; color: #8094ae; overflow-wrap: anywhere; }
+.tct-ops-dash .ops-stat-cta { display: block; margin-top: 4px; font-size: 12.5px; font-weight: 600; color: var(--tone-ink); }
+.tct-ops-dash .ops-stat-arrow { flex-shrink: 0; align-self: center; font-size: 16px; color: #b7c2d0; transition: color 0.18s ease, transform 0.18s ease; }
+.tct-ops-dash .ops-stat.is-clickable:hover .ops-stat-arrow { color: var(--tone-ink); transform: translateX(2px); }
+
+/* ── Panels (D-1, table, charts) ── */
+.tct-ops-dash .ops-split { display: grid; grid-template-columns: minmax(300px, 1fr) minmax(0, 2fr); gap: 16px; margin-bottom: 28px; }
+.tct-ops-dash .ops-split > div { min-width: 0; }
+.tct-ops-dash .ops-split-even { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.tct-ops-dash .ops-panel {
+  height: 100%; margin: 0; background: #fff; border: 1px solid #e8ebf3; border-radius: 14px; overflow: hidden;
+  box-shadow: 0 1px 2px rgba(31, 43, 58, 0.04), 0 2px 8px rgba(31, 43, 58, 0.03);
+}
+.tct-ops-dash .ops-panel-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 20px;
+  border-bottom: 1px solid #eef1f6; background: linear-gradient(180deg, var(--tone-soft) 0%, #fff 100%);
+}
+.tct-ops-dash .ops-panel-title { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 15px; font-weight: 700; color: #1c2b46; }
+.tct-ops-dash .ops-panel-icon {
+  display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 8px;
+  font-size: 15px; color: var(--tone-ink); background: #fff; box-shadow: inset 0 0 0 1px var(--tone-shadow);
+}
+
+/* D-1 class status */
+.tct-ops-dash .ops-d1 { padding: 18px 20px 20px; }
+.tct-ops-dash .ops-d1-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.tct-ops-dash .ops-d1-tile { padding: 14px 10px; text-align: center; border-radius: 12px; border: 1px solid transparent; }
+.tct-ops-dash .ops-d1-tile.is-scheduled { background: #edf4ff; border-color: #dbe7ff; }
+.tct-ops-dash .ops-d1-tile.is-completed { background: #e9f9f2; border-color: #d2f1e4; }
+.tct-ops-dash .ops-d1-tile.is-cancelled { background: #fff0ee; border-color: #ffdcd7; }
+.tct-ops-dash .ops-d1-value { font-size: 1.6rem; font-weight: 700; line-height: 1.15; font-variant-numeric: tabular-nums; }
+.tct-ops-dash .is-scheduled .ops-d1-value { color: #2f6fd6; }
+.tct-ops-dash .is-completed .ops-d1-value { color: #12805f; }
+.tct-ops-dash .is-cancelled .ops-d1-value { color: #c03e2e; }
+.tct-ops-dash .ops-d1-label { display: block; margin-top: 2px; font-size: 12px; font-weight: 600; color: #526484; }
+.tct-ops-dash .ops-d1-progress-head { display: flex; justify-content: space-between; align-items: baseline; margin: 20px 0 8px; font-size: 13px; color: #6b7a90; }
+.tct-ops-dash .ops-d1-progress-head strong { font-size: 15px; color: #1c2b46; }
+.tct-ops-dash .ops-d1-progress { height: 10px; border-radius: 999px; background: #eef1f6; overflow: hidden; }
+.tct-ops-dash .ops-d1-progress .progress-bar { border-radius: 999px; background: linear-gradient(90deg, #2bb58a, #22a6b3); }
+
+/* Time-wise class details */
+.tct-ops-dash .ops-table-wrap { max-height: 330px; overflow: auto; }
+.tct-ops-dash .ops-table { font-size: 14px; }
+.tct-ops-dash .ops-table thead th {
+  position: sticky; top: 0; z-index: 1; padding: 11px 12px; background: #f8f9fc; border-top: 0; border-bottom: 1px solid #e5e9f2;
+  font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #8094ae; white-space: nowrap;
+}
+.tct-ops-dash .ops-table td { padding: 12px; vertical-align: middle; color: #526484; border-top: 1px solid #eef1f6; }
+/* Time and status stay on one line; names and subjects may wrap so the status column stays visible. */
+.tct-ops-dash .ops-table td:first-child, .tct-ops-dash .ops-table td:last-child { white-space: nowrap; }
+.tct-ops-dash .ops-table th:first-child { padding-left: 20px; }
+.tct-ops-dash .ops-table td:first-child { padding-left: 20px; }
+.tct-ops-dash .ops-table td:nth-child(2) { font-weight: 600; color: #364a63; }
+.tct-ops-dash .ops-table tbody tr:hover { background: #faf8ff; }
+.tct-ops-dash .ops-table .badge { padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; border: 0; }
+.tct-ops-dash .ops-table .badge-success { color: #12805f; background: #e3f7ee; }
+.tct-ops-dash .ops-table .badge-primary { color: #6a4fd8; background: #f1ecff; }
+
+/* Charts */
+.tct-ops-dash .ops-enroll-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px 16px; margin: 4px 0 12px; }
+.tct-ops-dash .ops-enroll-head .ops-group-title { flex: 1 1 240px; }
+.tct-ops-dash .ops-upload { display: inline-flex; align-items: center; border-radius: 10px; font-weight: 600; }
+.tct-ops-dash .ops-chart { height: 320px; padding: 16px 16px 8px 8px; }
+.tct-ops-dash .ops-chart .recharts-default-tooltip { padding: 8px 12px !important; }
+
+/* ── Card detail popup (Modal renders in a portal, so it is scoped by its own .ops-modal class) ──
+   White surface, card-colour accent strip, icon + title + count header, round close button, and the table
+   inset as its own rounded block. Width follows the table (min 560px, max 1060px / viewport - 32px). */
+.modal-dialog.ops-modal {
+  width: fit-content; min-width: min(560px, calc(100% - 32px)); max-width: min(1060px, calc(100% - 32px));
+  margin-left: auto; margin-right: auto;
+}
+.modal-dialog.ops-modal .modal-content {
+  max-height: 84vh; border: 0; border-top: 5px solid var(--tone); border-radius: 18px; overflow: hidden;
+  background: #fff; box-shadow: 0 24px 64px rgba(28, 43, 70, 0.2), 0 2px 8px rgba(28, 43, 70, 0.06);
+}
+
+/* Header — !important: index.css forces .modal-header { padding: 10px !important } on every modal; this popup only. */
+.modal-dialog.ops-modal .modal-content .modal-header {
+  align-items: center; padding: 18px 22px !important; border-bottom: 1px solid #eef1f6;
+  background: linear-gradient(180deg, var(--tone-soft) 0%, #fff 100%);
+}
+.ops-modal .modal-title { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; min-width: 0; font-size: 1.3rem; font-weight: 700; line-height: 1.3; color: #1c2b46; }
+.ops-modal .ops-modal-icon {
+  flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; width: 46px; height: 46px;
+  border-radius: 12px; font-size: 21px; color: var(--tone-ink); background: var(--tone-soft); box-shadow: inset 0 0 0 1px var(--tone-shadow);
+}
+.ops-modal .ops-modal-count {
+  display: inline-flex; align-items: center; justify-content: center; min-width: 32px; height: 32px; margin-left: 0 !important; padding: 0 10px;
+  border-radius: 999px; font-size: 14px; font-weight: 700; color: #1c2b46; background: #fff; border: 1px solid #e5e9f2;
+  box-shadow: 0 1px 2px rgba(31, 43, 58, 0.06);
+}
+.ops-modal .modal-header .close {
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 40px; height: 40px; margin: 0 0 0 auto; padding: 0;
+  border-radius: 50%; font-size: 1.5rem; font-weight: 600; line-height: 1; color: #364a63; opacity: 1; text-shadow: none;
+  background: #fff; border: 1px solid #eef1f6; box-shadow: 0 2px 8px rgba(31, 43, 58, 0.1);
+  transition: color .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+.ops-modal .modal-header .close:hover { color: var(--tone-ink); box-shadow: 0 4px 12px var(--tone-shadow); transform: scale(1.04); }
+.ops-modal .modal-header .close:focus { outline: none; }
+.ops-modal .modal-header .close:focus-visible { color: var(--tone-ink); box-shadow: 0 0 0 3px var(--tone-shadow); }
+
+/* Body: the table sits inset as a rounded, bordered block that scrolls (both ways) with its header row pinned. */
+/* !important: the body carries Bootstrap's .p-0 (padding: 0 !important); this inset applies to this popup only. */
+.ops-modal .modal-body { padding: 18px 20px 22px !important; background: #fff; }
+.ops-modal .modal-body > .table-responsive {
+  max-height: calc(84vh - 140px); overflow: auto; border: 1px solid #e5e9f2; border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(31, 43, 58, 0.04);
+}
+.ops-modal .table { margin: 0; font-size: 14.5px; }
+.ops-modal .table thead th {
+  position: sticky; top: 0; z-index: 1; padding: 13px 16px; background: #f3f5fa; border-top: 0; border-bottom: 1px solid #e5e9f2;
+  font-size: 12.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #526484; white-space: nowrap;
+}
+.ops-modal .table td {
+  padding: 17px 16px; vertical-align: middle; color: #364a63; border-top: 1px solid #eef1f6; white-space: nowrap;
+}
+/* Light vertical dividers between columns, as in the reference. */
+.ops-modal .table th + th, .ops-modal .table td + td { border-left: 1px solid #eef1f6; }
+.ops-modal .table thead th + th { border-left-color: #e5e9f2; }
+.ops-modal .table tbody tr:first-child td { border-top: 0; }
+.ops-modal .table td:first-child { font-weight: 700; color: #1c2b46; }
+.ops-modal .table tbody tr:hover { background: #faf9ff; }
+/* One line per cell (no mid-word breaks); the last column (comments etc.) and the note lines under a status wrap. */
+.ops-modal .table td:last-child { white-space: normal; min-width: 160px; max-width: 360px; overflow-wrap: break-word; }
+.ops-modal .table td small { display: block; min-width: 160px; max-width: 320px; margin-top: 6px; font-size: 14px; line-height: 1.5; color: #526484; white-space: normal; overflow-wrap: break-word; }
+.ops-modal .table td .text-soft, .ops-modal .table td .text-muted { color: #526484 !important; }
+
+/* Status pills */
+.ops-modal .badge { padding: 6px 12px; border-radius: 999px; font-size: 13px; font-weight: 600; border: 0; white-space: nowrap; }
+.ops-modal .table .badge-success { color: #12805f; background: #dff5ea; }
+.ops-modal .table .badge-primary { color: #2f6fd6; background: #e3edff; }
+.ops-modal .table .badge-warning { color: #8f6200; background: #fff1cc; }
+.ops-modal .table .badge-danger  { color: #c03e2e; background: #ffe6e2; }
+.ops-modal .table .badge-info    { color: #6a4fd8; background: #efe9ff; }
+.ops-modal .table .badge-light   { color: #64748b; background: #eef1f6; }
+.ops-modal .table td .badge + .badge { margin-left: 6px; }
+.ops-modal .table td[colspan] { padding: 40px 16px !important; color: #8094ae !important; font-weight: 400; white-space: normal; border-left: 0; }
+
+@media (max-width: 575.98px) {
+  .modal-dialog.ops-modal { min-width: calc(100% - 16px); max-width: calc(100% - 16px); margin: 0.5rem auto; }
+  .modal-dialog.ops-modal .modal-content .modal-header { padding: 14px 14px !important; }
+  .ops-modal .modal-title { font-size: 1.1rem; gap: 10px; }
+  .ops-modal .ops-modal-icon { width: 38px; height: 38px; font-size: 18px; }
+  .ops-modal .modal-header .close { width: 36px; height: 36px; }
+  .ops-modal .modal-body { padding: 12px !important; }
+  .ops-modal .modal-body > .table-responsive { max-height: calc(84vh - 120px); }
+  .ops-modal .table td { padding: 14px; }
+}
+
+/* ── Responsive ── */
+@media (max-width: 1399.98px) {
+  .tct-ops-dash .ops-grid-4 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 1199.98px) {
+  .tct-ops-dash .ops-split, .tct-ops-dash .ops-split-even { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 991.98px) {
+  .tct-ops-dash .ops-grid-3, .tct-ops-dash .ops-grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 575.98px) {
+  .tct-ops-dash .ops-grid-3, .tct-ops-dash .ops-grid-4 { grid-template-columns: minmax(0, 1fr); }
+  .tct-ops-dash .ops-grid { gap: 12px; margin-bottom: 22px; }
+  .tct-ops-dash .ops-head .nk-block-title.page-title { font-size: 1.45rem; }
+  .tct-ops-dash .ops-d1 { padding: 16px; }
+  .tct-ops-dash .ops-chart { height: 280px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tct-ops-dash .ops-stat, .tct-ops-dash .ops-stat-arrow { transition: none; }
+  .tct-ops-dash .ops-stat.is-clickable:hover { transform: none; }
+}

@@ -1,0 +1,388 @@
+/* =========================================================
+   PAGE
+========================================================= */
+
+.product-transfer-page {
+  width: 100%;
+  min-height: 100vh;
+  padding: 20px 10px;
+  box-sizing: border-box;
+  background: #f5f6fa;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.product-transfer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 26px;
+}
+
+.product-transfer-header h1 {
+  margin: 0;
+  color: #263f63;
+  font-size: 25px;
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   FILTER BUTTON
+========================================================= */
+
+.product-transfer-filter-button {
+  height: 34px;
+  min-width: 153px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 9px;
+
+  padding: 0 13px;
+
+  border: 1px solid #d5deeb;
+  border-radius: 4px;
+
+  background: #ffffff;
+  color: #536b8a;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.product-transfer-filter-button:hover {
+  background: #fafbff;
+}
+
+.filter-arrow {
+  transform: rotate(-90deg);
+}
+
+
+/* =========================================================
+   MAIN CARD
+========================================================= */
+
+.product-transfer-card {
+  width: 100%;
+
+  background: #ffffff;
+
+  border-radius: 4px;
+
+  padding: 22px 22px 22px;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   SECTIONS
+========================================================= */
+
+.product-transfer-section {
+  width: 100%;
+}
+
+.product-transfer-section h2,
+.warehouse-address-section h2 {
+  margin: 0 0 22px;
+
+  color: #263f63;
+
+  font-size: 17px;
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   GRID
+========================================================= */
+
+.product-transfer-grid {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1.1fr)
+    minmax(0, 1.1fr);
+
+  column-gap: 24px;
+  row-gap: 22px;
+}
+
+
+/* =========================================================
+   FORM GROUP
+========================================================= */
+
+.product-transfer-form-group {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.product-transfer-form-group label {
+  display: block;
+
+  margin-bottom: 9px;
+
+  color: #263f63;
+
+  font-size: 13px;
+  font-weight: 500;
+}
+
+
+/* =========================================================
+   INPUT
+========================================================= */
+
+.product-transfer-form-group input,
+.product-transfer-form-group select {
+  width: 100%;
+  height: 32px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #d5deeb;
+  border-radius: 4px;
+
+  background: #ffffff;
+
+  color: #536b8a;
+
+  padding: 0 12px;
+
+  font-size: 12px;
+
+  outline: none;
+}
+
+.product-transfer-form-group input::placeholder {
+  color: #b0bdd0;
+}
+
+.product-transfer-form-group input:focus,
+.product-transfer-form-group select:focus {
+  border-color: #854cff;
+}
+
+
+/* =========================================================
+   SELECT WRAPPER
+========================================================= */
+
+.product-transfer-select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.product-transfer-select-wrapper select {
+  appearance: none;
+  -webkit-appearance: none;
+
+  padding-right: 35px;
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   SELECT ICON
+========================================================= */
+
+.product-transfer-select-icon {
+  position: absolute;
+
+  right: 10px;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  pointer-events: none;
+
+  color: #667d9b;
+}
+
+
+/* =========================================================
+   PRODUCT + ADD BUTTON
+========================================================= */
+
+.product-select-with-add {
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+
+  gap: 15px;
+}
+
+.product-select-with-add
+.product-transfer-select-wrapper {
+  flex: 1;
+}
+
+
+/* =========================================================
+   ADD PRODUCT BUTTON
+========================================================= */
+
+.product-add-button {
+  width: 32px;
+  height: 32px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 1px solid #d5deeb;
+  border-radius: 4px;
+
+  background: #ffffff;
+
+  color: #536b8a;
+
+  cursor: pointer;
+}
+
+.product-add-button:hover {
+  border-color: #854cff;
+  color: #854cff;
+  background: #faf8ff;
+}
+
+
+/* =========================================================
+   WAREHOUSE SECTION
+========================================================= */
+
+.warehouse-address-section {
+  margin-top: 38px;
+}
+
+.warehouse-grid {
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1.1fr)
+    minmax(0, 1.1fr);
+}
+
+
+/*
+   The screenshot uses only two warehouse fields.
+   Keep them in the first two columns.
+*/
+
+
+/* =========================================================
+   SAVE BUTTON
+========================================================= */
+
+.product-transfer-save-button {
+  margin-top: 21px;
+
+  height: 33px;
+
+  padding: 0 17px;
+
+  border: none;
+  border-radius: 4px;
+
+  background: #854cff;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.product-transfer-save-button:hover {
+  background: #7440e8;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1100px) {
+
+  .product-transfer-grid {
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(0, 1fr);
+  }
+
+}
+
+
+@media (max-width: 768px) {
+
+  .product-transfer-page {
+    padding: 16px 12px;
+  }
+
+  .product-transfer-header {
+    margin-bottom: 18px;
+  }
+
+  .product-transfer-header h1 {
+    font-size: 21px;
+  }
+
+  .product-transfer-filter-button {
+    min-width: 125px;
+  }
+
+  .product-transfer-card {
+    padding: 20px 16px;
+  }
+
+  .product-transfer-grid {
+    grid-template-columns: 1fr;
+    row-gap: 20px;
+  }
+
+  .warehouse-address-section {
+    margin-top: 30px;
+  }
+
+}
+
+
+@media (max-width: 480px) {
+
+  .product-transfer-header {
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .product-transfer-filter-button {
+    min-width: auto;
+    padding: 0 10px;
+  }
+
+  .product-transfer-filter-button span {
+    display: none;
+  }
+
+  .product-select-with-add {
+    gap: 8px;
+  }
+
+}

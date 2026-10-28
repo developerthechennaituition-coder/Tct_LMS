@@ -1,0 +1,836 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\vicky\\POC_Workspace\\TCT\\kmanikandan14\\TCT.LearningManagementSystem\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Controllers\\Base\\GenericController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\TCT.LMS.Data.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Entities\\Tutor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Entities\\Student.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Entities\\PhoneType.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Entities\\EmailType.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Entities\\BaseEntity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Enums\\EnumConstants.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Entities\\Address.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Entities\\UserProfile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Authentication\\Permissions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Authentication\\AuthorizeAttribute.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Business\\Services\\GenericService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Enums\\TypeGroup.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Enums\\TypeCode.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Controllers\\SalesController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Repositories\\GenericRepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Business\\Interfaces\\Services\\IGenericService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Common\\ServiceConfig.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Entities\\UserProfile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Entities\\Sales.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Controllers\\WeatherForecastController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Common\\AppDbContext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\AuthenticationMiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Validator\\User\\UserProfileValidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Validator\\Sales\\SalesValidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Business\\Interfaces\\Repositories\\IGenericRepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Entities\\Subject.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Entities\\Status.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Entities\\Board.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Entities\\Grade.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Business\\TCT.LMS.Business.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\TCT.LMS.API.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\RequestTimeoutMiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\RequestResponseTransformationMiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\AdditionalLogPropertiesMiddleWare.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\ExceptionHandling.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\ExceptionHandlingMiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\CompressionMiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\ResponseTimeMiddleWare.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\RateLimitingMiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\CustomHeaderMiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\ResponseCachingMiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\LoggingMiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\WeatherForecast.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 2,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "GenericService.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Business\\Services\\GenericService.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Business\\Services\\GenericService.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Business\\Services\\GenericService.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Business\\Services\\GenericService.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAACcAAAAsAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-24T17:54:51.833Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "GenericController.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Controllers\\Base\\GenericController.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Controllers\\Base\\GenericController.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Controllers\\Base\\GenericController.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Controllers\\Base\\GenericController.cs",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-24T17:54:51.867Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "TypeGroup.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Enums\\TypeGroup.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Enums\\TypeGroup.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Enums\\TypeGroup.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Enums\\TypeGroup.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAoAAAARAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-24T17:54:51.873Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "TypeCode.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Enums\\TypeCode.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Enums\\TypeCode.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Enums\\TypeCode.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Enums\\TypeCode.cs",
+              "ViewState": "AQIAABAAAAAAAAAAAAAuwBoAAAARAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-24T17:54:51.88Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "SalesController.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Controllers\\SalesController.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Controllers\\SalesController.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Controllers\\SalesController.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Controllers\\SalesController.cs",
+              "ViewState": "AQIAAAYAAAAAAAAAAAAAABAAAAASAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-24T17:54:51.887Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\appsettings.json",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\appsettings.json",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\appsettings.json",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\appsettings.json",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAA8AAAA0AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2024-08-24T17:54:51.895Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Program.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Program.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Program.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Program.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAkAAAAhAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-24T17:54:51.907Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "GenericRepository.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Repositories\\GenericRepository.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Repositories\\GenericRepository.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Repositories\\GenericRepository.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Repositories\\GenericRepository.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAoAAAAFAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-24T17:54:51.918Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "IGenericService.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Business\\Interfaces\\Services\\IGenericService.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Business\\Interfaces\\Services\\IGenericService.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Business\\Interfaces\\Services\\IGenericService.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Business\\Interfaces\\Services\\IGenericService.cs",
+              "ViewState": "AQIAAAMAAAAAAAAAAAAuwAYAAAAkAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-24T17:54:51.925Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "ServiceConfig.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Common\\ServiceConfig.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Common\\ServiceConfig.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Common\\ServiceConfig.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Common\\ServiceConfig.cs",
+              "ViewState": "AQIAAAYAAAAAAAAAAAAAAAwAAAA2AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-24T17:54:51.932Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "UserProfile.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Entities\\UserProfile.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Entities\\UserProfile.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Entities\\UserProfile.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Entities\\UserProfile.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAUAAAAYAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-24T17:54:51.939Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "Sales.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Entities\\Sales.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Entities\\Sales.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Entities\\Sales.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Entities\\Sales.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAEAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-24T17:54:51.944Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
+              "Title": "WeatherForecastController.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Controllers\\WeatherForecastController.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Controllers\\WeatherForecastController.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Controllers\\WeatherForecastController.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Controllers\\WeatherForecastController.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAuwAYAAAARAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-24T17:54:51.951Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 24,
+              "Title": "AppDbContext.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Common\\AppDbContext.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Common\\AppDbContext.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Common\\AppDbContext.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Common\\AppDbContext.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAUAAAAXAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-24T17:54:51.957Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 25,
+              "Title": "AuthenticationMiddleware.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\AuthenticationMiddleware.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\AuthenticationMiddleware.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\AuthenticationMiddleware.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\AuthenticationMiddleware.cs",
+              "ViewState": "AQIAAAUAAAAAAAAAAAAAwA8AAABBAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-24T17:54:51.963Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 26,
+              "Title": "UserProfileValidator.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Validator\\User\\UserProfileValidator.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Validator\\User\\UserProfileValidator.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Validator\\User\\UserProfileValidator.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Validator\\User\\UserProfileValidator.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAIBJwAgAAAAFAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-24T17:54:51.97Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 27,
+              "Title": "SalesValidator.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Validator\\Sales\\SalesValidator.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Validator\\Sales\\SalesValidator.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Validator\\Sales\\SalesValidator.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Validator\\Sales\\SalesValidator.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAA0AAAAFAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-24T17:54:51.977Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 28,
+              "Title": "IGenericRepository.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Business\\Interfaces\\Repositories\\IGenericRepository.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Business\\Interfaces\\Repositories\\IGenericRepository.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Business\\Interfaces\\Repositories\\IGenericRepository.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Business\\Interfaces\\Repositories\\IGenericRepository.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAQAAAA2AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-24T17:54:51.984Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 29,
+              "Title": "Subject.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Entities\\Subject.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Entities\\Subject.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Entities\\Subject.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Entities\\Subject.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAUAAAA7AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-24T17:54:51.992Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 30,
+              "Title": "Status.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Entities\\Status.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Entities\\Status.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Entities\\Status.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Entities\\Status.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAIAAAAaAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-24T17:54:51.999Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 31,
+              "Title": "Board.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Entities\\Board.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Entities\\Board.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Entities\\Board.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Entities\\Board.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAYAAAA8AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-24T17:54:52.006Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 32,
+              "Title": "Grade.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Entities\\Grade.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Entities\\Grade.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Entities\\Grade.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Data\\Entities\\Grade.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAYAAAABAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-24T17:54:52.012Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 33,
+              "Title": "TCT.LMS.Business.csproj",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Business\\TCT.LMS.Business.csproj",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Business\\TCT.LMS.Business.csproj",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Business\\TCT.LMS.Business.csproj",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.Business\\TCT.LMS.Business.csproj",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAgAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2024-08-24T17:54:52.018Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 34,
+              "Title": "TCT.LMS.API.csproj",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\TCT.LMS.API.csproj",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\TCT.LMS.API.csproj",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\TCT.LMS.API.csproj",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\TCT.LMS.API.csproj",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAA0AAAAeAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2024-08-24T17:54:52.026Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Tutor.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Entities\\Tutor.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Entities\\Tutor.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Entities\\Tutor.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Entities\\Tutor.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAWAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-21T16:43:31.355Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Student.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Entities\\Student.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Entities\\Student.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Entities\\Student.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Entities\\Student.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAWAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-21T16:43:31.357Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "PhoneType.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Entities\\PhoneType.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Entities\\PhoneType.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Entities\\PhoneType.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Entities\\PhoneType.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAWAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-21T16:43:31.359Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "EmailType.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Entities\\EmailType.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Entities\\EmailType.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Entities\\EmailType.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Entities\\EmailType.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAQAAAAoAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-21T16:43:31.361Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "TCT.LMS.Data.csproj",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\TCT.LMS.Data.csproj",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\TCT.LMS.Data.csproj",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\TCT.LMS.Data.csproj",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\TCT.LMS.Data.csproj",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2024-08-21T16:43:31.351Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "BaseEntity.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Entities\\BaseEntity.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Entities\\BaseEntity.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Entities\\BaseEntity.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Entities\\BaseEntity.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAWAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-21T16:43:31.363Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "EnumConstants.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Enums\\EnumConstants.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Enums\\EnumConstants.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Enums\\EnumConstants.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Enums\\EnumConstants.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAcAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-21T16:43:31.366Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Address.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Entities\\Address.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Entities\\Address.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Entities\\Address.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Entities\\Address.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAQAAAA2AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-21T16:43:31.368Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "UserProfile.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Entities\\UserProfile.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Entities\\UserProfile.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Entities\\UserProfile.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Entities\\UserProfile.cs",
+              "ViewState": "AQIAABwAAAAAAAAAAAAcwDEAAAAjAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-21T16:43:31.37Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "Permissions.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Authentication\\Permissions.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Authentication\\Permissions.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Authentication\\Permissions.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Authentication\\Permissions.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAANAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-21T16:43:31.372Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "AuthorizeAttribute.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Authentication\\AuthorizeAttribute.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Authentication\\AuthorizeAttribute.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Authentication\\AuthorizeAttribute.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.Entities\\Authentication\\AuthorizeAttribute.cs",
+              "ViewState": "AQIAAAIAAAAAAAAAAAAxwAAAAAANAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-21T16:43:31.376Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 35,
+              "Title": "RequestTimeoutMiddleware.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\RequestTimeoutMiddleware.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\RequestTimeoutMiddleware.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\RequestTimeoutMiddleware.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\RequestTimeoutMiddleware.cs",
+              "ViewState": "AQIAACEAAAAAAAAAAAAYwAAAAAANAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-24T17:54:52.105Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 36,
+              "Title": "RequestResponseTransformationMiddleware.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\RequestResponseTransformationMiddleware.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\RequestResponseTransformationMiddleware.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\RequestResponseTransformationMiddleware.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\RequestResponseTransformationMiddleware.cs",
+              "ViewState": "AQIAAAwAAAAAAAAAAAAYwAAAAAANAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-24T17:54:52.112Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 37,
+              "Title": "AdditionalLogPropertiesMiddleWare.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\AdditionalLogPropertiesMiddleWare.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\AdditionalLogPropertiesMiddleWare.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\AdditionalLogPropertiesMiddleWare.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\AdditionalLogPropertiesMiddleWare.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAIAAAANAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-24T17:54:52.119Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 38,
+              "Title": "ExceptionHandling.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\ExceptionHandling.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\ExceptionHandling.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\ExceptionHandling.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\ExceptionHandling.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAQAAAANAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-24T17:54:52.126Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 39,
+              "Title": "ExceptionHandlingMiddleware.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\ExceptionHandlingMiddleware.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\ExceptionHandlingMiddleware.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\ExceptionHandlingMiddleware.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\ExceptionHandlingMiddleware.cs",
+              "ViewState": "AQIAABsAAAAAAAAAAAAYwAAAAAANAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-24T17:54:52.133Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 40,
+              "Title": "CompressionMiddleware.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\CompressionMiddleware.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\CompressionMiddleware.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\CompressionMiddleware.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\CompressionMiddleware.cs",
+              "ViewState": "AQIAAA4AAAAAAAAAAAAowAIAAAANAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-24T17:54:52.14Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 41,
+              "Title": "ResponseTimeMiddleWare.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\ResponseTimeMiddleWare.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\ResponseTimeMiddleWare.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\ResponseTimeMiddleWare.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\ResponseTimeMiddleWare.cs",
+              "ViewState": "AQIAAA0AAAAAAAAAAAAQwAIAAAANAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-24T17:54:52.15Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 42,
+              "Title": "RateLimitingMiddleware.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\RateLimitingMiddleware.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\RateLimitingMiddleware.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\RateLimitingMiddleware.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\RateLimitingMiddleware.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAuwAAAAAAjAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-24T17:54:52.158Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 43,
+              "Title": "CustomHeaderMiddleware.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\CustomHeaderMiddleware.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\CustomHeaderMiddleware.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\CustomHeaderMiddleware.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\CustomHeaderMiddleware.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAANAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-24T17:54:52.173Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 44,
+              "Title": "ResponseCachingMiddleware.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\ResponseCachingMiddleware.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\ResponseCachingMiddleware.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\ResponseCachingMiddleware.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\ResponseCachingMiddleware.cs",
+              "ViewState": "AQIAABQAAAAAAAAAAAAswAAAAAANAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-24T17:54:52.183Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 45,
+              "Title": "LoggingMiddleware.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\LoggingMiddleware.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\LoggingMiddleware.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\LoggingMiddleware.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\Middlewares\\LoggingMiddleware.cs",
+              "ViewState": "AQIAAAMAAAAAAAAAAAAowAAAAAANAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-24T17:54:52.195Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 46,
+              "Title": "WeatherForecast.cs",
+              "DocumentMoniker": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\WeatherForecast.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\WeatherForecast.cs",
+              "ToolTip": "D:\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\WeatherForecast.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Manikandan\\Personal FreeLance Projects\\Sudan\\Project\\TCT.LearningManagementSystem\\TCT.LMS.API\\WeatherForecast.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAANAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-24T17:54:52.204Z"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{56df62a4-05a3-4e5b-aa1a-99371ccfb997}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:132:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:135:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:133:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:133:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:136:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:138:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{13b12e3e-c1b4-4539-9371-4fe9a0d523fc}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{13b12e3e-c1b4-4539-9371-4fe9a0d523fc}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:130:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:131:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:148:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:147:0:{13b12e3e-c1b4-4539-9371-4fe9a0d523fc}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:137:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:132:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:134:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:141:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:139:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:140:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:143:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:144:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:142:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:146:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:145:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:130:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,601 @@
+/* Student Profile / Edit Enrollment (student-profile-regular-new) — Coordinator view only.
+   Every rule is under .tct-sp, which the page renders only for the Coordinator role. Tab 1 and 2 forms carry
+   .tct-sp-pane; Courses and Availability (shared components) are styled through the page's own
+   .tct-sp-courses / .tct-sp-avail wrappers, and their popups (portals) through body:has(.tct-sp), which only
+   matches while this page is open. The Address and Activity tabs are not targeted. */
+
+/* ─── Form card ─────────────────────────────────────────────────────────── */
+.tct-sp > .card {
+  border: 1px solid #e5e9f2; border-radius: 16px; background: #fff;
+  box-shadow: 0 1px 3px rgba(28, 43, 70, 0.05);
+}
+.tct-sp > .card > .card-inner { padding: 8px 28px 28px; }
+
+/* ─── Step tabs ─────────────────────────────────────────────────────────── */
+.tct-sp .nav-tabs { margin-top: 0 !important; gap: 4px 28px; border-bottom: 1px solid #e5e9f2; flex-wrap: wrap; }
+.tct-sp .nav-tabs .nav-item { padding: 0; margin: 0; }
+.tct-sp .nav-tabs .nav-link {
+  display: inline-flex; align-items: center; gap: 8px; padding: 16px 2px 14px; cursor: pointer;
+  border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px;
+  font-size: 14.5px; font-weight: 600; color: #526484; transition: color .15s ease, border-color .15s ease;
+}
+.tct-sp .nav-tabs .nav-link::after { display: none; }
+.tct-sp .nav-tabs .nav-link .icon {
+  display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; margin: 0;
+  border-radius: 8px; font-size: 16px; color: #8094ae; background: #f5f6fa; transition: color .15s ease, background .15s ease;
+}
+.tct-sp .nav-tabs .nav-link:hover { color: #1c2b46; }
+.tct-sp .nav-tabs .nav-link.active { color: #6a35e8; border-bottom-color: #854fff; background: transparent; }
+.tct-sp .nav-tabs .nav-link.active .icon { color: #fff; background: #854fff; }
+.tct-sp .nav-tabs .nav-link.disabled { color: #b7c2d0; }
+.tct-sp .nav-tabs .nav-link.disabled .icon { color: #c1c9d6; background: #f7f8fa; }
+
+/* ─── Labels and inputs ─────────────────────────────────────────────────── */
+.tct-sp .tct-sp-pane .form-group { margin-bottom: 0; }
+.tct-sp .tct-sp-pane .form-label { margin-bottom: 8px; font-size: 13.5px; font-weight: 600; line-height: 1.45; color: #364a63; }
+.tct-sp .tct-sp-pane .form-label .text-danger { color: #e85347 !important; }
+.tct-sp .tct-sp-pane .form-control {
+  height: 42px; padding: 0 14px; border: 1px solid #dbdfea; border-radius: 10px;
+  font-size: 14px; color: #1c2b46; background-color: #fff; box-shadow: none;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.tct-sp .tct-sp-pane .form-control::placeholder { color: #98a4b6; }
+.tct-sp .tct-sp-pane .form-control:hover { border-color: #c5cbe0; }
+.tct-sp .tct-sp-pane .form-control:focus { border-color: #854fff; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.14); outline: none; }
+.tct-sp .tct-sp-pane .react-datepicker-wrapper { display: block; width: 100%; }
+.tct-sp .tct-sp-pane .date-picker,
+.tct-sp .tct-sp-pane .react-datepicker-wrapper .form-control {
+  padding-right: 40px;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238094ae' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5' width='18' height='16' rx='2'/%3E%3Cpath d='M16 3v4M8 3v4M3 11h18'/%3E%3C/svg%3E") no-repeat right 14px center;
+}
+.tct-sp .tct-sp-pane .invalid { display: block; margin-top: 6px; font-size: 12px !important; font-style: normal !important; color: #e85347 !important; }
+
+/* react-select (RSelect) */
+.tct-sp .tct-sp-pane .react-select__control {
+  min-height: 42px; border: 1px solid #dbdfea; border-radius: 10px; box-shadow: none; transition: border-color .15s ease, box-shadow .15s ease;
+}
+.tct-sp .tct-sp-pane .react-select__control:hover { border-color: #c5cbe0; }
+.tct-sp .tct-sp-pane .react-select__control--is-focused { border-color: #854fff !important; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.14) !important; }
+.tct-sp .tct-sp-pane .react-select__value-container { padding: 0 12px; }
+.tct-sp .tct-sp-pane .react-select__placeholder { font-size: 14px; color: #98a4b6; }
+.tct-sp .tct-sp-pane .react-select__single-value { font-size: 14px; color: #1c2b46; }
+.tct-sp .tct-sp-pane .react-select__indicator-separator { display: none; }
+.tct-sp .tct-sp-pane .react-select__indicator { color: #8094ae; }
+.tct-sp .tct-sp-pane .react-select__menu { z-index: 20; margin-top: 6px; border: 1px solid #e5e9f2; border-radius: 10px; box-shadow: 0 12px 28px rgba(28, 43, 70, 0.14); overflow: hidden; }
+.tct-sp .tct-sp-pane .react-select__option { font-size: 14px; }
+.tct-sp .tct-sp-pane .react-select__option--is-focused { background: #f5f1ff; color: #6a35e8; }
+.tct-sp .tct-sp-pane .react-select__option--is-selected { background: #854fff; color: #fff; }
+.tct-sp .tct-sp-pane .react-select__input input { box-shadow: none !important; border: 0 !important; height: auto !important; }
+
+/* Phone: flag + number in one field */
+.tct-sp .tct-sp-pane .PhoneInput {
+  display: flex; align-items: center; height: 42px; padding: 0 0 0 12px; border: 1px solid #dbdfea; border-radius: 10px;
+  background: #fff; transition: border-color .15s ease, box-shadow .15s ease;
+}
+.tct-sp .tct-sp-pane .PhoneInput:hover { border-color: #c5cbe0; }
+.tct-sp .tct-sp-pane .PhoneInput:focus-within { border-color: #854fff; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.14); }
+.tct-sp .tct-sp-pane .PhoneInputCountry { flex-shrink: 0; margin-right: 0; padding-right: 10px; border-right: 1px solid #e5e9f2; height: 24px; }
+.tct-sp .tct-sp-pane .PhoneInputCountryIcon { width: 22px; height: 15px; }
+.tct-sp .tct-sp-pane .PhoneInputInput {
+  flex: 1 1 auto; min-width: 0; height: 100%; padding: 0 12px; border: 0 !important; outline: none; box-shadow: none !important;
+  font-size: 14px; color: #1c2b46; background: transparent;
+}
+
+/* ─── Additional Information: radio groups ──────────────────────────────── */
+.tct-sp .tct-sp-pane .d-flex.flex-wrap.gap-3 { display: flex; flex-wrap: wrap; gap: 8px; }
+.tct-sp .tct-sp-pane .form-check {
+  position: relative; display: inline-flex; align-items: center; gap: 8px; margin: 0 !important; padding: 7px 12px 7px 10px;
+  border: 1px solid #e5e9f2; border-radius: 9px; background: #fff; cursor: pointer; transition: border-color .15s ease, background .15s ease;
+}
+.tct-sp .tct-sp-pane .form-check:hover { border-color: #c5b3ff; background: #faf8ff; }
+.tct-sp .tct-sp-pane .form-check:has(.form-check-input:checked) { border-color: #854fff; background: #f5f1ff; }
+.tct-sp .tct-sp-pane .form-check-input {
+  -webkit-appearance: none; appearance: none; position: static !important; flex-shrink: 0;
+  width: 16px !important; height: 16px !important; min-width: 0; margin: 0 !important; padding: 0;
+  border: 1.5px solid #b7c2d0; border-radius: 50%; background: #fff; cursor: pointer; transition: border-color .15s ease, box-shadow .15s ease;
+}
+.tct-sp .tct-sp-pane .form-check-input:checked { border-color: #854fff; box-shadow: inset 0 0 0 3.5px #fff; background: #854fff; }
+.tct-sp .tct-sp-pane .form-check-input:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.2); }
+.tct-sp .tct-sp-pane .form-check-input:checked:focus-visible { box-shadow: inset 0 0 0 3.5px #fff, 0 0 0 3px rgba(133, 79, 255, 0.2); }
+.tct-sp .tct-sp-pane .form-check-label {
+  position: static; margin: 0; padding: 0; font-size: 13.5px; font-weight: 500; line-height: 1.3; color: #364a63; cursor: pointer;
+}
+.tct-sp .tct-sp-pane .form-check-label::before,
+.tct-sp .tct-sp-pane .form-check-label::after { display: none !important; }
+.tct-sp .tct-sp-pane .form-check:has(.form-check-input:checked) .form-check-label { color: #6a35e8; font-weight: 600; }
+
+/* ─── Upload areas ──────────────────────────────────────────────────────── */
+.tct-sp .tct-sp-pane .dropzone.upload-zone {
+  display: flex; align-items: center; justify-content: center; min-height: 128px; padding: 0;
+  border: 1.5px dashed #cdbdff; border-radius: 12px; background: #fcfbff; cursor: pointer;
+  transition: border-color .15s ease, background .15s ease;
+}
+.tct-sp .tct-sp-pane .dropzone.upload-zone:hover,
+.tct-sp .tct-sp-pane .dropzone.upload-zone:focus-within { border-color: #854fff; background: #f8f5ff; }
+.tct-sp .tct-sp-pane .dropzone .dz-message { display: flex; flex-direction: column; align-items: center; gap: 4px; margin: 0; }
+.tct-sp .tct-sp-pane .tct-sp-dz-icon { font-size: 28px; line-height: 1; color: #854fff; }
+.tct-sp .tct-sp-pane .dropzone .dz-message-text { font-size: 13.5px; color: #526484; }
+.tct-sp .tct-sp-pane .dropzone .dz-message-text b { font-weight: 600; color: #6a35e8; }
+.tct-sp .tct-sp-pane .tct-sp-dz-hint { font-size: 12px; color: #8094ae; }
+.tct-sp .tct-sp-pane .dropzone .btn-danger { border-radius: 8px; }
+
+/* ─── Primary buttons (Next / Save / Add) ──────────────────────────────── */
+.tct-sp .tct-sp-pane .btn-primary,
+.tct-sp .tct-sp-courses .nk-block-head .btn-primary {
+  position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 12px;
+  height: 46px; padding: 0 8px 0 22px; overflow: hidden;
+  border: 0; border-radius: 12px; font-size: 14.5px; font-weight: 600; letter-spacing: 0.01em; color: #fff;
+  background: linear-gradient(135deg, #9a6bff 0%, #854fff 45%, #6a35e8 100%);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset, 0 6px 16px rgba(106, 53, 232, 0.28);
+  transition: box-shadow .2s ease, transform .2s ease, filter .2s ease;
+}
+/* Arrow / plus icon sits in its own soft chip */
+.tct-sp .tct-sp-pane .btn-primary .icon,
+.tct-sp .tct-sp-courses .nk-block-head .btn-primary .icon {
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+  width: 30px; height: 30px; margin: 0; border-radius: 9px; font-size: 16px;
+  background: rgba(255, 255, 255, 0.18); transition: transform .2s ease, background .2s ease;
+}
+/* Soft sheen that sweeps across on hover */
+.tct-sp .tct-sp-pane .btn-primary::after,
+.tct-sp .tct-sp-courses .nk-block-head .btn-primary::after {
+  content: ""; position: absolute; top: 0; left: -60%; width: 40%; height: 100%; pointer-events: none;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+  transform: skewX(-20deg); transition: left .5s ease;
+}
+.tct-sp .tct-sp-pane .btn-primary:hover:not(:disabled),
+.tct-sp .tct-sp-courses .nk-block-head .btn-primary:hover:not(:disabled) {
+  color: #fff; transform: translateY(-1px); filter: saturate(1.08);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset, 0 10px 22px rgba(106, 53, 232, 0.36);
+}
+.tct-sp .tct-sp-pane .btn-primary:hover:not(:disabled)::after,
+.tct-sp .tct-sp-courses .nk-block-head .btn-primary:hover:not(:disabled)::after { left: 120%; }
+.tct-sp .tct-sp-pane .btn-primary:hover:not(:disabled) .icon,
+.tct-sp .tct-sp-courses .nk-block-head .btn-primary:hover:not(:disabled) .icon { background: rgba(255, 255, 255, 0.28); }
+.tct-sp .tct-sp-pane .btn-primary:hover:not(:disabled) .ni-arrow-right,
+.tct-sp .tct-sp-courses .nk-block-head .btn-primary:hover:not(:disabled) .ni-arrow-right { transform: translateX(3px); }
+.tct-sp .tct-sp-pane .btn-primary:active:not(:disabled),
+.tct-sp .tct-sp-courses .nk-block-head .btn-primary:active:not(:disabled) { transform: translateY(0); box-shadow: 0 4px 10px rgba(106, 53, 232, 0.28); }
+.tct-sp .tct-sp-pane .btn-primary:focus-visible,
+.tct-sp .tct-sp-courses .nk-block-head .btn-primary:focus-visible {
+  outline: none; box-shadow: 0 0 0 3px #fff, 0 0 0 5px rgba(133, 79, 255, 0.55), 0 6px 16px rgba(106, 53, 232, 0.28);
+}
+.tct-sp .tct-sp-pane .btn-primary:disabled,
+.tct-sp .tct-sp-courses .nk-block-head .btn-primary:disabled { opacity: .55; box-shadow: none; cursor: not-allowed; }
+
+
+/* ─── Section headings in the form tabs ─────────────────────────────────── */
+.tct-sp .tct-sp-pane > .nk-block-head { padding-bottom: 16px; }
+.tct-sp .tct-sp-pane > .nk-block-head .nk-block-title {
+  display: flex; align-items: center; gap: 10px; margin: 0; font-size: 1.05rem; font-weight: 700; color: #1c2b46;
+}
+.tct-sp .tct-sp-pane > .nk-block-head .nk-block-title::before {
+  content: ""; width: 4px; height: 18px; border-radius: 4px; background: linear-gradient(180deg, #9a6bff, #6a35e8);
+}
+.tct-sp .tct-sp-pane .form-control:disabled,
+.tct-sp .tct-sp-pane .form-control[readonly] { color: #6b7a90; background: #f5f6fa; border-color: #e5e9f2; cursor: not-allowed; }
+.tct-sp .tct-sp-pane .react-select--is-disabled .react-select__control { background: #f5f6fa; }
+
+/* Additional Information: even vertical rhythm between field groups */
+.tct-sp .tct-sp-additional > .row { row-gap: 22px; }
+.tct-sp .tct-sp-additional > .row > [class*="col-"] { margin-top: 0 !important; }
+.tct-sp .tct-sp-additional .dz-preview { margin: 8px; }
+.tct-sp .tct-sp-additional .dz-image img { border-radius: 8px; }
+
+/* Save buttons: leading save icon, divider above, left aligned with the form */
+.tct-sp .tct-sp-pane .btn-primary:has(> .tct-sp-btn-icon:first-child) { padding: 0 22px 0 8px; }
+.tct-sp .tct-sp-pane form > .mt-4,
+.tct-sp .tct-sp-additional > .row > .col-md-12:last-child { margin-top: 8px; padding-top: 20px; border-top: 1px solid #eef0f5; }
+
+/* ─── Courses / Availability: Add + Add Slots buttons (same look as the Save buttons) ─── */
+.tct-sp .tct-sp-courses .nk-block-head li { list-style: none; }
+.tct-sp .tct-sp-courses .nk-block-head .btn-primary,
+.tct-sp .tct-sp-avail > .nk-block-head .btn-primary {
+  position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  height: 42px; padding: 0 20px 0 7px; overflow: hidden; border: 0; border-radius: 12px;
+  font-size: 14px; font-weight: 600; color: #fff;
+  background: linear-gradient(135deg, #9a6bff 0%, #854fff 45%, #6a35e8 100%);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset, 0 6px 16px rgba(106, 53, 232, 0.28);
+  transition: box-shadow .2s ease, transform .2s ease;
+}
+.tct-sp .tct-sp-courses .nk-block-head .btn-primary .icon,
+.tct-sp .tct-sp-avail > .nk-block-head .btn-primary .icon {
+  display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; margin: 0;
+  border-radius: 9px; font-size: 15px; background: rgba(255, 255, 255, 0.18); transition: transform .2s ease;
+}
+.tct-sp .tct-sp-courses .nk-block-head .btn-primary:hover,
+.tct-sp .tct-sp-avail > .nk-block-head .btn-primary:hover {
+  color: #fff; transform: translateY(-1px); box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset, 0 10px 22px rgba(106, 53, 232, 0.36);
+}
+.tct-sp .tct-sp-courses .nk-block-head .btn-primary:hover .icon,
+.tct-sp .tct-sp-avail > .nk-block-head .btn-primary:hover .icon { transform: rotate(90deg); }
+.tct-sp .tct-sp-courses .nk-block-head .btn-primary:focus-visible,
+.tct-sp .tct-sp-avail > .nk-block-head .btn-primary:focus-visible {
+  outline: none; box-shadow: 0 0 0 3px #fff, 0 0 0 5px rgba(133, 79, 255, 0.55);
+}
+
+/* Courses: Status as a soft badge (same text) and actions kept together */
+.tct-sp .tct-sp-courses .nk-tb-list.is-separate .nk-tb-item:not(.nk-tb-head) .nk-tb-col:nth-child(5) > span {
+  display: inline-block; max-width: 100%; padding: 4px 10px; border-radius: 999px; overflow-wrap: anywhere;
+  font-size: 12.5px; font-weight: 600; line-height: 1.4; color: #6a35e8; background: #f3eeff; border: 1px solid #e3dafd;
+}
+.tct-sp .tct-sp-courses .nk-tb-list.is-separate .nk-tb-item:not(.nk-tb-head) .nk-tb-col:nth-child(1) > span { font-weight: 600; color: #1c2b46; }
+.tct-sp .tct-sp-courses .nk-tb-list.is-separate .nk-tb-item:not(.nk-tb-head) .nk-tb-col:last-child { white-space: nowrap; text-align: right; }
+
+/* ─── Availability tab ──────────────────────────────────────────────────── */
+.tct-sp .tct-sp-avail > .nk-block-head { padding-bottom: 14px; }
+.tct-sp .tct-sp-avail > .nk-block-head .nk-block-between { align-items: center; }
+/* ─── Enroll New Course step: Enrolled Courses card ──────────────────── */
+.tct-sp .tct-sp-courses .nk-block-head { padding-bottom: 14px; }
+.tct-sp .tct-sp-courses .nk-block-head .nk-block-between { align-items: center; }
+.tct-sp .tct-sp-courses .nk-block-head .nk-block-title { font-size: 1.1rem; font-weight: 700; color: #1c2b46; }
+.tct-sp .tct-sp-courses .nk-block-head li { list-style: none; }
+
+.tct-sp .tct-sp-courses .nk-tb-list.is-separate {
+  margin-bottom: 0 !important; border: 1px solid #e5e9f2; border-radius: 12px 12px 0 0; border-spacing: 0; overflow: hidden;
+}
+.tct-sp .tct-sp-courses .nk-tb-list.is-separate .nk-tb-item { box-shadow: none; }
+.tct-sp .tct-sp-courses .nk-tb-list.is-separate .nk-tb-col { padding: 13px 18px; border-top: 1px solid #eef0f5; font-size: 14px; color: #526484; background: #fff; }
+.tct-sp .tct-sp-courses .nk-tb-list.is-separate .nk-tb-head .nk-tb-col { padding-top: 12px; padding-bottom: 12px; border-top: 0; background: #f5f6fa; }
+.tct-sp .tct-sp-courses .nk-tb-list.is-separate .nk-tb-head .sub-text {
+  font-size: 11.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #6b7a90; white-space: nowrap;
+}
+.tct-sp .tct-sp-courses .nk-tb-list.is-separate .nk-tb-item:not(.nk-tb-head):hover .nk-tb-col { background: #faf9ff; }
+.tct-sp .tct-sp-courses .nk-tb-list.is-separate .icon.ni-edit,
+.tct-sp .tct-sp-courses .nk-tb-list.is-separate .icon.ni-trash {
+  display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 8px;
+  font-size: 16px; color: #8094ae; cursor: pointer; transition: color .15s ease, background .15s ease;
+}
+.tct-sp .tct-sp-courses .nk-tb-list.is-separate .icon.ni-edit:hover { color: #6a35e8; background: #f1ecff; }
+.tct-sp .tct-sp-courses .nk-tb-list.is-separate .icon.ni-trash:hover { color: #e85347; background: #fdecea; }
+/* When there are rows, round the bottom of the table instead of leaving it open */
+.tct-sp .tct-sp-courses .nk-tb-list.is-separate:not(:has(+ .card)) { border-radius: 12px; }
+
+/* Empty state ("No data found") */
+.tct-sp .tct-sp-courses .nk-tb-list + .card {
+  margin: 0; border: 1px solid #e5e9f2; border-top: 0; border-radius: 0 0 12px 12px; box-shadow: none; background: #fff;
+}
+.tct-sp .tct-sp-courses .nk-tb-list + .card .card-inner { padding: 34px 16px; }
+.tct-sp .tct-sp-courses .nk-tb-list + .card .text-center { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.tct-sp .tct-sp-courses .nk-tb-list + .card .text-center::before {
+  content: "\e971"; font-family: "Nioicon"; display: inline-flex; align-items: center; justify-content: center;
+  width: 48px; height: 48px; border-radius: 14px; font-size: 22px; color: #854fff; background: #f1ecff;
+}
+.tct-sp .tct-sp-courses .nk-tb-list + .card .text-silent { font-size: 14px; font-weight: 500; color: #6b7a90; }
+
+/* Toolbar row: full width, search box always visible on the left, settings on the right. */
+.tct-sp .tct-sp-avail > .nk-block > .row { margin: 0 0 14px; }
+.tct-sp .tct-sp-avail > .nk-block > .row > div:first-child:empty { display: none; }
+.tct-sp .tct-sp-avail > .nk-block > .row > div { flex: 1 1 100%; max-width: 100%; padding: 0; }
+.tct-sp .tct-sp-avail .entrolled-list.card-tools-toggle {
+  display: flex; align-items: center; gap: 10px; padding: 0; border: 0;
+}
+.tct-sp .tct-sp-avail .entrolled-list .card-search.search-wrap {
+  position: static; order: 0; flex: 0 1 380px; min-width: 0;
+  opacity: 1 !important; visibility: visible !important; transform: none !important; background: transparent; box-shadow: none;
+  /* The theme disables input on the closed search box (pointer-events: none); it is always open here. */
+  pointer-events: auto !important; z-index: 1;
+}
+.tct-sp .tct-sp-avail .entrolled-list .card-title-group { order: 1; margin-left: auto; }
+/* The search box no longer opens/closes: hide its open icon, divider and back arrow. */
+.tct-sp .tct-sp-avail .entrolled-list .card-tools li:has(> .toggle-search),
+.tct-sp .tct-sp-avail .entrolled-list .card-tools .btn-toolbar-sep,
+.tct-sp .tct-sp-avail .entrolled-list .search-back { display: none !important; }
+.tct-sp .tct-sp-avail .entrolled-list .card-search .card-body { padding: 0; }
+.tct-sp .tct-sp-avail .entrolled-list .search-content { position: relative; display: flex; align-items: center; }
+.tct-sp .tct-sp-avail .entrolled-list .search-content .form-control {
+  height: 40px; padding: 0 14px 0 40px !important; border: 1px solid #dbdfea !important; border-radius: 9px;
+  font-size: 14px; color: #1c2b46; background: #fff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.tct-sp .tct-sp-avail .entrolled-list .search-content .form-control::placeholder { color: #a7b2c3; }
+.tct-sp .tct-sp-avail .entrolled-list .search-content .form-control:hover { border-color: #c5cbe0 !important; }
+.tct-sp .tct-sp-avail .entrolled-list .search-content .form-control:focus {
+  border-color: #854fff !important; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.15);
+}
+.tct-sp .tct-sp-avail .entrolled-list .search-submit {
+  position: absolute; top: 50%; left: 6px; right: auto; transform: translateY(-50%);
+  width: 30px; height: 30px; padding: 0; border: 0; background: transparent; color: #8094ae; pointer-events: none;
+}
+.tct-sp .tct-sp-avail .entrolled-list .card-tools .btn-trigger,
+.tct-sp .tct-sp-avail .entrolled-list .card-tools .dropdown-toggle {
+  width: 40px; height: 40px; border: 1px solid #dbdfea; border-radius: 9px; color: #6b7a90; background: #fff;
+}
+.tct-sp .tct-sp-avail .entrolled-list .card-tools .btn-trigger:hover,
+.tct-sp .tct-sp-avail .entrolled-list .card-tools .dropdown-toggle:hover { color: #6a35e8; border-color: #d9cbff; background: #f5f1ff; }
+.tct-sp .tct-sp-avail .entrolled-list .card-tools .dropdown-menu { border: 1px solid #e5e9f2; border-radius: 10px; box-shadow: 0 12px 28px rgba(28, 43, 70, 0.14); }
+
+/* Slots table */
+.tct-sp .tct-sp-avail .rdt_Table { border: 1px solid #e5e9f2; border-radius: 10px; overflow: hidden; }
+.tct-sp .tct-sp-avail .rdt_TableHeadRow { min-height: 44px; background: #f5f6fa; border-bottom: 1px solid #e5e9f2; }
+.tct-sp .tct-sp-avail .rdt_TableCol { font-size: 11.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #526484; }
+.tct-sp .tct-sp-avail .rdt_TableRow { min-height: 50px; font-size: 14px; color: #364a63; border-bottom-color: #eef0f5; }
+.tct-sp .tct-sp-avail .rdt_TableRow:hover { background: #faf8ff; }
+.tct-sp .tct-sp-avail .dataTables_wrapper .p-2 {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;
+  padding: 40px 20px !important; border: 1px dashed #d9cbff; border-radius: 12px; background: #fcfbff;
+  font-size: 15px; font-weight: 700; color: #1c2b46; text-align: center;
+}
+.tct-sp .tct-sp-avail .dataTables_wrapper .p-2::after {
+  /* "\201C " and "\201D " are curly quotes; the space after each code ends the escape. */
+  content: "Use \201C Add Slots\201D  to add the days and hours this student is available.";
+  margin-top: 4px; font-size: 13px; font-weight: 400; color: #8094ae;
+}
+
+/* ─── Add / Edit Slots popup (shared UserAvailability, .custom-modal) ──── */
+body:has(.tct-sp) .modal-dialog.custom-modal { max-width: 920px; }
+body:has(.tct-sp) .custom-modal .modal-content {
+  border: 0; border-radius: 14px; box-shadow: 0 24px 60px rgba(28, 43, 70, 0.22); overflow: hidden;
+}
+body:has(.tct-sp) .custom-modal .modal-header {
+  align-items: center; padding: 20px 24px; border-bottom: 1px solid #eef0f5;
+  background: linear-gradient(180deg, #faf8ff 0%, #ffffff 100%);
+}
+body:has(.tct-sp) .custom-modal .modal-title { font-size: 1.2rem; font-weight: 700; color: #1c2b46; }
+body:has(.tct-sp) .custom-modal .modal-title::after {
+  content: "Pick the days, then drag the slider to set the available hours.";
+  display: block; margin-top: 3px; font-size: 13px; font-weight: 400; color: #8094ae;
+}
+body:has(.tct-sp) .custom-modal .modal-header .close {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; margin: 0 0 0 auto; padding: 0; border-radius: 10px;
+  font-size: 22px; color: #8094ae; opacity: 1; transition: background 0.15s ease, color 0.15s ease;
+}
+body:has(.tct-sp) .custom-modal .modal-header .close:hover { color: #1c2b46; background: #f1f3f8; }
+body:has(.tct-sp) .custom-modal .modal-body { padding: 0 !important; }
+body:has(.tct-sp) .custom-modal .card-preview { margin: 0; border: 0; box-shadow: none; }
+body:has(.tct-sp) .custom-modal .card-preview > .card-inner { padding: 20px 24px 12px; }
+body:has(.tct-sp) .custom-modal form > .row { margin-left: 0; margin-right: 0; }
+
+body:has(.tct-sp) .custom-modal .form-label { margin-bottom: 8px; font-size: 13px; font-weight: 600; color: #364a63; }
+body:has(.tct-sp) .custom-modal .custom-control-label { font-size: 13.5px; font-weight: 500; color: #364a63; cursor: pointer; }
+body:has(.tct-sp) .custom-modal .custom-control-input:checked ~ .custom-control-label::before { border-color: #854fff; background-color: #854fff; }
+body:has(.tct-sp) .custom-modal .custom-checkbox { margin-bottom: 6px; }
+
+/* Day chips */
+body:has(.tct-sp) .custom-modal .form-group > .row { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; }
+body:has(.tct-sp) .custom-modal .form-group > .row > .col { flex: 0 0 auto; max-width: none; padding: 0; }
+body:has(.tct-sp) .custom-modal .days-wrap { margin: 0 !important; }
+body:has(.tct-sp) .custom-modal .days-wrap .btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 52px; height: 40px; padding: 0 12px; border-radius: 10px;
+  font-size: 13.5px; font-weight: 600; box-shadow: none;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+body:has(.tct-sp) .custom-modal .days-wrap .btn-repeat { border: 1px solid #dbdfea; color: #526484; background: #fff; }
+body:has(.tct-sp) .custom-modal .days-wrap .btn-repeat:hover { border-color: #d9cbff; color: #6a35e8; background: #f5f1ff; }
+body:has(.tct-sp) .custom-modal .days-wrap .btn-primary {
+  border: 1px solid #854fff; color: #fff; background: #854fff; box-shadow: 0 4px 10px rgba(133, 79, 255, 0.25);
+}
+
+/* Dates */
+body:has(.tct-sp) .custom-modal .react-datepicker-wrapper { display: block; width: 100%; }
+body:has(.tct-sp) .custom-modal .date-picker.form-control {
+  height: 42px; padding: 0 14px; border: 1px solid #dbdfea; border-radius: 8px; font-size: 14px; color: #1c2b46;
+}
+body:has(.tct-sp) .custom-modal .date-picker.form-control:focus { border-color: #854fff; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.15); }
+
+/* Day slot rows */
+body:has(.tct-sp) .custom-modal .row.border.border-primary.rounded {
+  align-items: center; margin: 0 0 10px !important; padding: 10px 6px;
+  border: 1px solid #e5e9f2 !important; border-radius: 12px !important; background: #fafbfd;
+}
+body:has(.tct-sp) .custom-modal .row.border.border-primary.rounded:hover { border-color: #d9cbff !important; background: #fcfbff; }
+body:has(.tct-sp) .custom-modal .row.border.border-primary.rounded > .col-md-2 > div {
+  gap: 8px; font-size: 14px; font-weight: 700; color: #1c2b46;
+}
+body:has(.tct-sp) .custom-modal .row.border.border-primary.rounded > .col-md-2 > div::before {
+  content: ""; width: 8px; height: 8px; border-radius: 50%; background: #854fff; flex-shrink: 0;
+}
+body:has(.tct-sp) .custom-modal .row.border.border-primary.rounded .form-label { margin-bottom: 4px; font-size: 13px; font-weight: 700; color: #6a35e8; }
+body:has(.tct-sp) .custom-modal .row.border.border-primary.rounded .btn-trigger { border-radius: 8px; color: #6b7a90; }
+body:has(.tct-sp) .custom-modal .row.border.border-primary.rounded .btn-trigger:hover { color: #6a35e8; background: #f1ecff; }
+/* "Please select day to add." */
+body:has(.tct-sp) .custom-modal .row.border.border-primary.rounded:has(.text-warning) {
+  border-style: dashed !important; border-color: #d9cbff !important; background: #fcfbff;
+}
+body:has(.tct-sp) .custom-modal .row.border.border-primary.rounded .text-warning { font-size: 13.5px; font-weight: 500; color: #8094ae !important; }
+
+/* Time range slider (noUiSlider) */
+body:has(.tct-sp) .custom-modal .noUi-target { height: 6px; border: 0; border-radius: 6px; background: #e5e9f2; box-shadow: none; }
+body:has(.tct-sp) .custom-modal .noUi-connect { background: #854fff; }
+body:has(.tct-sp) .custom-modal .noUi-horizontal .noUi-handle {
+  top: -8px; right: -11px; width: 22px; height: 22px; border: 3px solid #854fff; border-radius: 50%;
+  background: #fff; box-shadow: 0 2px 6px rgba(28, 43, 70, 0.2); cursor: grab;
+}
+body:has(.tct-sp) .custom-modal .noUi-handle::before,
+body:has(.tct-sp) .custom-modal .noUi-handle::after { display: none; }
+body:has(.tct-sp) .custom-modal .noUi-handle:focus-visible { outline: none; box-shadow: 0 0 0 4px rgba(133, 79, 255, 0.25); }
+
+/* Footer: Cancel (outline) then the primary action, right aligned */
+body:has(.tct-sp) .custom-modal .modal-footer { padding: 14px 24px !important; border-top: 1px solid #eef0f5; background: #f8f9fc; }
+body:has(.tct-sp) .custom-modal .modal-footer > .row { margin: 0; padding: 0 !important; width: 100%; }
+body:has(.tct-sp) .custom-modal .modal-footer > .row > div { padding: 0; }
+body:has(.tct-sp) .custom-modal .modal-footer .d-flex { flex-direction: row-reverse; justify-content: flex-start; gap: 10px; }
+body:has(.tct-sp) .custom-modal .modal-footer .btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 120px; height: 42px; margin: 0 !important; padding: 0 20px; border-radius: 9px; font-size: 14px; font-weight: 600;
+}
+body:has(.tct-sp) .custom-modal .modal-footer .btn-secondary { border: 1px solid #dbdfea; color: #526484; background: #fff; }
+body:has(.tct-sp) .custom-modal .modal-footer .btn-secondary:hover { border-color: #c5cbe0; color: #1c2b46; background: #fff; }
+
+/* ─── Enroll New Course popup (portal) ──────────────────────────────────── */
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) { max-width: 760px; }
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) .modal-content {
+  border: 1px solid #e5e9f2; border-radius: 16px; overflow: visible;
+  box-shadow: 0 24px 64px rgba(28, 43, 70, 0.24), 0 2px 6px rgba(28, 43, 70, 0.06);
+}
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) .modal-body { position: relative; padding: 24px 26px 24px; }
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) .modal-body > .close {
+  position: absolute; top: 16px; right: 16px; display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 10px; color: #8094ae; opacity: 1; transition: background .15s ease, color .15s ease;
+}
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) .modal-body > .close:hover { background: #f1f3f8; color: #1c2b46; }
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) .modal-body > .p-2 { padding: 0 !important; }
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) .title {
+  margin: 0 48px 0 0; padding-bottom: 16px; border-bottom: 1px solid #eef0f5; font-size: 1.2rem; font-weight: 700; color: #1c2b46;
+}
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) .title + .mt-4 { margin-top: 20px !important; }
+/* Flatten the nested row/col-12 wrappers so every field shares one grid gutter */
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) form > .row { row-gap: 16px; }
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) form > .row > .col-md-12 > .row.col-md-12 { margin: 0 -10px; padding: 0; row-gap: 16px; }
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) form .row.col-md-12 > [class*="col-md-"] { padding: 0 10px; }
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) .form-group { margin-bottom: 0; }
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) .form-label { margin-bottom: 8px; font-size: 13.5px; font-weight: 600; line-height: 1.45; color: #364a63; }
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) .form-label .text-danger { color: #e85347 !important; }
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) .form-control {
+  height: 42px; padding: 0 14px; border: 1px solid #dbdfea; border-radius: 10px; font-size: 14px; color: #1c2b46; box-shadow: none;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) .form-control::placeholder { color: #98a4b6; }
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) .form-control:focus { border-color: #854fff; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.14); outline: none; }
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) .form-control:disabled { color: #8094ae; background: #f5f6fa; border-color: #e5e9f2; }
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) .react-select__control {
+  min-height: 42px; border: 1px solid #dbdfea; border-radius: 10px; box-shadow: none;
+}
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) .react-select__control--is-focused { border-color: #854fff !important; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.14) !important; }
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) .react-select__value-container { padding: 0 12px; }
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) .react-select__placeholder { font-size: 14px; color: #98a4b6; }
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) .react-select__indicator-separator { display: none; }
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) .react-select__menu { z-index: 30; margin-top: 6px; border: 1px solid #e5e9f2; border-radius: 10px; box-shadow: 0 12px 28px rgba(28, 43, 70, 0.14); overflow: hidden; }
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) .react-select__option--is-focused { background: #f5f1ff; color: #6a35e8; }
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) .react-select__option--is-selected { background: #854fff; color: #fff; }
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) .react-select__input input { box-shadow: none !important; border: 0 !important; height: auto !important; }
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) .invalid { display: block; margin-top: 6px; font-size: 12px !important; font-style: normal !important; }
+/* Footer row with the Enroll Course button */
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) form > .row > :last-child {
+  display: flex; justify-content: flex-end; margin-top: 6px; padding-top: 18px; border-top: 1px solid #eef0f5;
+}
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) .btn-primary {
+  display: inline-flex; align-items: center; gap: 6px; height: 42px; padding: 0 22px; border-color: #854fff; border-radius: 10px;
+  background: #854fff; font-weight: 600; box-shadow: 0 4px 12px rgba(133, 79, 255, 0.22);
+}
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) .btn-primary:hover:not(:disabled) { background: #6a35e8; border-color: #6a35e8; }
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) .btn-primary:focus-visible { box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.3); }
+
+
+/* ─── Responsive ────────────────────────────────────────────────────────── */
+@media (max-width: 767.98px) {
+  .tct-sp > .card > .card-inner { padding: 4px 16px 20px; }
+  .tct-sp .nav-tabs { gap: 0 18px; }
+  .tct-sp .nav-tabs .nav-link { padding: 12px 0 10px; font-size: 13.5px; }
+  .tct-sp .tct-sp-courses .nk-tb-list.is-separate { display: block; overflow-x: auto; }
+  .tct-sp .tct-sp-avail .entrolled-list .card-search.search-wrap { flex: 1 1 auto; }
+  body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) .modal-body { padding: 18px 16px; }
+  body:has(.tct-sp) .modal-dialog.custom-modal { margin: 8px; }
+  body:has(.tct-sp) .custom-modal .card-preview > .card-inner { padding: 16px; }
+  body:has(.tct-sp) .custom-modal .modal-header,
+  body:has(.tct-sp) .custom-modal .modal-footer { padding-left: 16px !important; padding-right: 16px !important; }
+}
+@media (max-width: 575.98px) {
+  body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) { margin: 8px; }
+  body:has(.tct-sp) .custom-modal .modal-footer .btn { flex: 1 1 0; min-width: 0; }
+}
+
+/* ─── Address tab: Save Address button only (fields untouched) ──────────── */
+/* The field rows are "row col-md-12"; only the button column (col-12, not a row) gets the divider. */
+.tct-sp .tct-sp-address > .row + .col-12:not(.row) { margin-top: 22px; padding-top: 20px; border-top: 1px solid #eef0f5; }
+.tct-sp .tct-sp-address > .col-12:not(.row) > ul { margin: 0; padding: 0; list-style: none; }
+.tct-sp .tct-sp-address > .col-12:not(.row) > ul > li { padding: 0; }
+.tct-sp .tct-sp-address .btn-primary {
+  position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 46px; padding: 0 24px; overflow: hidden; border: 0; border-radius: 12px;
+  font-size: 14.5px; font-weight: 600; letter-spacing: 0.01em; color: #fff;
+  background: linear-gradient(135deg, #9a6bff 0%, #854fff 45%, #6a35e8 100%);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset, 0 6px 16px rgba(106, 53, 232, 0.28);
+  transition: box-shadow .2s ease, transform .2s ease;
+}
+.tct-sp .tct-sp-address .btn-primary:hover:not(:disabled) {
+  color: #fff; transform: translateY(-1px); box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset, 0 10px 22px rgba(106, 53, 232, 0.36);
+}
+.tct-sp .tct-sp-address .btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 3px #fff, 0 0 0 5px rgba(133, 79, 255, 0.55); }
+.tct-sp .tct-sp-address .btn-primary:disabled { opacity: .55; box-shadow: none; cursor: not-allowed; }
+/* Save Address: save icon in a soft chip (CSS icon, same Nioicon font; hidden while "Saving...") */
+.tct-sp .tct-sp-address .btn-primary { padding: 0 24px 0 8px; gap: 12px; }
+.tct-sp .tct-sp-address .btn-primary:not(:has(.spinner-border))::before {
+  content: "\eb68"; font-family: "Nioicon"; display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; border-radius: 9px; font-size: 16px; font-weight: 400; background: rgba(255, 255, 255, 0.18);
+  transition: background .2s ease;
+}
+.tct-sp .tct-sp-address .btn-primary:has(.spinner-border) { padding: 0 24px; }
+.tct-sp .tct-sp-address .btn-primary:hover:not(:disabled)::before { background: rgba(255, 255, 255, 0.28); }
+/* Soft sheen on hover, like the other Save buttons */
+.tct-sp .tct-sp-address .btn-primary::after {
+  content: ""; position: absolute; top: 0; left: -60%; width: 40%; height: 100%; pointer-events: none;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.22), transparent); transform: skewX(-20deg); transition: left .5s ease;
+}
+.tct-sp .tct-sp-address .btn-primary:hover:not(:disabled)::after { left: 120%; }
+
+/* ─── Enroll / Edit Enrolled Course popup: header band, full-width dividers, primary button ─── */
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) .modal-body { padding: 0 26px 22px; }
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) .modal-body > .close { top: 18px; right: 18px; z-index: 2; }
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) .title {
+  margin: 0 -26px; padding: 22px 72px 18px 26px; border-bottom: 1px solid #eef0f5; border-radius: 16px 16px 0 0;
+  background: linear-gradient(180deg, #faf8ff 0%, #ffffff 100%);
+  display: flex; align-items: center; gap: 12px; font-size: 1.2rem; font-weight: 700; color: #1c2b46;
+}
+/* Book icon tile before the title */
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) .title::before {
+  content: "\e971"; font-family: "Nioicon"; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;
+  width: 42px; height: 42px; border-radius: 12px; font-size: 20px; font-weight: 400; color: #854fff; background: #f1ecff;
+}
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) .title + .mt-4 { margin-top: 22px !important; }
+/* Grey labels for read-only Payment, clearer focus */
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) .form-control:not(:disabled):hover { border-color: #c5cbe0; }
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) .react-select__control:hover { border-color: #c5cbe0; }
+/* Footer row: full-width divider and light band */
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) form > .row > :last-child {
+  /* the form row has an 8px gutter (g-3: -8px margins, 8px !important padding), so offsets are 26px - 8px */
+  margin: 8px -18px -14px; padding: 16px 26px !important; border-top: 1px solid #eef0f5; border-radius: 0 0 16px 16px; background: #fafbfd;
+  flex: 0 0 calc(100% + 36px); max-width: calc(100% + 36px);
+}
+/* Enroll Course / Edit Course button: gradient, check icon chip, hover lift */
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) form .btn-primary {
+  position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  height: 46px; padding: 0 24px 0 8px; overflow: hidden; border: 0; border-radius: 12px;
+  font-size: 14.5px; font-weight: 600; letter-spacing: 0.01em; color: #fff;
+  background: linear-gradient(135deg, #9a6bff 0%, #854fff 45%, #6a35e8 100%);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset, 0 6px 16px rgba(106, 53, 232, 0.28);
+  transition: box-shadow .2s ease, transform .2s ease;
+}
+/* The button's own icon element has no glyph; give it a check icon in a soft chip */
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) form .btn-primary > em.icon {
+  display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; margin: 0;
+  border-radius: 9px; font-size: 16px; background: rgba(255, 255, 255, 0.18); transition: background .2s ease;
+}
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) form .btn-primary > em.icon::before { content: "\e9b8"; font-family: "Nioicon"; }
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) form .btn-primary:has(.spinner-border) { padding: 0 24px; }
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) form .btn-primary::after {
+  content: ""; position: absolute; top: 0; left: -60%; width: 40%; height: 100%; pointer-events: none;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.22), transparent); transform: skewX(-20deg); transition: left .5s ease;
+}
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) form .btn-primary:hover:not(:disabled) {
+  color: #fff; transform: translateY(-1px); box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset, 0 10px 22px rgba(106, 53, 232, 0.36);
+}
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) form .btn-primary:hover:not(:disabled)::after { left: 120%; }
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) form .btn-primary:hover:not(:disabled) > em.icon { background: rgba(255, 255, 255, 0.28); }
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) form .btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 3px #fff, 0 0 0 5px rgba(133, 79, 255, 0.55); }
+body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) form .btn-primary:disabled { opacity: .55; box-shadow: none; cursor: not-allowed; }
+@media (max-width: 767.98px) {
+  body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) .modal-body { padding: 0 16px 16px; }
+  body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) .title { margin: 0 -16px; padding: 18px 60px 16px 16px; }
+  body:has(.tct-sp) .modal-dialog.modal-dialog-centered.modal-lg:has(.modal-body > .p-2 > .title) form > .row > :last-child {
+    margin: 8px -8px -8px; padding: 14px 16px !important; flex-basis: calc(100% + 16px); max-width: calc(100% + 16px);
+  }
+}
+
+/* ─── Availability: search · settings · Add Slots on one line, table below ─────────────
+   The shared component renders Add Slots (block head) and the search/settings toolbar (block row)
+   in separate blocks; flattening both wrappers lets them share one flex row. Markup is unchanged. */
+.tct-sp .tct-sp-avail { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 10px; }
+.tct-sp .tct-sp-avail > .nk-block-head,
+.tct-sp .tct-sp-avail > .nk-block-head > .nk-block-between,
+.tct-sp .tct-sp-avail > .nk-block { display: contents; }
+.tct-sp .tct-sp-avail > .nk-block-head > .nk-block-between > .nk-block-head-content:first-child { display: none; }
+/* 1: search + settings (settings pushed to the right end, next to Add Slots) */
+.tct-sp .tct-sp-avail > .nk-block > .row { order: 1; flex: 1 1 320px; min-width: 0; margin: 0; }
+/* 2: Add Slots */
+.tct-sp .tct-sp-avail > .nk-block-head > .nk-block-between > .nk-block-head-content:last-child { order: 2; flex: 0 0 auto; margin: 0; }
+/* 3: slots table / empty state, full width */
+.tct-sp .tct-sp-avail > .nk-block > :not(.row) { order: 3; flex: 1 1 100%; min-width: 0; }
+.tct-sp .tct-sp-avail .entrolled-list .card-title-group .card-tools.mr-n1 { margin-right: 0 !important; }

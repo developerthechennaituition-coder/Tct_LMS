@@ -1,0 +1,354 @@
+/* Edit Tutor modal (.tct-edit-tutor) and its Add Course modal (.tct-edit-tutor-course).
+   Every selector is scoped to these two modals; nothing here affects other pages or modals. */
+
+/* ─── Shell ─────────────────────────────────────────────────────────────── */
+.tct-edit-tutor .modal-content,
+.tct-edit-tutor-course .modal-content {
+  border: 0;
+  border-radius: 14px;
+  box-shadow: 0 24px 60px rgba(28, 43, 70, 0.22);
+  overflow: hidden;
+}
+/* Add Course: let the Subject menu extend past the card instead of being cut off at its edge. */
+.tct-edit-tutor-course .modal-content { overflow: visible; }
+
+/* Header: title + tutor name / code */
+.tct-edit-tutor .modal-header {
+  align-items: center;
+  padding: 20px 28px;
+  border-bottom: 1px solid #eef0f5;
+  background: linear-gradient(180deg, #faf8ff 0%, #ffffff 100%);
+}
+.tct-edit-tutor .modal-header .modal-title { display: flex; flex-direction: column; gap: 4px; }
+.tct-edit-tutor .tct-et-title { font-size: 1.25rem; font-weight: 700; line-height: 1.2; color: #1c2b46; }
+.tct-edit-tutor .tct-et-subtitle {
+  display: inline-flex; align-items: center; flex-wrap: wrap; gap: 8px;
+  font-size: 13px; font-weight: 500; color: #6b7a90; text-transform: capitalize;
+}
+.tct-edit-tutor .tct-et-code {
+  padding: 2px 8px; border-radius: 6px; font-size: 11.5px; font-weight: 700; letter-spacing: 0.03em;
+  text-transform: uppercase; color: #6a35e8; background: #f1ecff;
+}
+.tct-edit-tutor .modal-header .close {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; margin: 0 0 0 auto; padding: 0;
+  border: 0; border-radius: 10px; background: transparent; color: #8094ae; opacity: 1;
+  font-size: 18px; transition: background 0.15s ease, color 0.15s ease;
+}
+.tct-edit-tutor .modal-header .close:hover { color: #1c2b46; background: #f1f3f8; }
+
+/* Body: the PreviewCard is only a wrapper here */
+.tct-edit-tutor .card-preview { border: 0; box-shadow: none; margin: 0; }
+.tct-edit-tutor .card-preview > .card-inner { padding: 20px 28px 8px; }
+.tct-edit-tutor .tab-content { min-height: 380px; }
+
+/* ─── Tabs: segmented control ───────────────────────────────────────────── */
+.tct-edit-tutor .nav-tabs.tct-et-tabs {
+  display: inline-flex; gap: 4px; margin: 0 0 20px !important; padding: 4px;
+  border: 0; border-radius: 12px; background: #f3f4f9;
+}
+.tct-edit-tutor .tct-et-tabs .nav-item { margin: 0; padding: 0; }
+.tct-edit-tutor .tct-et-tabs .nav-link {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 18px; border: 0; border-radius: 9px;
+  font-size: 14px; font-weight: 600; color: #6b7a90; background: transparent;
+  transition: color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+.tct-edit-tutor .tct-et-tabs .nav-link::after { content: none; display: none; }
+.tct-edit-tutor .tct-et-tabs .nav-link .icon { font-size: 16px; }
+.tct-edit-tutor .tct-et-tabs .nav-link:hover { color: #6a35e8; }
+.tct-edit-tutor .tct-et-tabs .nav-link.active {
+  color: #6a35e8; background: #fff; box-shadow: 0 1px 3px rgba(28, 43, 70, 0.12);
+}
+.tct-edit-tutor .tct-et-tabs .nav-link.disabled { color: #b7c2d0; cursor: not-allowed; }
+
+/* ─── Tutor Info form ───────────────────────────────────────────────────── */
+.tct-edit-tutor .tct-et-form { margin-top: 0 !important; }
+.tct-edit-tutor .tct-et-section {
+  display: flex; align-items: center; gap: 12px;
+  margin-top: 4px; padding: 12px 14px;
+  border-radius: 10px; background: #f8f9fc;
+}
+.tct-edit-tutor .tct-et-section + .row { margin-top: 4px; }
+.tct-edit-tutor .tct-et-section-icon {
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+  width: 34px; height: 34px; border-radius: 9px; font-size: 17px; color: #854fff; background: #fff;
+  box-shadow: 0 1px 2px rgba(28, 43, 70, 0.08);
+}
+.tct-edit-tutor .tct-et-section h6 { margin: 0; font-size: 14px; font-weight: 700; color: #1c2b46; }
+.tct-edit-tutor .tct-et-section p { margin: 2px 0 0; font-size: 12.5px; color: #8094ae; }
+
+.tct-edit-tutor .form-label,
+.tct-edit-tutor-course .form-label {
+  margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #364a63;
+}
+.tct-edit-tutor .form-group { margin-bottom: 4px; }
+
+/* Text inputs, date picker, native selects */
+.tct-edit-tutor .form-control,
+.tct-edit-tutor-course .form-control {
+  height: 42px; padding: 0 14px;
+  border: 1px solid #dbdfea; border-radius: 8px;
+  font-size: 14px; color: #1c2b46; background-color: #fff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.tct-edit-tutor .form-control::placeholder,
+.tct-edit-tutor-course .form-control::placeholder { color: #a7b2c3; }
+.tct-edit-tutor .form-control:hover,
+.tct-edit-tutor-course .form-control:hover { border-color: #c5cbe0; }
+.tct-edit-tutor .form-control:focus,
+.tct-edit-tutor-course .form-control:focus {
+  border-color: #854fff; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.15); outline: none;
+}
+.tct-edit-tutor .react-datepicker-wrapper { display: block; width: 100%; }
+
+/* Phone: country flag + number in one field */
+.tct-edit-tutor .PhoneInput {
+  display: flex; align-items: center; height: 42px; padding: 0 0 0 10px;
+  border: 1px solid #dbdfea; border-radius: 8px; background: #fff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.tct-edit-tutor .PhoneInput:hover { border-color: #c5cbe0; }
+.tct-edit-tutor .PhoneInput:focus-within { border-color: #854fff; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.15); }
+/* Country flag + arrow: compact, vertically centred, separated from the number by a thin divider. */
+.tct-edit-tutor .PhoneInputCountry {
+  display: flex; align-items: center; align-self: stretch; flex-shrink: 0;
+  height: auto; margin: 0; padding: 0 8px 0 0; border-right: 1px solid #eef0f5;
+}
+.tct-edit-tutor .PhoneInputCountryIcon {
+  width: 22px; height: 15px; overflow: hidden; border-radius: 3px;
+  box-shadow: 0 0 0 1px rgba(28, 43, 70, 0.12); background: #f1f3f8;
+}
+.tct-edit-tutor .PhoneInputCountryIconImg { display: block; width: 100%; height: 100%; object-fit: cover; }
+.tct-edit-tutor .PhoneInputCountrySelectArrow { margin-left: 5px; color: #8094ae; opacity: 1; }
+.tct-edit-tutor .PhoneInputCountrySelect:focus + .PhoneInputCountryIcon { box-shadow: 0 0 0 2px rgba(133, 79, 255, 0.45); }
+.tct-edit-tutor .PhoneInputInput {
+  flex: 1 1 auto; min-width: 0; height: 100%; padding: 0 8px 0 9px;
+  border: 0 !important; outline: 0; box-shadow: none !important; background: transparent;
+  font-size: 14px; color: #1c2b46; font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
+}
+
+/* Native <select> (Board, Grade) with a custom chevron */
+.tct-edit-tutor-course select.form-control {
+  appearance: none; -webkit-appearance: none; -moz-appearance: none;
+  padding-right: 40px; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%238094ae' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center; background-size: 12px 8px;
+}
+.tct-edit-tutor-course select.form-control:focus {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23854fff' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+/* Board / Grade option list: styled picker where the browser supports customizable <select>
+   (Chrome / Edge 135+). Other browsers keep their native list. Same <select>, same values and events. */
+@supports (appearance: base-select) {
+  .tct-edit-tutor-course select.form-control,
+  .tct-edit-tutor-course select.form-control::picker(select) { appearance: base-select; }
+  .tct-edit-tutor-course select.form-control { display: flex; align-items: center; }
+  .tct-edit-tutor-course select.form-control::picker-icon { display: none; }
+  .tct-edit-tutor-course select.form-control:open {
+    border-color: #854fff; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.15);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 6.5l5-5 5 5' fill='none' stroke='%23854fff' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  }
+  .tct-edit-tutor-course select.form-control::picker(select) {
+    min-width: anchor-size(width); max-height: 330px; margin-top: 6px; padding: 6px; overflow-y: auto;
+    border: 1px solid #e5e9f2; border-radius: 10px; background: #fff;
+    box-shadow: 0 12px 28px rgba(28, 43, 70, 0.14);
+    scrollbar-width: thin; scrollbar-color: #d9cbff transparent;
+  }
+  .tct-edit-tutor-course select.form-control option {
+    display: flex; align-items: center; min-height: 38px; padding: 8px 12px;
+    border-radius: 7px; font-size: 14px; color: #364a63; cursor: pointer;
+  }
+  .tct-edit-tutor-course select.form-control option::checkmark { display: none; }
+  .tct-edit-tutor-course select.form-control option:hover,
+  .tct-edit-tutor-course select.form-control option:focus-visible { outline: none; background: #f5f1ff; color: #6a35e8; }
+  .tct-edit-tutor-course select.form-control option:checked { background: #854fff; color: #fff; font-weight: 600; }
+  /* The "Select a board / grade" placeholder: muted, shown from its label attribute. */
+  .tct-edit-tutor-course select.form-control option[value=""] { color: #a7b2c3; font-weight: 400; }
+  .tct-edit-tutor-course select.form-control option[value=""]:checked { background: transparent; color: #a7b2c3; }
+}
+
+/* react-select (Gender, Country, Subject) */
+.tct-edit-tutor .react-select__control,
+.tct-edit-tutor-course .react-select__control {
+  min-height: 42px; border: 1px solid #dbdfea; border-radius: 8px; box-shadow: none; cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.tct-edit-tutor .react-select__control:hover,
+.tct-edit-tutor-course .react-select__control:hover { border-color: #c5cbe0; }
+.tct-edit-tutor .react-select__control--is-focused,
+.tct-edit-tutor .react-select__control--is-focused:hover,
+.tct-edit-tutor-course .react-select__control--is-focused,
+.tct-edit-tutor-course .react-select__control--is-focused:hover {
+  border-color: #854fff; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.15);
+}
+.tct-edit-tutor .react-select__value-container,
+.tct-edit-tutor-course .react-select__value-container { padding: 2px 12px; }
+.tct-edit-tutor .react-select__placeholder,
+.tct-edit-tutor-course .react-select__placeholder { font-size: 14px; color: #a7b2c3; }
+.tct-edit-tutor .react-select__single-value,
+.tct-edit-tutor-course .react-select__single-value { font-size: 14px; color: #1c2b46; }
+.tct-edit-tutor .react-select__indicator-separator,
+.tct-edit-tutor-course .react-select__indicator-separator { display: none; }
+.tct-edit-tutor .react-select__indicator,
+.tct-edit-tutor-course .react-select__indicator { color: #8094ae; }
+.tct-edit-tutor .react-select__control--is-focused .react-select__dropdown-indicator,
+.tct-edit-tutor-course .react-select__control--is-focused .react-select__dropdown-indicator { color: #854fff; }
+.tct-edit-tutor .react-select__menu,
+.tct-edit-tutor-course .react-select__menu {
+  z-index: 20; margin-top: 6px; overflow: hidden;
+  border: 1px solid #e5e9f2; border-radius: 10px; box-shadow: 0 12px 28px rgba(28, 43, 70, 0.14);
+}
+.tct-edit-tutor .react-select__menu-list,
+.tct-edit-tutor-course .react-select__menu-list {
+  max-height: 220px; padding: 6px; overflow-x: hidden;
+  scrollbar-width: thin; scrollbar-color: #d9cbff transparent;
+}
+.tct-edit-tutor .react-select__option,
+.tct-edit-tutor-course .react-select__option { white-space: normal; overflow-wrap: anywhere; }
+/* Country sits in the form's last row, at the bottom of the scrolling body, so its list opens upwards
+   (into the fields above) instead of being cut off by the body's bottom edge. */
+.tct-edit-tutor .tct-et-form form > .row:last-of-type .react-select__menu {
+  top: auto; bottom: 100%; margin: 0 0 6px;
+  box-shadow: 0 -12px 28px rgba(28, 43, 70, 0.14);
+}
+/* The search input inside react-select picked up a bordered input style (stray box before "Select..."). */
+.tct-edit-tutor .react-select__input input,
+.tct-edit-tutor-course .react-select__input input {
+  height: auto !important; min-height: 0 !important; margin: 0 !important; padding: 0 !important;
+  border: 0 !important; border-radius: 0 !important; box-shadow: none !important; background: transparent !important;
+  font-size: 14px !important; color: #1c2b46 !important;
+}
+.tct-edit-tutor .react-select__option,
+.tct-edit-tutor-course .react-select__option {
+  border-radius: 7px; padding: 9px 12px; font-size: 14px; color: #364a63; cursor: pointer;
+}
+.tct-edit-tutor .react-select__option--is-focused,
+.tct-edit-tutor-course .react-select__option--is-focused { background: #f5f1ff; color: #6a35e8; }
+.tct-edit-tutor .react-select__option--is-selected,
+.tct-edit-tutor-course .react-select__option--is-selected { background: #854fff; color: #fff; }
+.tct-edit-tutor-course .react-select__multi-value {
+  margin: 3px 6px 3px 0; border-radius: 6px; background: #f1ecff;
+}
+.tct-edit-tutor-course .react-select__multi-value__label { padding: 3px 4px 3px 8px; font-size: 13px; font-weight: 600; color: #6a35e8; }
+.tct-edit-tutor-course .react-select__multi-value__remove { border-radius: 0 6px 6px 0; color: #9a74ff; cursor: pointer; }
+.tct-edit-tutor-course .react-select__multi-value__remove:hover { background: #e3d8ff; color: #5626c9; }
+
+/* Validation messages */
+.tct-edit-tutor .invalid,
+.tct-edit-tutor-course .invalid { font-size: 12px; color: #e85347; }
+
+/* ─── Tutor Course tab ──────────────────────────────────────────────────── */
+.tct-edit-tutor .tct-et-courses-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px;
+}
+.tct-edit-tutor .tct-et-courses-head h6 {
+  display: flex; align-items: center; gap: 8px; margin: 0; font-size: 15px; font-weight: 700; color: #1c2b46;
+}
+.tct-edit-tutor .tct-et-courses-head p { margin: 3px 0 0; font-size: 13px; color: #8094ae; }
+.tct-edit-tutor .tct-et-count {
+  display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 22px; padding: 0 7px;
+  border-radius: 11px; font-size: 12px; font-weight: 700; color: #6a35e8; background: #f1ecff;
+}
+.tct-edit-tutor .tct-et-courses-head .btn {
+  align-items: center; gap: 6px; height: 40px; padding: 0 16px; border-radius: 9px;
+  font-size: 14px; font-weight: 600; white-space: nowrap; flex-shrink: 0;
+}
+
+/* Course table */
+.tct-edit-tutor .tct-et-course-table .rdt_Table {
+  border: 1px solid #e5e9f2; border-radius: 10px; overflow: hidden;
+}
+.tct-edit-tutor .tct-et-course-table .rdt_TableHeadRow {
+  min-height: 44px; background: #f5f6fa; border-bottom: 1px solid #e5e9f2;
+}
+.tct-edit-tutor .tct-et-course-table .rdt_TableCol {
+  font-size: 11.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #526484;
+}
+.tct-edit-tutor .tct-et-course-table .rdt_TableRow {
+  min-height: 50px; font-size: 14px; color: #364a63; border-bottom-color: #eef0f5;
+}
+.tct-edit-tutor .tct-et-course-table .rdt_TableRow:hover { background: #faf8ff; }
+.tct-edit-tutor .tct-et-delete {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; border-radius: 8px; transition: background 0.15s ease;
+}
+.tct-edit-tutor .tct-et-delete:hover { background: #fdecea; }
+
+/* Empty state */
+.tct-edit-tutor .tct-et-empty {
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  padding: 40px 20px; border: 1px dashed #d9cbff; border-radius: 12px; background: #fcfbff;
+}
+.tct-edit-tutor .tct-et-empty-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 52px; height: 52px; margin-bottom: 12px; border-radius: 14px;
+  font-size: 24px; color: #854fff; background: #f1ecff;
+}
+.tct-edit-tutor .tct-et-empty h6 { margin: 0 0 4px; font-size: 15px; font-weight: 700; color: #1c2b46; }
+.tct-edit-tutor .tct-et-empty p { max-width: 340px; margin: 0; font-size: 13px; color: #8094ae; }
+
+/* ─── Footer ────────────────────────────────────────────────────────────── */
+.tct-edit-tutor .tct-et-footer {
+  padding: 16px 28px; border-top: 1px solid #eef0f5; background: #f8f9fc !important;
+}
+.tct-edit-tutor .tct-et-footer > div { padding: 0; }
+.tct-edit-tutor .tct-et-footer ul { display: flex; justify-content: flex-end; margin: 0; }
+.tct-edit-tutor .tct-et-footer li:last-child { order: -1; }
+.tct-edit-tutor .tct-et-footer .btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  min-width: 132px; height: 42px; padding: 0 20px; border-radius: 9px; font-size: 14px; font-weight: 600;
+}
+.tct-edit-tutor .tct-et-footer .link {
+  display: inline-flex; align-items: center; justify-content: center;
+  height: 42px; padding: 0 20px; border: 1px solid #dbdfea; border-radius: 9px;
+  font-size: 14px; font-weight: 600; color: #526484; background: #fff; text-decoration: none;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+.tct-edit-tutor .tct-et-footer .link:hover { border-color: #c5cbe0; color: #1c2b46; }
+
+/* ─── Add Course modal ──────────────────────────────────────────────────── */
+.modal-dialog.tct-edit-tutor-course { max-width: 560px; }
+.tct-edit-tutor-course .tct-etc-head {
+  display: flex; align-items: flex-start; gap: 14px;
+  padding: 22px 24px 18px; border-bottom: 1px solid #eef0f5; border-radius: 14px 14px 0 0;
+  background: linear-gradient(180deg, #faf8ff 0%, #ffffff 100%);
+}
+.tct-edit-tutor-course .tct-etc-icon {
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+  width: 42px; height: 42px; border-radius: 11px; font-size: 20px; color: #854fff; background: #f1ecff;
+}
+.tct-edit-tutor-course .tct-etc-head .title { margin: 0; font-size: 1.15rem; font-weight: 700; color: #1c2b46; }
+.tct-edit-tutor-course .tct-etc-head p { margin: 3px 0 0; font-size: 13px; color: #8094ae; }
+.tct-edit-tutor-course .tct-etc-close {
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+  width: 34px; height: 34px; margin-left: auto; padding: 0;
+  border: 0; border-radius: 9px; background: transparent; color: #8094ae; font-size: 17px; cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.tct-edit-tutor-course .tct-etc-close:hover { color: #1c2b46; background: #f1f3f8; }
+.tct-edit-tutor-course .tct-etc-close:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.25); }
+.tct-edit-tutor-course .tct-etc-body { padding: 20px 24px 24px; }
+.tct-edit-tutor-course .form-group { margin-bottom: 14px; }
+.tct-edit-tutor-course .form-control-wrap { position: relative; }
+.tct-edit-tutor-course .btn-primary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  width: 100%; height: 44px; margin-top: 4px; border-radius: 9px; font-size: 14px; font-weight: 600;
+}
+
+/* ─── Small screens ─────────────────────────────────────────────────────── */
+@media (max-width: 767.98px) {
+  .tct-edit-tutor .modal-header { padding: 16px 18px; }
+  .tct-edit-tutor .card-preview > .card-inner { padding: 16px 18px 4px; }
+  .tct-edit-tutor .tab-content { min-height: 0; }
+  .tct-edit-tutor .nav-tabs.tct-et-tabs { display: flex; }
+  .tct-edit-tutor .tct-et-tabs .nav-item { flex: 1 1 0; }
+  .tct-edit-tutor .tct-et-tabs .nav-link { justify-content: center; width: 100%; padding: 9px 10px; }
+  .tct-edit-tutor .tct-et-footer { padding: 14px 18px; }
+  .tct-edit-tutor .tct-et-footer li { flex: 1 1 0; }
+  .tct-edit-tutor .tct-et-footer .btn,
+  .tct-edit-tutor .tct-et-footer .link { width: 100%; min-width: 0; }
+  .tct-edit-tutor-course .tct-etc-head { padding: 18px 18px 14px; }
+  .tct-edit-tutor-course .tct-etc-body { padding: 16px 18px 20px; }
+}

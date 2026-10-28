@@ -1,0 +1,1117 @@
+/* =========================================================
+   STUDENT LIST PAGE
+   ========================================================= */
+
+.student-list-page {
+  width: 100%;
+  min-width: 0;
+  min-height: 100%;
+  padding: 80px 30px 40px;
+  box-sizing: border-box;
+  background: #f5f6fa;
+
+  /*
+    Important:
+    Do NOT use overflow:hidden here.
+    It can clip the header controls and dropdown.
+  */
+  overflow: visible;
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.student-list-header {
+  width: 100%;
+  min-width: 0;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 24px;
+  margin-bottom: 24px;
+
+  box-sizing: border-box;
+}
+
+/* TITLE */
+
+.student-list-title {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.student-list-title h2 {
+  margin: 0;
+
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 700;
+
+  color: #364a63;
+}
+
+.student-list-title p {
+  margin: 5px 0 0;
+
+  font-size: 13px;
+  line-height: 20px;
+
+  color: #8091a5;
+}
+
+/* =========================================================
+   HEADER ACTIONS
+   ========================================================= */
+
+.student-list-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  flex: 0 1 auto;
+  min-width: 0;
+
+  box-sizing: border-box;
+
+  position: relative;
+  z-index: 20;
+}
+
+/* =========================================================
+   SEARCH
+   ========================================================= */
+
+.student-search {
+  position: relative;
+
+  width: 200px;
+  min-width: 160px;
+  height: 40px;
+
+  flex: 0 1 200px;
+
+  box-sizing: border-box;
+}
+
+.student-search input {
+  width: 100%;
+  height: 40px;
+
+  padding: 0 38px 0 14px;
+
+  border: 1px solid #dbdfea;
+  border-radius: 4px;
+
+  outline: none;
+
+  background: #ffffff;
+
+  color: #364a63;
+
+  font-size: 13px;
+
+  box-sizing: border-box;
+}
+
+.student-search input::placeholder {
+  color: #9aa9bb;
+}
+
+.student-search input:focus {
+  border-color: #6576ff;
+
+  box-shadow: 0 0 0 2px rgba(101, 118, 255, 0.08);
+}
+
+.student-search-icon {
+  position: absolute;
+
+  right: 12px;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  font-size: 20px;
+  line-height: 1;
+
+  color: #8091a5;
+
+  pointer-events: none;
+}
+
+/* =========================================================
+   STATUS FILTER
+   ========================================================= */
+
+.status-filter-wrapper {
+  position: relative;
+
+  width: 115px;
+  min-width: 105px;
+  height: 40px;
+
+  flex: 0 1 115px;
+
+  box-sizing: border-box;
+}
+
+.status-filter-wrapper select {
+  width: 100%;
+  height: 40px;
+
+  padding: 0 32px 0 13px;
+
+  border: 1px solid #dbdfea;
+  border-radius: 4px;
+
+  outline: none;
+
+  appearance: none;
+
+  background: #ffffff;
+
+  color: #526484;
+
+  font-size: 13px;
+
+  cursor: pointer;
+
+  box-sizing: border-box;
+}
+
+.status-filter-wrapper select:focus {
+  border-color: #6576ff;
+
+  box-shadow: 0 0 0 2px rgba(101, 118, 255, 0.08);
+}
+
+.status-filter-arrow {
+  position: absolute;
+
+  right: 11px;
+  top: 50%;
+
+  transform: translateY(-52%);
+
+  font-size: 16px;
+  line-height: 1;
+
+  color: #8091a5;
+
+  pointer-events: none;
+}
+
+/* =========================================================
+   ADD BUTTON
+   ========================================================= */
+
+.add-student-btn {
+  height: 40px;
+  min-width: 96px;
+
+  padding: 0 15px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 5px;
+
+  flex: 0 0 auto;
+
+  border: 1px solid #6576ff;
+  border-radius: 4px;
+
+  outline: none;
+
+  background: #6576ff;
+  color: #ffffff;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  white-space: nowrap;
+
+  box-sizing: border-box;
+
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.add-student-btn:hover {
+  background: #5969e8;
+  border-color: #5969e8;
+}
+
+.add-student-btn:focus {
+  box-shadow: 0 0 0 3px rgba(101, 118, 255, 0.16);
+}
+
+.add-icon {
+  font-size: 17px;
+  line-height: 1;
+}
+
+/* =========================================================
+   TABLE CONTAINER
+   ========================================================= */
+
+.student-table-wrapper {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  background: #ffffff;
+
+  border: 1px solid #e5e9f2;
+  border-radius: 4px;
+
+  overflow-x: auto;
+  overflow-y: visible;
+
+  -webkit-overflow-scrolling: touch;
+}
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.student-table {
+  width: 100%;
+
+  min-width: 1050px;
+
+  border-collapse: separate;
+  border-spacing: 0;
+
+  background: #ffffff;
+
+  font-size: 13px;
+
+  table-layout: auto;
+}
+
+/* HEADER */
+
+.student-table thead th {
+  height: 50px;
+
+  padding: 0 18px;
+
+  border-bottom: 1px solid #e5e9f2;
+
+  background: #ffffff;
+
+  color: #8091a5;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  text-align: left;
+
+  white-space: nowrap;
+
+  box-sizing: border-box;
+}
+
+.student-table thead th:first-child {
+  padding-left: 20px;
+}
+
+.student-table thead th:last-child {
+  padding-right: 20px;
+}
+
+/* BODY */
+
+.student-table tbody td {
+  height: 68px;
+
+  padding: 10px 18px;
+
+  border-bottom: 1px solid #edf0f5;
+
+  color: #526484;
+
+  vertical-align: middle;
+
+  box-sizing: border-box;
+
+  white-space: nowrap;
+}
+
+.student-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.student-table tbody tr:hover {
+  background: #fafbff;
+}
+
+/* =========================================================
+   COLUMN WIDTHS
+   ========================================================= */
+
+.student-table .student-column {
+  width: 220px;
+}
+
+.student-table th:nth-child(2),
+.student-table td:nth-child(2) {
+  width: 230px;
+}
+
+.student-table th:nth-child(3),
+.student-table td:nth-child(3) {
+  width: 170px;
+}
+
+.student-table th:nth-child(4),
+.student-table td:nth-child(4) {
+  width: 120px;
+}
+
+.student-table th:nth-child(5),
+.student-table td:nth-child(5) {
+  width: 130px;
+}
+
+.student-table th:nth-child(6),
+.student-table td:nth-child(6) {
+  width: 120px;
+}
+
+.student-table .action-column {
+  width: 80px;
+  text-align: center;
+}
+
+/* =========================================================
+   STUDENT INFO
+   ========================================================= */
+
+.student-info {
+  display: flex;
+  align-items: center;
+
+  min-width: 0;
+
+  gap: 11px;
+}
+
+.student-avatar {
+  width: 38px;
+  height: 38px;
+
+  flex: 0 0 38px;
+
+  border-radius: 50%;
+
+  object-fit: cover;
+
+  display: block;
+
+  background: #e5e9f2;
+}
+
+.student-name-wrapper {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.student-name {
+  color: #364a63;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.student-email {
+  color: #526484;
+}
+
+.student-phone {
+  color: #526484;
+}
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.student-status {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 7px;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+
+  flex: 0 0 7px;
+
+  border-radius: 50%;
+
+  display: inline-block;
+}
+
+.student-status.active {
+  color: #1ca774;
+}
+
+.student-status.active .status-dot {
+  background: #1ca774;
+}
+
+.student-status.inactive {
+  color: #e85347;
+}
+
+.student-status.inactive .status-dot {
+  background: #e85347;
+}
+
+/* =========================================================
+   ACTION MENU
+   ========================================================= */
+
+.student-action-wrapper {
+  position: relative;
+
+  width: 100%;
+
+  display: flex;
+  justify-content: center;
+}
+
+.student-menu-btn {
+  width: 32px;
+  height: 32px;
+
+  padding: 0;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 4px;
+
+  background: transparent;
+
+  color: #8091a5;
+
+  font-size: 20px;
+  line-height: 1;
+
+  cursor: pointer;
+}
+
+.student-menu-btn:hover {
+  background: #f0f2f7;
+
+  color: #364a63;
+}
+
+.student-dropdown {
+  position: absolute;
+
+  top: 35px;
+  right: 0;
+
+  z-index: 1000;
+
+  width: 135px;
+
+  padding: 5px 0;
+
+  background: #ffffff;
+
+  border: 1px solid #e5e9f2;
+  border-radius: 4px;
+
+  box-shadow:
+    0 5px 20px rgba(43, 55, 72, 0.12);
+
+  box-sizing: border-box;
+}
+
+.student-dropdown-item {
+  width: 100%;
+  min-height: 36px;
+
+  padding: 0 13px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+
+  border: none;
+
+  background: transparent;
+
+  color: #526484;
+
+  font-size: 13px;
+
+  text-align: left;
+
+  cursor: pointer;
+}
+
+.student-dropdown-item:hover {
+  background: #f5f6fa;
+
+  color: #364a63;
+}
+
+.student-dropdown-item.delete {
+  color: #e85347;
+}
+
+.student-dropdown-item.delete:hover {
+  background: #fff0ef;
+
+  color: #e85347;
+}
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.student-empty-row {
+  height: 180px !important;
+
+  text-align: center !important;
+
+  color: #8091a5 !important;
+
+  font-size: 14px !important;
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.student-list-footer {
+  width: 100%;
+
+  padding: 15px 4px 0;
+
+  box-sizing: border-box;
+
+  color: #8091a5;
+
+  font-size: 12px;
+}
+
+/* =========================================================
+   MODAL
+   ========================================================= */
+
+.student-modal-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background: rgba(24, 36, 51, 0.45);
+
+  box-sizing: border-box;
+}
+
+.student-modal {
+  width: 100%;
+  max-width: 650px;
+
+  max-height: calc(100vh - 40px);
+
+  overflow-y: auto;
+
+  background: #ffffff;
+
+  border-radius: 6px;
+
+  box-shadow:
+    0 15px 50px rgba(24, 36, 51, 0.2);
+
+  box-sizing: border-box;
+}
+
+/* MODAL HEADER */
+
+.student-modal-header {
+  padding: 22px 24px 18px;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  border-bottom: 1px solid #e5e9f2;
+
+  box-sizing: border-box;
+}
+
+.student-modal-header h3 {
+  margin: 0;
+
+  color: #364a63;
+
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.student-modal-header p {
+  margin: 4px 0 0;
+
+  color: #8091a5;
+
+  font-size: 12px;
+}
+
+.student-modal-close {
+  width: 32px;
+  height: 32px;
+
+  padding: 0;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 4px;
+
+  background: transparent;
+
+  color: #8091a5;
+
+  font-size: 25px;
+  line-height: 1;
+
+  cursor: pointer;
+}
+
+.student-modal-close:hover {
+  background: #f5f6fa;
+
+  color: #364a63;
+}
+
+/* FORM */
+
+.student-form-grid {
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 18px;
+
+  padding: 24px;
+
+  box-sizing: border-box;
+}
+
+.student-form-group {
+  display: flex;
+  flex-direction: column;
+
+  gap: 7px;
+}
+
+.student-form-group label {
+  color: #364a63;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.student-form-group input,
+.student-form-group select {
+  width: 100%;
+  height: 40px;
+
+  padding: 0 12px;
+
+  border: 1px solid #dbdfea;
+  border-radius: 4px;
+
+  outline: none;
+
+  background: #ffffff;
+
+  color: #526484;
+
+  font-size: 13px;
+
+  box-sizing: border-box;
+}
+
+.student-form-group input:focus,
+.student-form-group select:focus {
+  border-color: #6576ff;
+
+  box-shadow: 0 0 0 2px rgba(101, 118, 255, 0.08);
+}
+
+.student-form-group input::placeholder {
+  color: #9aa9bb;
+}
+
+/* MODAL FOOTER */
+
+.student-modal-footer {
+  padding: 18px 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  border-top: 1px solid #e5e9f2;
+
+  box-sizing: border-box;
+}
+
+.student-cancel-btn,
+.student-save-btn {
+  height: 38px;
+
+  padding: 0 16px;
+
+  border-radius: 4px;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  box-sizing: border-box;
+}
+
+.student-cancel-btn {
+  border: 1px solid #dbdfea;
+
+  background: #ffffff;
+
+  color: #526484;
+}
+
+.student-cancel-btn:hover {
+  background: #f5f6fa;
+}
+
+.student-save-btn {
+  border: 1px solid #6576ff;
+
+  background: #6576ff;
+
+  color: #ffffff;
+}
+
+.student-save-btn:hover {
+  background: #5969e8;
+
+  border-color: #5969e8;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+/*
+  Medium screen:
+  Header actions move below title instead of getting clipped.
+*/
+
+@media (max-width: 1100px) {
+  .student-list-header {
+    flex-direction: column;
+    align-items: stretch;
+
+    gap: 18px;
+  }
+
+  .student-list-actions {
+    width: 100%;
+
+    justify-content: flex-start;
+
+    flex-wrap: wrap;
+  }
+}
+
+/*
+  Smaller screen
+*/
+
+@media (max-width: 700px) {
+  .student-list-page {
+    padding: 20px 15px 30px;
+  }
+
+  .student-list-actions {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns: minmax(0, 1fr) 110px;
+
+    gap: 10px;
+  }
+
+  .student-search {
+    width: auto;
+    min-width: 0;
+
+    flex: none;
+  }
+
+  .status-filter-wrapper {
+    width: auto;
+    min-width: 0;
+
+    flex: none;
+  }
+
+  .add-student-btn {
+    width: 100%;
+  }
+
+  .student-search {
+    grid-column: 1 / -1;
+  }
+
+  .status-filter-wrapper {
+    grid-column: 1;
+  }
+
+  .add-student-btn {
+    grid-column: 2;
+  }
+
+  .student-form-grid {
+    grid-template-columns: 1fr;
+
+    padding: 18px;
+  }
+
+  .student-modal-header {
+    padding: 18px;
+  }
+
+  .student-modal-footer {
+    padding: 15px 18px;
+  }
+}
+
+/*
+  Very small screen
+*/
+
+@media (max-width: 430px) {
+  .student-list-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .student-search {
+    grid-column: 1;
+  }
+
+  .status-filter-wrapper {
+    grid-column: 1;
+  }
+
+  .add-student-btn {
+    grid-column: 1;
+  }
+}
+/* =========================================
+   ACTION MENU
+========================================= */
+
+.student-action-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+
+/* Three dot button */
+
+.student-menu-btn {
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 50%;
+
+  background: transparent;
+
+  color: #58718f;
+
+  font-size: 16px;
+  font-weight: 700;
+
+  letter-spacing: 2px;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.student-menu-btn:hover {
+  background: #edf0f6;
+  color: #8150f6;
+}
+
+
+/* =========================================
+   DROPDOWN
+========================================= */
+
+.student-dropdown {
+  position: absolute;
+
+  right: 0;
+  top: calc(100% + 5px);
+
+  width: 155px;
+
+  background: #ffffff;
+
+  border: 1px solid #e7ebf1;
+
+  border-radius: 4px;
+
+  box-shadow:
+    0 5px 20px rgba(34, 48, 73, 0.12);
+
+  z-index: 1000;
+
+  overflow: hidden;
+
+  padding: 4px 0;
+}
+
+
+/* =========================================
+   DROPDOWN ITEM
+========================================= */
+
+.student-dropdown-item {
+  width: 100%;
+
+  min-height: 40px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 11px;
+
+  padding: 0 14px;
+
+  border: none;
+
+  background: #ffffff;
+
+  color: #526b88;
+
+  font-size: 12px;
+
+  font-weight: 500;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.student-dropdown-item:hover {
+  background: #f6f7fb;
+  color: #8150f6;
+}
+
+
+/* =========================================
+   DROPDOWN ICON
+========================================= */
+
+.dropdown-icon {
+  width: 18px;
+  height: 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  font-size: 14px;
+}
+
+
+/* View Details icon */
+
+.view-icon {
+  color: #8192a8;
+}
+
+
+/* Activities icon */
+
+.activity-icon {
+  color: #8150f6;
+}
+
+
+/* =========================================
+   ACTIVE / HOVER
+========================================= */
+
+.student-dropdown-item:hover .view-icon {
+  color: #8150f6;
+}
+
+.student-dropdown-item:hover .activity-icon {
+  color: #8150f6;
+}

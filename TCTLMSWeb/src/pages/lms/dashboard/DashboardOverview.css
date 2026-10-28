@@ -1,0 +1,684 @@
+/* =========================================================
+   ANALYTICS DASHBOARD
+   ========================================================= */
+
+.analytics-dashboard {
+  width: 100%;
+  max-width: 100%;
+  padding-bottom: 30px;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.analytics-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.analytics-filter-btn {
+  min-width: 140px;
+  height: 38px;
+  border: 1px solid #e5e9f2 !important;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.analytics-report-btn {
+  min-width: 105px;
+  height: 38px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   MAIN GRID
+   ========================================================= */
+
+.analytics-grid {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1.5fr)
+    minmax(0, 1fr)
+    minmax(0, 0.9fr);
+
+  gap: 20px;
+
+  width: 100%;
+}
+
+
+/* =========================================================
+   COMMON CARD
+   ========================================================= */
+
+.analytics-card {
+  background: #ffffff;
+
+  border: 1px solid #e5e9f2;
+
+  border-radius: 4px;
+
+  overflow: hidden;
+
+  min-width: 0;
+
+  box-shadow: none;
+
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.analytics-card:hover {
+  box-shadow: 0 4px 14px rgba(30, 42, 80, 0.05);
+}
+
+
+/* =========================================================
+   CARD HEADER
+   ========================================================= */
+
+.analytics-card-header {
+  min-height: 88px;
+
+  padding: 20px 22px;
+
+  display: flex;
+
+  align-items: flex-start;
+
+  justify-content: space-between;
+
+  gap: 15px;
+
+  border-bottom: 1px solid #e5e9f2;
+}
+
+.analytics-card-title {
+  margin: 0 0 5px;
+
+  font-size: 15px;
+
+  line-height: 1.3;
+
+  font-weight: 700;
+
+  color: #1f2b3d;
+}
+
+.analytics-card-description {
+  margin: 0;
+
+  font-size: 11px;
+
+  line-height: 1.5;
+
+  color: #8091a7;
+}
+
+
+/* =========================================================
+   PERIOD BUTTONS
+   ========================================================= */
+
+.analytics-period-buttons {
+  display: flex;
+
+  gap: 3px;
+
+  flex-shrink: 0;
+}
+
+.analytics-period-buttons button {
+  height: 28px;
+
+  min-width: 35px;
+
+  padding: 0 9px;
+
+  border: 0;
+
+  background: #f0f2f7;
+
+  color: #52627a;
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.analytics-period-buttons button.active {
+  background: #6576ff;
+
+  color: #ffffff;
+}
+
+
+/* =========================================================
+   AUDIENCE CARD
+   ========================================================= */
+
+.audience-card {
+  grid-column: span 2;
+}
+
+.audience-stats {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, 1fr);
+
+  padding: 20px 22px 10px;
+
+  gap: 20px;
+}
+
+.audience-stat {
+  min-width: 0;
+}
+
+.audience-stat span {
+  display: block;
+
+  color: #8091a7;
+
+  font-size: 11px;
+
+  margin-bottom: 6px;
+}
+
+.audience-stat strong {
+  display: block;
+
+  color: #344357;
+
+  font-size: 19px;
+
+  line-height: 1.2;
+
+  font-weight: 700;
+}
+
+.audience-stat small {
+  display: block;
+
+  margin-top: 6px;
+
+  font-size: 10px;
+}
+
+.positive {
+  color: #20c997 !important;
+}
+
+.negative {
+  color: #e85347 !important;
+}
+
+
+/* =========================================================
+   AUDIENCE CHART
+   ========================================================= */
+
+.audience-chart {
+  width: 100%;
+
+  height: 300px;
+
+  padding: 15px 20px 20px;
+}
+
+
+/* =========================================================
+   ACTIVE USERS
+   ========================================================= */
+
+.active-users-card {
+  grid-column: span 1;
+}
+
+.active-user-summary {
+  padding: 22px 22px 8px;
+}
+
+.active-user-summary span {
+  display: block;
+
+  font-size: 11px;
+
+  color: #8091a7;
+
+  margin-bottom: 5px;
+}
+
+.active-user-summary strong {
+  display: block;
+
+  font-size: 21px;
+
+  color: #344357;
+}
+
+.active-user-summary small {
+  display: block;
+
+  margin-top: 5px;
+
+  font-size: 10px;
+}
+
+.active-users-chart {
+  height: 300px;
+
+  padding: 5px 18px 20px;
+}
+
+
+/* =========================================================
+   PERFORMANCE
+   ========================================================= */
+
+.performance-card {
+  grid-column: span 1;
+}
+
+.performance-list {
+  padding: 12px 22px;
+}
+
+.performance-row {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  min-height: 52px;
+
+  border-bottom: 1px solid #eef1f6;
+
+  font-size: 12px;
+}
+
+.performance-row:last-child {
+  border-bottom: 0;
+}
+
+.performance-row span {
+  color: #8091a7;
+}
+
+.performance-row strong {
+  color: #52627a;
+
+  font-size: 12px;
+}
+
+
+/* =========================================================
+   TRAFFIC TABLE
+   ========================================================= */
+
+.traffic-table-card {
+  grid-column: span 1;
+}
+
+.analytics-small-select {
+  height: 28px;
+
+  padding: 0 10px;
+
+  border: 1px solid #e5e9f2;
+
+  border-radius: 3px;
+
+  background: #f5f7fa;
+
+  color: #36445a;
+
+  font-size: 10px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.analytics-table-wrapper {
+  width: 100%;
+
+  overflow-x: auto;
+}
+
+.analytics-table {
+  width: 100%;
+
+  border-collapse: collapse;
+
+  font-size: 11px;
+}
+
+.analytics-table th {
+  padding: 12px 18px;
+
+  background: #fafbfc;
+
+  color: #66758a;
+
+  border-bottom: 1px solid #e5e9f2;
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  text-align: left;
+
+  white-space: nowrap;
+}
+
+.analytics-table td {
+  padding: 12px 18px;
+
+  color: #52627a;
+
+  border-bottom: 1px solid #eef1f6;
+
+  white-space: nowrap;
+}
+
+.analytics-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.analytics-table tbody tr:hover {
+  background: #fafbff;
+}
+
+.analytics-table td:nth-child(2),
+.analytics-table th:nth-child(2) {
+  text-align: right;
+}
+
+.analytics-table td:nth-child(3),
+.analytics-table th:nth-child(3) {
+  text-align: right;
+}
+
+
+/* =========================================================
+   TRAFFIC DONUT
+   ========================================================= */
+
+.traffic-chart-card {
+  grid-column: span 1;
+}
+
+.traffic-donut {
+  height: 220px;
+
+  padding: 10px 30px 0;
+}
+
+.chart-legend {
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: 8px;
+
+  padding: 0 22px 20px;
+}
+
+.legend-item {
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  color: #8091a7;
+
+  font-size: 10px;
+}
+
+.legend-dot {
+  width: 7px;
+
+  height: 7px;
+
+  border-radius: 50%;
+
+  flex-shrink: 0;
+}
+
+
+/* =========================================================
+   BROWSER
+   ========================================================= */
+
+.browser-card {
+  grid-column: span 1;
+}
+
+.browser-table td:first-child {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+}
+
+.browser-icon {
+  width: 27px;
+
+  height: 27px;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #eef1ff;
+
+  color: #6576ff;
+
+  flex-shrink: 0;
+}
+
+
+/* =========================================================
+   PAGES
+   ========================================================= */
+
+.pages-card {
+  grid-column: span 1;
+}
+
+.pages-table td:first-child {
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  max-width: 250px;
+}
+
+
+/* =========================================================
+   DEVICE
+   ========================================================= */
+
+.device-card {
+  grid-column: span 1;
+}
+
+.device-chart {
+  height: 220px;
+
+  padding: 5px 25px 0;
+}
+
+.device-stats {
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  padding: 0 15px 22px;
+
+  text-align: center;
+}
+
+.device-stats div {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+.device-stats strong {
+  font-size: 13px;
+
+  color: #344357;
+}
+
+.device-stats span {
+  font-size: 10px;
+
+  color: #8091a7;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1400px) {
+
+  .analytics-grid {
+    grid-template-columns:
+      minmax(0, 1.5fr)
+      minmax(0, 1fr);
+  }
+
+  .audience-card {
+    grid-column: span 2;
+  }
+
+  .active-users-card {
+    grid-column: span 1;
+  }
+
+  .performance-card {
+    grid-column: span 1;
+  }
+
+  .traffic-table-card {
+    grid-column: span 1;
+  }
+
+  .traffic-chart-card {
+    grid-column: span 1;
+  }
+
+  .browser-card {
+    grid-column: span 1;
+  }
+
+  .pages-card {
+    grid-column: span 1;
+  }
+
+  .device-card {
+    grid-column: span 1;
+  }
+}
+
+
+@media (max-width: 992px) {
+
+  .analytics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .audience-card,
+  .active-users-card,
+  .performance-card,
+  .traffic-table-card,
+  .traffic-chart-card,
+  .browser-card,
+  .pages-card,
+  .device-card {
+    grid-column: span 1;
+  }
+
+  .analytics-header-actions {
+    margin-top: 10px;
+  }
+}
+
+
+@media (max-width: 768px) {
+
+  .analytics-card-header {
+    padding: 16px;
+  }
+
+  .audience-stats {
+    grid-template-columns: repeat(2, 1fr);
+
+    padding: 16px;
+  }
+
+  .audience-chart {
+    height: 250px;
+
+    padding: 10px;
+  }
+
+  .active-users-chart {
+    height: 250px;
+  }
+
+  .analytics-header-actions {
+    flex-wrap: wrap;
+  }
+}
+
+
+@media (max-width: 480px) {
+
+  .audience-stats {
+    grid-template-columns: 1fr 1fr;
+
+    gap: 15px;
+  }
+
+  .analytics-card-description {
+    max-width: 180px;
+  }
+
+  .analytics-period-buttons button {
+    min-width: 30px;
+
+    padding: 0 6px;
+  }
+
+  .analytics-table {
+    font-size: 10px;
+  }
+
+  .analytics-table th,
+  .analytics-table td {
+    padding: 10px;
+  }
+}

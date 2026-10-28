@@ -1,0 +1,1503 @@
+/* =========================================================
+   INSTRUCTOR DETAILS PAGE
+   ========================================================= */
+
+.instructor-details-page {
+    width: 100%;
+    min-height: calc(100vh - 70px);
+
+    margin-top: 65px;
+
+    padding: 32px;
+
+    background: #f5f6fa;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   HEADING
+   ========================================================= */
+
+.instructor-details-heading {
+    display: flex;
+    align-items: center;
+
+    gap: 7px;
+
+    margin-bottom: 38px;
+
+    font-size: 27px;
+    line-height: 1.2;
+    font-weight: 700;
+}
+
+.instructor-details-heading-main {
+    color: #1f3b5c;
+}
+
+.instructor-details-heading-slash {
+    color: #1f3b5c;
+}
+
+.instructor-details-heading-name {
+    color: #764cff;
+}
+
+
+/* =========================================================
+   MAIN CARD
+   ========================================================= */
+
+.instructor-details-card {
+    width: 100%;
+
+    background: #ffffff;
+
+    border-radius: 5px;
+
+    overflow: visible;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   TABS
+   ========================================================= */
+
+.instructor-details-tabs {
+    height: 55px;
+
+    display: flex;
+    align-items: stretch;
+
+    gap: 28px;
+
+    padding: 0 24px;
+
+    border-bottom: 1px solid #dfe4ec;
+
+    box-sizing: border-box;
+}
+
+.instructor-details-tabs button {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 0;
+
+    border: 0;
+
+    background: transparent;
+
+    color: #496384;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.instructor-details-tabs button:hover {
+    color: #764cff;
+}
+
+.instructor-details-tabs button.active {
+    color: #764cff;
+}
+
+.instructor-details-tabs button.active::after {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    right: 0;
+    bottom: -1px;
+
+    height: 2px;
+
+    background: #764cff;
+}
+
+.instructor-edit-button {
+    margin-left: auto;
+}
+
+
+/* =========================================================
+   INFORMATION
+   ========================================================= */
+
+.instructor-information {
+    padding: 25px 24px 5px;
+}
+
+.instructor-info-row {
+    display: grid;
+
+    grid-template-columns:
+        210px
+        270px
+        270px
+        1fr;
+
+    min-height: 48px;
+
+    align-items: center;
+}
+
+.instructor-info-label {
+    color: #7890b1;
+
+    font-size: 13px;
+}
+
+.instructor-info-value {
+    color: #355276;
+
+    font-size: 13px;
+    font-weight: 500;
+}
+
+
+/* =========================================================
+   ADDITIONAL INFORMATION
+   ========================================================= */
+
+.instructor-section-title {
+    margin: 20px 0 18px;
+
+    color: #355276;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    letter-spacing: 2px;
+}
+
+
+/* =========================================================
+   ADMIN NOTES
+   ========================================================= */
+
+.instructor-admin-notes {
+    margin: 0 24px;
+
+    padding: 22px 0 30px;
+
+    border-top: 1px solid #dfe4ec;
+}
+
+.instructor-admin-notes-header {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 15px;
+}
+
+.instructor-admin-notes-header h2 {
+    margin: 0;
+
+    color: #1f3b5c;
+
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.instructor-add-note {
+    display: flex;
+    align-items: center;
+
+    gap: 4px;
+
+    border: 0;
+
+    background: transparent;
+
+    color: #764cff;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.instructor-add-note:hover {
+    color: #5936d7;
+}
+
+
+/* =========================================================
+   NOTE
+   ========================================================= */
+
+.instructor-note {
+    margin-bottom: 25px;
+}
+
+.instructor-note-content {
+    padding: 22px 24px;
+
+    background: #f4f5f9;
+
+    color: #496384;
+
+    font-size: 13px;
+
+    line-height: 1.7;
+
+    border-radius: 4px;
+}
+
+.instructor-note-meta {
+    margin-top: 11px;
+
+    color: #7890b1;
+
+    font-size: 11px;
+}
+
+.instructor-note-meta button {
+    margin-left: 8px;
+
+    padding: 0;
+
+    border: 0;
+
+    background: transparent;
+
+    color: #ff3b30;
+
+    font-size: 11px;
+
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   TAB CONTENT
+   ========================================================= */
+
+.instructor-tab-content {
+    padding: 35px 24px 45px;
+}
+
+.instructor-tab-content h3 {
+    margin: 0 0 25px;
+
+    color: #1f3b5c;
+
+    font-size: 20px;
+}
+
+
+/* =========================================================
+   OVERVIEW STATS
+   ========================================================= */
+
+.instructor-overview-stats {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 20px;
+}
+
+.instructor-overview-stats > div {
+    padding: 25px;
+
+    border: 1px solid #e4e7ec;
+
+    border-radius: 5px;
+}
+
+.instructor-overview-stats span {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #7890b1;
+
+    font-size: 12px;
+}
+
+.instructor-overview-stats strong {
+    color: #1f3b5c;
+
+    font-size: 24px;
+}
+
+
+/* =========================================================
+   COURSE DETAILS
+   ========================================================= */
+
+.instructor-course-detail {
+    display: flex;
+    align-items: center;
+
+    padding: 18px 0;
+
+    border-bottom: 1px solid #e4e7ec;
+
+    color: #355276;
+
+    font-size: 13px;
+}
+
+.instructor-course-detail div {
+    flex: 1;
+
+    font-weight: 600;
+}
+
+.instructor-course-detail span {
+    width: 180px;
+
+    color: #7890b1;
+}
+
+.instructor-course-detail strong {
+    width: 120px;
+
+    color: #355276;
+}
+
+
+/* =========================================================
+   REVIEW
+   ========================================================= */
+
+.instructor-review {
+    padding: 25px;
+
+    border: 1px solid #e4e7ec;
+
+    border-radius: 5px;
+}
+
+.instructor-review strong {
+    display: block;
+
+    margin-bottom: 10px;
+
+    color: #1f3b5c;
+
+    font-size: 30px;
+}
+
+.instructor-review span {
+    color: #ffb400;
+
+    font-size: 20px;
+}
+
+.instructor-review p {
+    margin: 15px 0 0;
+
+    color: #7890b1;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1000px) {
+
+    .instructor-info-row {
+        grid-template-columns:
+            180px
+            1fr
+            180px
+            1fr;
+    }
+
+}
+
+@media (max-width: 767px) {
+
+    .instructor-details-page {
+        margin-top: 60px;
+
+        padding: 20px 15px;
+    }
+
+    .instructor-details-heading {
+        font-size: 23px;
+
+        margin-bottom: 25px;
+    }
+
+    .instructor-details-tabs {
+        gap: 18px;
+
+        padding: 0 15px;
+
+        overflow-x: auto;
+    }
+
+    .instructor-details-tabs button {
+        white-space: nowrap;
+    }
+
+    .instructor-information {
+        padding: 20px 15px;
+    }
+
+    .instructor-info-row {
+        grid-template-columns: 1fr;
+
+        gap: 5px;
+
+        padding: 12px 0;
+    }
+
+    .instructor-info-label {
+        margin-top: 5px;
+    }
+
+    .instructor-overview-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .instructor-course-detail {
+        flex-wrap: wrap;
+
+        gap: 8px;
+    }
+
+    .instructor-course-detail span,
+    .instructor-course-detail strong {
+        width: auto;
+    }
+
+    .instructor-admin-notes {
+        margin: 0 15px;
+    }
+}
+/* =========================================================
+   INSTRUCTOR PROFILE OVERVIEW
+   ========================================================= */
+
+.instructor-profile-overview {
+    width: 100%;
+    padding: 30px 24px 40px;
+
+    box-sizing: border-box;
+
+    background: #f5f6fa;
+}
+
+
+/* =========================================================
+   OVERVIEW HEADER
+   ========================================================= */
+
+.profile-overview-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 20px;
+}
+
+.profile-overview-header h2 {
+    margin: 0;
+
+    color: #1f3b5c;
+
+    font-size: 20px;
+    line-height: 1.3;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   DATE FILTER
+   ========================================================= */
+
+.profile-date-filter {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    height: 36px;
+
+    padding: 0 13px;
+
+    border: 1px solid #d9dfeb;
+    border-radius: 4px;
+
+    background: #ffffff;
+
+    color: #355276;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.profile-date-filter:hover {
+    border-color: #6576ff;
+}
+
+.profile-date-filter svg:first-child {
+    color: #6576ff;
+}
+
+.profile-date-filter svg:last-child {
+    margin-left: 3px;
+}
+
+
+/* =========================================================
+   MAIN GRID
+   ========================================================= */
+
+.profile-overview-grid {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 2fr)
+        minmax(330px, 0.95fr);
+
+    gap: 24px;
+
+    width: 100%;
+}
+
+
+/* =========================================================
+   TOTAL EARNING CARD
+   ========================================================= */
+
+.total-earning-card {
+    min-width: 0;
+
+    padding: 26px 24px 22px;
+
+    background: #ffffff;
+
+    border-radius: 5px;
+
+    box-shadow:
+        0 1px 3px rgba(16, 24, 40, 0.02);
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   EARNING TITLE
+   ========================================================= */
+
+.earning-card-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 22px;
+}
+
+.earning-card-title-row h3 {
+    margin: 0;
+
+    color: #1f3b5c;
+
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.earning-help-icon {
+    color: #c4ccda;
+}
+
+
+/* =========================================================
+   EARNING STATISTICS
+   ========================================================= */
+
+.earning-statistics {
+    display: grid;
+
+    grid-template-columns:
+        1fr
+        1fr
+        1fr;
+
+    gap: 20px;
+
+    margin-bottom: 18px;
+}
+
+.earning-stat {
+    display: flex;
+    flex-direction: column;
+
+    min-width: 0;
+}
+
+.earning-stat-right {
+    align-items: flex-end;
+}
+
+.earning-stat-label {
+    margin-bottom: 7px;
+
+    color: #7890b1;
+
+    font-size: 12px;
+}
+
+.earning-stat strong {
+    margin-bottom: 5px;
+
+    color: #1f3b5c;
+
+    font-size: 25px;
+    line-height: 1.2;
+    font-weight: 500;
+}
+
+.earning-positive {
+    color: #20c997;
+
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.earning-negative {
+    color: #ff4d5a;
+
+    font-size: 11px;
+    font-weight: 500;
+}
+
+
+/* =========================================================
+   MAIN CHART
+   ========================================================= */
+
+.earning-chart {
+    width: 100%;
+
+    height: 210px;
+
+    margin-top: 8px;
+}
+
+
+/* =========================================================
+   RIGHT SIDE
+   ========================================================= */
+
+.profile-overview-side {
+    display: grid;
+
+    grid-template-rows:
+        1fr
+        1fr;
+
+    gap: 24px;
+
+    min-width: 0;
+}
+
+
+/* =========================================================
+   SMALL CARD
+   ========================================================= */
+
+.overview-small-card {
+    min-width: 0;
+
+    padding: 25px 24px 15px;
+
+    background: #ffffff;
+
+    border-radius: 5px;
+
+    box-sizing: border-box;
+}
+
+.small-card-title {
+    margin-bottom: 10px;
+
+    color: #8b5cf6;
+
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.small-card-main-row {
+    display: flex;
+
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.small-card-main-row > strong {
+    color: #1f3b5c;
+
+    font-size: 30px;
+    line-height: 1.2;
+    font-weight: 500;
+}
+
+.small-card-growth {
+    display: flex;
+    flex-direction: column;
+
+    align-items: flex-end;
+
+    padding-top: 3px;
+}
+
+.small-card-growth span {
+    color: #20c997;
+
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.small-card-growth small {
+    margin-top: 5px;
+
+    color: #7890b1;
+
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   SMALL CHART
+   ========================================================= */
+
+.small-chart {
+    width: 100%;
+
+    height: 65px;
+
+    margin-top: 10px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1100px) {
+
+    .profile-overview-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-overview-side {
+        grid-template-columns:
+            1fr
+            1fr;
+
+        grid-template-rows: none;
+    }
+}
+
+
+@media (max-width: 767px) {
+
+    .instructor-profile-overview {
+        padding: 20px 15px 30px;
+    }
+
+    .profile-overview-header {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: 15px;
+    }
+
+    .profile-date-filter {
+        align-self: flex-end;
+    }
+
+    .earning-statistics {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .earning-stat-right {
+        align-items: flex-start;
+    }
+
+    .profile-overview-side {
+        grid-template-columns: 1fr;
+    }
+
+    .total-earning-card {
+        padding: 20px 15px;
+    }
+
+    .overview-small-card {
+        padding: 20px 15px 15px;
+    }
+}
+/* =========================================================
+   INSTRUCTOR COURSES TAB
+   ========================================================= */
+
+.instructor-courses-tab {
+    width: 100%;
+
+    padding: 24px;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.instructor-courses-table {
+    width: 100%;
+
+    border: 1px solid #dfe4ec;
+
+    border-radius: 4px;
+
+    overflow: hidden;
+
+    background: #ffffff;
+}
+
+
+/* =========================================================
+   COURSE ROW
+   ========================================================= */
+
+.instructor-course-row {
+    display: grid;
+
+    grid-template-columns:
+        130px
+        minmax(300px, 1fr)
+        280px
+        50px;
+
+    min-height: 47px;
+
+    align-items: center;
+
+    border-bottom: 1px solid #dfe4ec;
+
+    box-sizing: border-box;
+}
+
+.instructor-course-row:last-child {
+    border-bottom: none;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.instructor-course-header {
+    min-height: 39px;
+
+    background: #ffffff;
+
+    color: #1f3b5c;
+
+    font-size: 13px;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   NUMBER
+   ========================================================= */
+
+.course-number {
+    padding-left: 24px;
+
+    color: #7890b1;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   COURSE NAME
+   ========================================================= */
+
+.course-name {
+    padding: 0 15px;
+
+    color: #7890b1;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+}
+
+.instructor-course-header .course-name {
+    color: #1f3b5c;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.course-status {
+    display: flex;
+
+    align-items: center;
+}
+
+.course-status-badge {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    font-size: 12px;
+
+    font-weight: 500;
+}
+
+
+/* Status dot */
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+
+    border-radius: 50%;
+
+    display: inline-block;
+}
+
+
+/* Active */
+
+.course-status-badge.active {
+    color: #00c897;
+}
+
+.course-status-badge.active .status-dot {
+    background: #00c897;
+}
+
+
+/* Pending */
+
+.course-status-badge.pending {
+    color: #f0a500;
+}
+
+.course-status-badge.pending .status-dot {
+    background: #f0a500;
+}
+
+
+/* Canceled */
+
+.course-status-badge.canceled {
+    color: #ff4d4f;
+}
+
+.course-status-badge.canceled .status-dot {
+    background: #ff4d4f;
+}
+
+
+/* =========================================================
+   DELETE ACTION
+   ========================================================= */
+
+.course-action {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+}
+
+.course-delete-button {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 28px;
+    height: 28px;
+
+    padding: 0;
+
+    border: none;
+
+    background: transparent;
+
+    color: #ff4d4f;
+
+    cursor: pointer;
+
+    transition:
+        color 0.2s ease,
+        background 0.2s ease;
+}
+
+.course-delete-button:hover {
+    color: #d92d20;
+
+    background: #fff1f0;
+
+    border-radius: 4px;
+}
+
+
+/* =========================================================
+   ROW HOVER
+   ========================================================= */
+
+.instructor-course-row:not(.instructor-course-header):hover {
+    background: #fafbff;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .instructor-course-row {
+        grid-template-columns:
+            60px
+            minmax(250px, 1fr)
+            150px
+            50px;
+    }
+
+    .course-number {
+        padding-left: 15px;
+    }
+
+}
+
+
+@media (max-width: 650px) {
+
+    .instructor-courses-tab {
+        padding: 15px;
+    }
+
+    .instructor-courses-table {
+        overflow-x: auto;
+    }
+
+    .instructor-course-row {
+        min-width: 650px;
+    }
+
+}
+/* =========================================================
+   INSTRUCTOR REVIEW TAB
+   ========================================================= */
+
+.instructor-review-tab {
+    width: 100%;
+
+    padding: 24px;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   REVIEW TABLE
+   ========================================================= */
+
+.instructor-review-table {
+    width: 100%;
+
+    border: 1px solid #dfe4ec;
+
+    border-radius: 4px;
+
+    overflow: hidden;
+
+    background: #ffffff;
+}
+
+
+/* =========================================================
+   REVIEW ROW
+   ========================================================= */
+
+.instructor-review-row {
+    display: grid;
+
+    grid-template-columns:
+        45px
+        280px
+        minmax(260px, 1fr)
+        120px
+        minmax(350px, 1.5fr)
+        45px;
+
+    min-height: 74px;
+
+    align-items: center;
+
+    border-bottom: 1px solid #dfe4ec;
+
+    box-sizing: border-box;
+}
+
+.instructor-review-row:last-child {
+    border-bottom: none;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.instructor-review-header {
+    min-height: 39px;
+
+    background: #ffffff;
+
+    color: #1f3b5c;
+
+    font-size: 13px;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   CHECKBOX
+   ========================================================= */
+
+.review-checkbox {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+}
+
+.review-checkbox input {
+    width: 18px;
+    height: 18px;
+
+    margin: 0;
+
+    appearance: none;
+
+    border: 2px solid #d5dce8;
+
+    border-radius: 4px;
+
+    background: #ffffff;
+
+    cursor: pointer;
+}
+
+.review-checkbox input:checked {
+    border-color: #6576ff;
+
+    background: #6576ff;
+
+    position: relative;
+}
+
+.review-checkbox input:checked::after {
+    content: "✓";
+
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -55%);
+
+    color: #ffffff;
+
+    font-size: 12px;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   STUDENT
+   ========================================================= */
+
+.review-student {
+    min-width: 0;
+}
+
+.review-student-info {
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+}
+
+.review-avatar {
+    width: 40px;
+    height: 40px;
+
+    flex: 0 0 40px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    color: #ffffff;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    overflow: hidden;
+}
+
+
+/* Avatar colors */
+
+.avatar-purple {
+    background: #854cff;
+}
+
+.avatar-yellow {
+    background: #f6b900;
+}
+
+.avatar-green {
+    background: #20d5a2;
+}
+
+.avatar-image {
+    background: #e9edf5;
+}
+
+.avatar-image img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+}
+
+
+/* =========================================================
+   STUDENT NAME + EMAIL
+   ========================================================= */
+
+.review-student-details {
+    display: flex;
+
+    flex-direction: column;
+
+    min-width: 0;
+}
+
+.review-student-name {
+    color: #1f3b5c;
+
+    font-size: 13px;
+
+    font-weight: 500;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+.review-student-email {
+    margin-top: 5px;
+
+    color: #7890b1;
+
+    font-size: 11px;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   COURSE
+   ========================================================= */
+
+.review-course {
+    padding-right: 20px;
+
+    color: #7890b1;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   RATING
+   ========================================================= */
+
+.review-rating {
+    display: flex;
+
+    align-items: center;
+}
+
+.review-stars {
+    color: #f7b500;
+
+    font-size: 15px;
+
+    letter-spacing: 1px;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   REVIEW CONTENT
+   ========================================================= */
+
+.review-content {
+    padding-right: 20px;
+
+    color: #7890b1;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   ACTION
+   ========================================================= */
+
+.review-action {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+}
+
+.review-action svg {
+    color: #7890b1;
+}
+
+
+/* Delete button */
+
+.review-delete-button {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 28px;
+    height: 28px;
+
+    padding: 0;
+
+    border: none;
+
+    background: transparent;
+
+    color: #ff4d4f;
+
+    cursor: pointer;
+
+    border-radius: 4px;
+
+    transition:
+        color 0.2s ease,
+        background 0.2s ease;
+}
+
+.review-delete-button:hover {
+    color: #d92d20;
+
+    background: #fff1f0;
+}
+
+
+/* =========================================================
+   ROW HOVER
+   ========================================================= */
+
+.instructor-review-row:not(.instructor-review-header):hover {
+    background: #fafbff;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1200px) {
+
+    .instructor-review-row {
+        grid-template-columns:
+            45px
+            250px
+            250px
+            110px
+            minmax(280px, 1fr)
+            45px;
+    }
+
+}
+
+
+@media (max-width: 900px) {
+
+    .instructor-review-tab {
+        padding: 15px;
+    }
+
+    .instructor-review-table {
+        overflow-x: auto;
+    }
+
+    .instructor-review-row {
+        min-width: 1100px;
+    }
+
+}

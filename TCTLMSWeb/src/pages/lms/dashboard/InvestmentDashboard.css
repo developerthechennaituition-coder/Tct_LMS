@@ -1,0 +1,1338 @@
+/* =========================================================
+   INVESTMENT DASHBOARD
+   ========================================================= */
+
+.investment-dashboard {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 0;
+  color: #364a63;
+  overflow-x: hidden;
+}
+
+.investment-dashboard *,
+.investment-dashboard *::before,
+.investment-dashboard *::after {
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   PAGE HEADER
+   ========================================================= */
+
+.investment-page-header {
+  width: 100%;
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+  margin-bottom: 22px;
+}
+
+.investment-page-title {
+  min-width: 0;
+}
+
+.investment-page-title h1 {
+  margin: 0;
+
+  color: #253b56;
+  font-size: 24px;
+  line-height: 1.25;
+  font-weight: 600;
+}
+
+.investment-page-title p {
+  margin: 5px 0 0;
+
+  color: #8091a7;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.investment-header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.investment-header-btn,
+.investment-add-btn {
+  border: 1px solid #d8c9ff;
+  background: #ffffff;
+
+  color: #7549f7;
+
+  height: 36px;
+  min-height: 36px;
+
+  border-radius: 4px;
+
+  font-size: 12px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.investment-header-btn {
+  padding: 0 14px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+}
+
+.investment-header-btn:hover {
+  background: #f8f5ff;
+  border-color: #7549f7;
+}
+
+.investment-header-btn span {
+  font-size: 13px;
+}
+
+.investment-add-btn {
+  width: 36px;
+  padding: 0;
+
+  color: #ffffff;
+  background: #7549f7;
+  border-color: #7549f7;
+
+  font-size: 22px;
+  font-weight: 400;
+
+  line-height: 1;
+}
+
+.investment-add-btn:hover {
+  background: #6436e8;
+}
+
+/* =========================================================
+   COMMON GRID RULE
+   IMPORTANT FOR ZOOM / RESPONSIVE
+   ========================================================= */
+
+.investment-stats-grid,
+.investment-middle-grid,
+.investment-bottom-grid {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.investment-stats-grid > *,
+.investment-middle-grid > *,
+.investment-bottom-grid > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* =========================================================
+   TOP STATISTICS
+   ========================================================= */
+
+.investment-stats-grid {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr)
+    minmax(0, 1fr);
+
+  gap: 18px;
+
+  margin-bottom: 18px;
+}
+
+.investment-stat-card {
+  min-width: 0;
+
+  min-height: 126px;
+
+  padding: 20px;
+
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  background: #ffffff;
+
+  border: 1px solid #e5e9f2;
+
+  border-radius: 4px;
+
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.02);
+}
+
+.investment-stat-content {
+  min-width: 0;
+  flex: 1;
+}
+
+.investment-stat-label {
+  margin-bottom: 8px;
+
+  color: #8091a7;
+
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.investment-stat-amount {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+
+  gap: 7px;
+
+  color: #364a63;
+
+  font-size: 19px;
+  line-height: 1.3;
+  font-weight: 500;
+}
+
+.investment-percentage {
+  font-size: 10px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.positive {
+  color: #20c997;
+}
+
+.negative {
+  color: #ff646d;
+}
+
+.investment-stat-details {
+  display: flex;
+
+  gap: 42px;
+
+  margin-top: 17px;
+}
+
+.investment-stat-details > div {
+  min-width: 80px;
+}
+
+.investment-stat-details span {
+  display: block;
+
+  margin-bottom: 4px;
+
+  color: #9aa8b9;
+
+  font-size: 8px;
+  line-height: 1.2;
+  letter-spacing: 0.2px;
+}
+
+.investment-stat-details strong {
+  display: block;
+
+  color: #52627a;
+
+  font-size: 10px;
+  line-height: 1.3;
+  font-weight: 500;
+
+  white-space: nowrap;
+}
+
+/* =========================================================
+   MINI BAR CHART
+   ========================================================= */
+
+.investment-mini-bars {
+  width: 150px;
+  height: 55px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+
+  gap: 8px;
+}
+
+.investment-mini-bars span {
+  width: 17px;
+  min-height: 10px;
+
+  display: block;
+
+  background: #e1e4fc;
+}
+
+.investment-mini-bars span:last-child {
+  background: #6d63f5;
+}
+
+.investment-mini-bars.blue-bars span {
+  background: #dceafb;
+}
+
+.investment-mini-bars.blue-bars span:last-child {
+  background: #4b96f7;
+}
+
+/* =========================================================
+   MIDDLE GRID
+   ========================================================= */
+
+.investment-middle-grid {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1.25fr)
+    minmax(0, 1.25fr)
+    minmax(0, 1fr);
+
+  gap: 18px;
+
+  margin-bottom: 18px;
+}
+
+/* =========================================================
+   COMMON PANEL
+   ========================================================= */
+
+.investment-panel {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+
+  background: #ffffff;
+
+  border: 1px solid #e5e9f2;
+
+  border-radius: 4px;
+
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.02);
+
+  overflow: hidden;
+}
+
+/* =========================================================
+   PANEL HEADER
+   ========================================================= */
+
+.investment-panel-header {
+  min-height: 62px;
+
+  padding: 16px 18px 12px;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 12px;
+}
+
+.investment-panel-header h3,
+.investment-panel-heading h3 {
+  margin: 0;
+
+  color: #364a63;
+
+  font-size: 13px;
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+.investment-panel-header p {
+  margin: 4px 0 0;
+
+  color: #8091a7;
+
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+.investment-panel-header p span {
+  color: #7549f7;
+}
+
+/* =========================================================
+   TABS
+   ========================================================= */
+
+.investment-tabs {
+  display: flex;
+
+  padding: 0 18px;
+
+  border-bottom: 1px solid #e1e5eb;
+
+  gap: 22px;
+}
+
+.investment-tabs button {
+  position: relative;
+
+  padding: 10px 0;
+
+  border: 0;
+  background: transparent;
+
+  color: #8091a7;
+
+  font-size: 10px;
+  line-height: 1.2;
+
+  cursor: pointer;
+}
+
+.investment-tabs button.active {
+  color: #7549f7;
+}
+
+.investment-tabs button.active::after {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  bottom: -1px;
+
+  height: 2px;
+
+  background: #7549f7;
+}
+
+/* =========================================================
+   INVESTMENT OVERVIEW
+   ========================================================= */
+
+.investment-overview-content {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(90px, 0.55fr);
+
+  padding: 0 18px;
+}
+
+.investment-overview-item {
+  min-width: 0;
+
+  min-height: 118px;
+
+  padding: 18px 0;
+
+  border-bottom: 1px solid #e5e9ef;
+}
+
+.investment-overview-item:nth-child(odd) {
+  padding-right: 25px;
+}
+
+.investment-overview-item:nth-child(even) {
+  padding-left: 25px;
+
+  border-left: 1px solid #e5e9ef;
+}
+
+.investment-overview-item:nth-child(3),
+.investment-overview-item:nth-child(4) {
+  border-bottom: 0;
+}
+
+.overview-label {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: #8091a7;
+
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+.investment-overview-item strong {
+  display: block;
+
+  color: #52627a;
+
+  font-size: 14px;
+  line-height: 1.4;
+  font-weight: 500;
+
+  white-space: nowrap;
+}
+
+.investment-overview-item small {
+  display: block;
+
+  margin-top: 3px;
+
+  color: #9aa8b9;
+
+  font-size: 7px;
+  line-height: 1.3;
+  letter-spacing: 0.4px;
+}
+
+.investment-overview-item .profit-amount {
+  margin-top: 14px;
+}
+
+.investment-plan-count {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.investment-plan-count strong {
+  font-size: 16px;
+}
+
+.investment-plan-count strong span {
+  margin-left: 4px;
+
+  font-size: 8px;
+  font-weight: 500;
+}
+
+/* =========================================================
+   TOP PLANS
+   ========================================================= */
+
+.investment-more-btn {
+  border: 0;
+  background: transparent;
+
+  color: #52627a;
+
+  font-size: 14px;
+
+  cursor: pointer;
+}
+
+.investment-plans-list {
+  padding: 3px 18px 0;
+}
+
+.investment-plan-row {
+  margin-bottom: 12px;
+}
+
+.investment-plan-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  margin-bottom: 6px;
+}
+
+.investment-plan-label span {
+  min-width: 0;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  color: #52627a;
+
+  font-size: 9px;
+}
+
+.investment-plan-label small {
+  flex-shrink: 0;
+
+  color: #8091a7;
+
+  font-size: 8px;
+}
+
+.investment-progress {
+  width: 100%;
+  height: 4px;
+
+  overflow: hidden;
+
+  background: #f0f2f6;
+}
+
+.investment-progress-value {
+  height: 100%;
+}
+
+/* =========================================================
+   BOTTOM BARS
+   ========================================================= */
+
+.investment-bottom-bars {
+  height: 50px;
+
+  margin: 12px 18px 16px;
+
+  display: flex;
+  align-items: flex-end;
+
+  gap: 7px;
+}
+
+.investment-bottom-bars span {
+  flex: 1;
+
+  min-width: 3px;
+
+  background: #e1e4fc;
+}
+
+/* =========================================================
+   ACTIVITIES
+   ========================================================= */
+
+.investment-panel-heading {
+  min-height: 50px;
+
+  padding: 0 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 15px;
+
+  border-bottom: 1px solid #e1e5eb;
+}
+
+.investment-activity-filter {
+  display: flex;
+  align-items: center;
+
+  gap: 16px;
+}
+
+.investment-activity-filter button,
+.investment-panel-heading button {
+  padding: 0;
+
+  border: 0;
+  background: transparent;
+
+  color: #8091a7;
+
+  font-size: 9px;
+
+  cursor: pointer;
+}
+
+.investment-activity-filter button.active,
+.investment-panel-heading button {
+  color: #7549f7;
+}
+
+.investment-activities-list {
+  width: 100%;
+}
+
+.investment-activity-row {
+  min-height: 58px;
+
+  padding: 8px 18px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  border-bottom: 1px solid #e6e9ef;
+}
+
+.investment-activity-row:last-child {
+  border-bottom: 0;
+}
+
+.investment-activity-info {
+  min-width: 0;
+}
+
+.investment-activity-info p {
+  margin: 0 0 3px;
+
+  color: #52627a;
+
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+.investment-activity-info p strong {
+  font-weight: 600;
+}
+
+.investment-activity-info small {
+  color: #8091a7;
+
+  font-size: 8px;
+}
+
+/* =========================================================
+   AVATARS
+   ========================================================= */
+
+.investment-avatar {
+  width: 30px;
+  height: 30px;
+  min-width: 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  font-size: 8px;
+  font-weight: 600;
+}
+
+.avatar-orange {
+  background: #f2dfd5;
+  color: #52627a;
+}
+
+.avatar-yellow {
+  background: #ffc400;
+  color: #ffffff;
+}
+
+.avatar-blue {
+  background: #287cff;
+  color: #ffffff;
+}
+
+.avatar-gray {
+  background: #e5e7ed;
+  color: #52627a;
+}
+
+.avatar-pink {
+  background: #f65c9f;
+  color: #ffffff;
+}
+
+.person-pink {
+  background: #ffe1ed;
+  color: #fa5798;
+}
+
+.person-blue {
+  background: #dfeeff;
+  color: #287cff;
+}
+
+.person-purple {
+  background: #eee7ff;
+  color: #8757ff;
+}
+
+.person-green {
+  background: #ddf7ed;
+  color: #20b989;
+}
+
+.person-orange {
+  background: #fff0df;
+  color: #ff994d;
+}
+
+/* =========================================================
+   BOTTOM GRID
+   ========================================================= */
+
+.investment-bottom-grid {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1.8fr);
+
+  gap: 18px;
+
+  width: 100%;
+  min-width: 0;
+}
+
+.investment-bottom-grid > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* =========================================================
+   NOTIFICATIONS
+   ========================================================= */
+
+.investment-notification-body {
+  padding: 16px 18px;
+}
+
+.investment-month-title {
+  margin-bottom: 12px;
+
+  color: #8091a7;
+
+  font-size: 9px;
+}
+
+.investment-notification-row {
+  display: grid;
+
+  grid-template-columns: 18px 50px minmax(0, 1fr);
+
+  min-height: 62px;
+
+  position: relative;
+}
+
+.investment-timeline {
+  position: relative;
+}
+
+.investment-timeline::before {
+  content: "";
+
+  position: absolute;
+
+  left: 5px;
+  top: 8px;
+  bottom: -12px;
+
+  border-left: 1px solid #dfe4eb;
+}
+
+.investment-notification-row:last-child
+  .investment-timeline::before {
+  display: none;
+}
+
+.investment-timeline span {
+  position: absolute;
+
+  top: 5px;
+  left: 1px;
+
+  width: 9px;
+  height: 9px;
+
+  border: 2px solid #7549f7;
+
+  background: #ffffff;
+
+  border-radius: 50%;
+
+  z-index: 2;
+}
+
+.investment-notification-date {
+  color: #8091a7;
+
+  font-size: 8px;
+
+  padding-top: 2px;
+}
+
+.investment-notification-content {
+  min-width: 0;
+}
+
+.investment-notification-content strong {
+  display: block;
+
+  color: #364a63;
+
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+.investment-notification-content p {
+  margin: 3px 0 2px;
+
+  color: #8091a7;
+
+  font-size: 8px;
+  line-height: 1.4;
+}
+
+.investment-notification-content small {
+  color: #8091a7;
+
+  font-size: 7px;
+}
+
+/* =========================================================
+   RECENT INVESTMENT TABLE
+   ========================================================= */
+
+.investment-table-wrapper {
+  width: 100%;
+  max-width: 100%;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  -webkit-overflow-scrolling: touch;
+}
+
+.investment-table {
+  width: 100%;
+
+  min-width: 760px;
+
+  border-collapse: collapse;
+
+  table-layout: fixed;
+}
+
+.investment-table th {
+  height: 36px;
+
+  padding: 0 16px;
+
+  text-align: left;
+
+  color: #8091a7;
+
+  font-size: 8px;
+  font-weight: 500;
+
+  border-bottom: 1px solid #dfe4eb;
+
+  white-space: nowrap;
+}
+
+.investment-table th:nth-child(1) {
+  width: 34%;
+}
+
+.investment-table th:nth-child(2) {
+  width: 22%;
+}
+
+.investment-table th:nth-child(3) {
+  width: 13%;
+}
+
+.investment-table th:nth-child(4) {
+  width: 14%;
+}
+
+.investment-table th:nth-child(5) {
+  width: 12%;
+}
+
+.investment-table th:nth-child(6) {
+  width: 5%;
+}
+
+.investment-table td {
+  height: 60px;
+
+  padding: 0 16px;
+
+  color: #52627a;
+
+  font-size: 8px;
+
+  border-bottom: 1px solid #e1e5eb;
+
+  vertical-align: middle;
+
+  white-space: nowrap;
+}
+
+.investment-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.investment-plan-info,
+.investment-person-info {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+}
+
+.investment-plan-info > span:last-child,
+.investment-person-info > span:last-child {
+  min-width: 0;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.investment-plan-circle {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #e8ebf1;
+
+  color: #52627a;
+
+  font-size: 8px;
+}
+
+.investment-processing-line {
+  display: block;
+
+  width: 38px;
+  height: 3px;
+
+  background: #7549f7;
+}
+
+.investment-status-completed {
+  color: #20c997;
+
+  font-size: 8px;
+}
+
+.investment-row-arrow {
+  color: #8091a7;
+
+  font-size: 17px;
+  line-height: 1;
+}
+
+/* =========================================================
+   LARGE DESKTOP
+   ========================================================= */
+
+@media (min-width: 1400px) {
+  .investment-page-title h1 {
+    font-size: 25px;
+  }
+
+  .investment-stat-card {
+    min-height: 130px;
+  }
+}
+
+/* =========================================================
+   DESKTOP / LAPTOP
+   ========================================================= */
+
+@media (max-width: 1199px) {
+  .investment-middle-grid {
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(0, 1fr);
+  }
+
+  .investment-activities-panel {
+    grid-column: 1 / -1;
+  }
+
+  .investment-bottom-grid {
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(0, 1.5fr);
+  }
+
+  .investment-mini-bars {
+    width: 120px;
+    gap: 6px;
+  }
+
+  .investment-mini-bars span {
+    width: 14px;
+  }
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 991px) {
+  .investment-stats-grid {
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(0, 1fr);
+  }
+
+  .investment-stats-grid .investment-stat-card:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .investment-middle-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .investment-activities-panel {
+    grid-column: auto;
+  }
+
+  .investment-bottom-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .investment-stat-card {
+    min-height: 120px;
+  }
+}
+
+/* =========================================================
+   SMALL TABLET
+   ========================================================= */
+
+@media (max-width: 767px) {
+  .investment-page-header {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    margin-bottom: 18px;
+  }
+
+  .investment-header-actions {
+    width: 100%;
+
+    justify-content: flex-start;
+
+    flex-wrap: wrap;
+  }
+
+  .investment-stats-grid {
+    grid-template-columns: minmax(0, 1fr);
+
+    gap: 14px;
+  }
+
+  .investment-stats-grid .investment-stat-card:last-child {
+    grid-column: auto;
+  }
+
+  .investment-stat-card {
+    min-height: 120px;
+
+    padding: 16px;
+  }
+
+  .investment-stat-amount {
+    font-size: 17px;
+  }
+
+  .investment-mini-bars {
+    width: 105px;
+  }
+
+  .investment-mini-bars span {
+    width: 11px;
+  }
+
+  .investment-overview-content {
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(0, 0.6fr);
+  }
+
+  .investment-overview-item:nth-child(odd) {
+    padding-right: 15px;
+  }
+
+  .investment-overview-item:nth-child(even) {
+    padding-left: 15px;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 575px) {
+  .investment-page-title h1 {
+    font-size: 20px;
+  }
+
+  .investment-page-title p {
+    font-size: 10px;
+  }
+
+  .investment-header-btn {
+    padding: 0 11px;
+  }
+
+  .investment-stat-card {
+    align-items: flex-end;
+
+    gap: 10px;
+  }
+
+  .investment-stat-details {
+    gap: 20px;
+  }
+
+  .investment-stat-details strong {
+    font-size: 9px;
+  }
+
+  .investment-mini-bars {
+    width: 80px;
+    height: 45px;
+
+    gap: 4px;
+  }
+
+  .investment-mini-bars span {
+    width: 8px;
+  }
+
+  .investment-panel-header,
+  .investment-panel-heading {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .investment-tabs {
+    padding-left: 14px;
+    padding-right: 14px;
+
+    gap: 16px;
+  }
+
+  .investment-overview-content {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .investment-overview-item,
+  .investment-overview-item:nth-child(odd),
+  .investment-overview-item:nth-child(even) {
+    min-height: 100px;
+
+    padding: 15px 0;
+
+    border-left: 0;
+    border-bottom: 1px solid #e5e9ef;
+  }
+
+  .investment-overview-item:last-child {
+    border-bottom: 0;
+  }
+
+  .investment-plan-count {
+    justify-content: flex-start;
+  }
+
+  .investment-notification-body {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .investment-notification-row {
+    grid-template-columns:
+      18px
+      45px
+      minmax(0, 1fr);
+  }
+
+  .investment-activity-row {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .investment-table {
+    min-width: 760px;
+  }
+}
+
+/* =========================================================
+   VERY SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 400px) {
+  .investment-header-actions {
+    gap: 6px;
+  }
+
+  .investment-header-btn {
+    font-size: 10px;
+
+    padding: 0 9px;
+  }
+
+  .investment-add-btn {
+    width: 34px;
+  }
+
+  .investment-stat-card {
+    padding: 14px;
+  }
+
+  .investment-mini-bars {
+    display: none;
+  }
+
+  .investment-stat-details {
+    gap: 28px;
+  }
+}
+
+/* =========================================================
+   ACCESSIBILITY / BUTTON RESET
+   ========================================================= */
+
+.investment-dashboard button {
+  font-family: inherit;
+}
+
+.investment-dashboard button:focus-visible {
+  outline: 2px solid #7549f7;
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   ZOOM / LONG TEXT PROTECTION
+   ========================================================= */
+
+.investment-dashboard h1,
+.investment-dashboard h3,
+.investment-dashboard p,
+.investment-dashboard span,
+.investment-dashboard strong,
+.investment-dashboard small,
+.investment-dashboard td,
+.investment-dashboard th {
+  overflow-wrap: break-word;
+}
+
+.investment-dashboard img,
+.investment-dashboard svg {
+  max-width: 100%;
+}

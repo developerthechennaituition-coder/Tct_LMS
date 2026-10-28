@@ -1,0 +1,90 @@
+--USE [TheChennaiTuitionQAV1];
+--GO
+
+---- GSTPercentage
+--IF NOT EXISTS (
+--    SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+--    WHERE TABLE_NAME = 'Sales' AND COLUMN_NAME = 'GSTPercentage'
+--)
+--BEGIN
+--    ALTER TABLE [dbo].[Sales]
+--    ADD [GSTPercentage] INT NULL;
+--END
+--GO
+
+---- VATPercentage
+--IF NOT EXISTS (
+--    SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+--    WHERE TABLE_NAME = 'Sales' AND COLUMN_NAME = 'VATPercentage'
+--)
+--BEGIN
+--    ALTER TABLE [dbo].[Sales]
+--    ADD [VATPercentage] INT NULL;
+--END
+--GO
+
+---- Currency
+--IF NOT EXISTS (
+--    SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+--    WHERE TABLE_NAME = 'Sales' AND COLUMN_NAME = 'Currency'
+--)
+--BEGIN
+--    ALTER TABLE [dbo].[Sales]
+--    ADD [Currency] NVARCHAR(10) NULL;
+--END
+--GO
+
+---- ClientGST
+--IF NOT EXISTS (
+--    SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+--    WHERE TABLE_NAME = 'Sales' AND COLUMN_NAME = 'ClientGST'
+--)
+--BEGIN
+--    ALTER TABLE [dbo].[Sales]
+--    ADD [ClientGST] NVARCHAR(50) NULL;
+--END
+--GO
+
+---- ClientPAN
+--IF NOT EXISTS (
+--    SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+--    WHERE TABLE_NAME = 'Sales' AND COLUMN_NAME = 'ClientPAN'
+--)
+--BEGIN
+--    ALTER TABLE [dbo].[Sales]
+--    ADD [ClientPAN] NVARCHAR(50) NULL;
+--END
+--GO
+
+---- ClientGSTStateCode
+--IF NOT EXISTS (
+--    SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+--    WHERE TABLE_NAME = 'Sales' AND COLUMN_NAME = 'ClientGSTStateCode'
+--)
+--BEGIN
+--    ALTER TABLE [dbo].[Sales]
+--    ADD [ClientGSTStateCode] NVARCHAR(10) NULL;
+--END
+--GO
+
+---- ClientCountryCode
+--IF NOT EXISTS (
+--    SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+--    WHERE TABLE_NAME = 'Sales' AND COLUMN_NAME = 'ClientCountryCode'
+--)
+--BEGIN
+--    ALTER TABLE [dbo].[Sales]
+--    ADD [ClientCountryCode] NVARCHAR(10) NULL;
+--END
+--GO
+
+--IF NOT EXISTS (
+--    SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+--    WHERE TABLE_NAME = 'TCTNotes' AND COLUMN_NAME = 'ReferenceId'
+--)
+--BEGIN
+--    ALTER TABLE [dbo].[TCTNotes]
+--    ADD [ReferenceId] UNIQUEIDENTIFIER NULL;
+--	PRINT 'Missing [ReferenceId] column added'
+--END
+--GO

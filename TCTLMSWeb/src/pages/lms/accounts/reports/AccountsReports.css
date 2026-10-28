@@ -1,0 +1,31 @@
+/* Accounts → Reports. Reuses the Operations Reports layout (.tct-ops-reports) and adds only what is
+   Accounts-specific. Every selector is scoped under .tct-acc-reports (these pages only). */
+
+/* Report tones (landing cards and the summary-tile accent on each report page) */
+.tct-acc-reports .opr-report-card.acr-tone-overview, .tct-acc-reports.acr-tone-overview  { --tone: #8b6cf6; --tone-soft: #f4f0ff; --tone-ink: #6a4fd8; --tone-shadow: rgba(139, 108, 246, 0.18); }
+.tct-acc-reports .opr-report-card.acr-tone-invoices, .tct-acc-reports.acr-tone-invoices  { --tone: #4f8ef7; --tone-soft: #edf4ff; --tone-ink: #2f6fd6; --tone-shadow: rgba(79, 142, 247, 0.18); }
+.tct-acc-reports .opr-report-card.acr-tone-revenue, .tct-acc-reports.acr-tone-revenue   { --tone: #2bb58a; --tone-soft: #e9f9f2; --tone-ink: #12805f; --tone-shadow: rgba(43, 181, 138, 0.18); }
+.tct-acc-reports .opr-report-card.acr-tone-payments, .tct-acc-reports.acr-tone-payments  { --tone: #f2915a; --tone-soft: #fff3eb; --tone-ink: #b4561a; --tone-shadow: rgba(242, 145, 90, 0.2); }
+.tct-acc-reports .opr-report-card.acr-tone-financial, .tct-acc-reports.acr-tone-financial { --tone: #22a6b3; --tone-soft: #e8f8f9; --tone-ink: #0c7a85; --tone-shadow: rgba(34, 166, 179, 0.18); }
+.tct-acc-reports .opr-report-card.acr-tone-refunds, .tct-acc-reports.acr-tone-refunds   { --tone: #ef6b5b; --tone-soft: #fff0ee; --tone-ink: #c03e2e; --tone-shadow: rgba(239, 107, 91, 0.18); }
+.tct-acc-reports[class*="acr-tone-"] .opr-stat { border-top-color: var(--tone); }
+
+.tct-acc-reports .acr-card-partial {
+  align-self: flex-start; margin: -6px 0 14px; padding: 2px 9px; border-radius: 999px;
+  font-size: 11px; font-weight: 600; color: #8f6200; background: #fff7e2; border: 1px solid #f6e3b0;
+}
+
+/* Summary tiles: values can be long currency amounts */
+.tct-acc-reports .acr-stats .opr-stat-value { overflow-wrap: anywhere; }
+.tct-acc-reports .acr-summary-error { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+/* Chart above the table */
+.tct-acc-reports .acr-chart { padding: 16px 16px 8px; border-bottom: 1px solid #eef0f5; transition: opacity 0.15s ease; }
+.tct-acc-reports .acr-chart.is-loading { opacity: 0.55; }
+.tct-acc-reports .acr-chart-empty { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 120px; font-size: 13px; color: #8094ae; }
+.tct-acc-reports .acr-chart-note { padding: 4px 0 6px; font-size: 12px; color: #8094ae; text-align: right; }
+
+@media (max-width: 575.98px) {
+  .tct-acc-reports .acr-chart { padding: 12px 4px 4px; }
+  .tct-acc-reports .acr-chart .recharts-legend-wrapper { max-width: 100% !important; }
+}

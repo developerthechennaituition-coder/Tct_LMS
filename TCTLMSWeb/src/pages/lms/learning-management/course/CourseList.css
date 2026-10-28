@@ -1,0 +1,799 @@
+/* =========================================================
+   COURSE LIST PAGE
+========================================================= */
+
+.course-list-page {
+  padding: 100px 26px 30px 26px;
+  background: #f5f6fa;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.course-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.course-list-header h2 {
+  margin: 0;
+  color: #294263;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.course-list-header p {
+  margin: 7px 0 0;
+  color: #7590ad;
+  font-size: 14px;
+}
+
+
+/* =========================================================
+   HEADER BUTTONS
+========================================================= */
+
+.course-list-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.course-filter-btn,
+.add-course-btn {
+  height: 38px;
+  padding: 0 17px;
+  border-radius: 5px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.course-filter-btn {
+  background: #ffffff;
+  border: 1px solid #d6deea;
+  color: #405878;
+}
+
+.add-course-btn {
+  border: none;
+  background: #8150f6;
+  color: #ffffff;
+}
+
+.filter-icon {
+  font-size: 14px;
+}
+
+.arrow-icon {
+  font-size: 20px;
+  line-height: 0;
+  margin-left: 5px;
+}
+
+.plus-icon {
+  font-size: 19px;
+  line-height: 0;
+}
+
+
+/* =========================================================
+   TABLE CONTAINER
+========================================================= */
+
+.course-table-container {
+  width: 100%;
+  background: #ffffff;
+  border-radius: 5px;
+  overflow-x: auto;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.course-table {
+  width: 100%;
+  min-width: 1250px;
+  border-collapse: collapse;
+}
+
+.course-table th {
+  height: 48px;
+  padding: 0 14px;
+  border-bottom: 1px solid #d6deea;
+  color: #7189a5;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.course-table td {
+  height: 72px;
+  padding: 0 14px;
+  border-bottom: 1px solid #d6deea;
+  color: #7590ad;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.course-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+
+/* =========================================================
+   CHECKBOX
+========================================================= */
+
+.checkbox-column {
+  width: 42px;
+  text-align: center !important;
+}
+
+.course-table input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #8150f6;
+}
+
+
+/* =========================================================
+   COURSE NAME
+========================================================= */
+
+.course-name-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.course-name-wrapper strong {
+  color: #294263;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.course-short-name {
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.course-short-name.RD {
+  background: #8150f6;
+}
+
+.course-short-name.AD {
+  background: #11bad4;
+}
+
+.course-short-name.UD {
+  background: #f9b900;
+}
+
+.course-short-name.WT {
+  background: #8150f6;
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.course-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 45px;
+  padding: 5px 9px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.course-status.active {
+  color: #19b394;
+  background: #e5faf5;
+}
+
+.course-status.pending {
+  color: #e6a900;
+  background: #fff7df;
+}
+
+.course-status.rejected {
+  color: #ef5350;
+  background: #ffeded;
+}
+
+
+/* =========================================================
+   ACTION
+========================================================= */
+
+.action-column {
+  text-align: center !important;
+  color: #55708e !important;
+  font-size: 16px !important;
+  letter-spacing: 1px;
+}
+
+
+/* =========================================================
+   COURSE MODAL
+========================================================= */
+
+.course-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(37, 52, 70, 0.48);
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+
+  padding-top: 15px;
+
+  z-index: 9999;
+}
+
+.course-modal {
+  width: 600px;
+  max-width: calc(100vw - 30px);
+  max-height: calc(100vh - 30px);
+
+  overflow-y: auto;
+
+  background: #ffffff;
+  border-radius: 5px;
+
+  padding: 34px 40px;
+
+  box-sizing: border-box;
+
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.15);
+}
+
+
+/* =========================================================
+   MODAL HEADER
+========================================================= */
+
+.course-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 24px;
+}
+
+.course-modal-header h2 {
+  margin: 0;
+  color: #344b67;
+  font-size: 21px;
+  font-weight: 700;
+}
+
+.course-modal-close {
+  border: none;
+  background: transparent;
+  color: #a4b2c2;
+  font-size: 27px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+
+/* =========================================================
+   FORM
+========================================================= */
+
+.course-form-group {
+  margin-bottom: 20px;
+  flex: 1;
+}
+
+.course-form-group label {
+  display: block;
+
+  margin-bottom: 9px;
+
+  color: #344b67;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.course-form-group input,
+.course-form-group select,
+.course-form-group textarea {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  border: 1px solid #d5deeb;
+  border-radius: 4px;
+
+  padding: 11px 15px;
+
+  background: #ffffff;
+  color: #405878;
+
+  font-size: 14px;
+
+  outline: none;
+}
+
+.course-form-group input,
+.course-form-group select {
+  height: 37px;
+}
+
+.course-form-group textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.course-form-group input:focus,
+.course-form-group select:focus,
+.course-form-group textarea:focus {
+  border-color: #8150f6;
+}
+
+
+/* =========================================================
+   TWO COLUMNS
+========================================================= */
+
+.course-form-row {
+  display: flex;
+  gap: 28px;
+}
+
+
+/* =========================================================
+   FILE INPUT
+========================================================= */
+
+.course-file-wrapper {
+  display: flex;
+  width: 100%;
+}
+
+.course-file-wrapper > input {
+  flex: 1;
+  min-width: 0;
+
+  border-radius: 4px 0 0 4px !important;
+}
+
+.course-browse-btn {
+  width: 80px;
+  height: 37px;
+
+  flex-shrink: 0;
+
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+
+  background: #eef1f5;
+
+  border: 1px solid #d5deeb;
+  border-left: none;
+
+  border-radius: 0 4px 4px 0;
+
+  color: #405878;
+  font-size: 13px;
+
+  cursor: pointer;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   STATUS RADIO
+========================================================= */
+
+.course-status-options {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.course-radio {
+  display: flex !important;
+  align-items: center;
+
+  gap: 8px;
+
+  margin: 0 !important;
+
+  color: #647d99 !important;
+
+  font-size: 14px !important;
+  font-weight: 400 !important;
+
+  cursor: pointer;
+}
+
+.course-radio input[type="radio"] {
+  width: 22px !important;
+  height: 22px !important;
+
+  margin: 0;
+
+  accent-color: #8150f6;
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   SAVE BUTTON
+========================================================= */
+
+.save-course-btn {
+  margin-top: 2px;
+
+  border: none;
+
+  background: #8150f6;
+  color: #ffffff;
+
+  padding: 11px 20px;
+
+  border-radius: 4px;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.save-course-btn:hover,
+.add-course-btn:hover {
+  opacity: 0.92;
+}
+
+
+/* =========================================================
+   RESPONSIVE PAGE
+========================================================= */
+
+@media (max-width: 1200px) {
+
+  .course-list-page {
+    padding: 100px 20px 30px 20px;
+  }
+
+  .course-list-header {
+    align-items: flex-start;
+  }
+}
+
+
+/* =========================================================
+   MOBILE HEADER
+========================================================= */
+
+@media (max-width: 768px) {
+
+  .course-list-page {
+    padding: 95px 15px 30px 15px;
+  }
+
+  .course-list-header {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .course-list-actions {
+    width: 100%;
+  }
+
+  .course-filter-btn,
+  .add-course-btn {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+
+/* =========================================================
+   MOBILE MODAL
+========================================================= */
+
+@media (max-width: 700px) {
+
+  .course-modal {
+    padding: 25px 20px;
+  }
+
+  .course-form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .course-status-options {
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+}
+/* =========================================================
+   THREE DOT ACTION MENU
+========================================================= */
+
+.course-action-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.course-three-dot-btn {
+  border: none;
+  background: transparent;
+  color: #55708e;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  cursor: pointer;
+  padding: 7px 9px;
+  border-radius: 4px;
+  line-height: 1;
+}
+
+.course-three-dot-btn:hover {
+  background: #f0f2f6;
+  color: #8150f6;
+}
+
+
+/* =========================================================
+   ACTION DROPDOWN
+========================================================= */
+
+.course-action-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+
+  width: 155px;
+
+  background: #ffffff;
+
+  border: 1px solid #e4e9f0;
+
+  border-radius: 5px;
+
+  box-shadow:
+    0 5px 20px rgba(38, 56, 76, 0.13);
+
+  z-index: 1000;
+
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   ACTION ITEM
+========================================================= */
+
+.course-action-item {
+  width: 100%;
+
+  height: 46px;
+
+  border: none;
+
+  background: #ffffff;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 0 16px;
+
+  font-size: 12px;
+
+  font-weight: 500;
+
+  text-align: left;
+
+  cursor: pointer;
+}
+
+.course-action-item:hover {
+  background: #f6f7fb;
+}
+
+
+/* EDIT */
+
+.course-action-item.edit {
+  color: #8150f6;
+}
+
+
+/* DELETE */
+
+.course-action-item.delete {
+  color: #ef5350;
+}
+
+
+/* ICON */
+
+.action-item-icon {
+  width: 18px;
+
+  font-size: 16px;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+}
+
+
+/* =========================================================
+   EDIT MODAL
+========================================================= */
+
+.course-edit-modal-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  background: rgba(37, 52, 70, 0.48);
+
+  display: flex;
+
+  align-items: flex-start;
+
+  justify-content: center;
+
+  padding-top: 40px;
+
+  z-index: 9999;
+
+  overflow-y: auto;
+}
+
+
+.course-edit-modal {
+  width: 620px;
+
+  max-width: calc(100vw - 30px);
+
+  background: #ffffff;
+
+  border-radius: 6px;
+
+  padding: 34px 40px;
+
+  box-sizing: border-box;
+
+  box-shadow:
+    0 15px 50px rgba(0, 0, 0, 0.18);
+
+  margin-bottom: 30px;
+}
+
+
+/* =========================================================
+   MODAL FOOTER
+========================================================= */
+
+.course-edit-modal-footer {
+  display: flex;
+
+  justify-content: flex-end;
+
+  align-items: center;
+
+  gap: 12px;
+
+  margin-top: 10px;
+}
+
+
+/* =========================================================
+   CANCEL BUTTON
+========================================================= */
+
+.course-cancel-btn {
+  height: 37px;
+
+  padding: 0 20px;
+
+  border: 1px solid #d5deeb;
+
+  background: #ffffff;
+
+  color: #647d99;
+
+  border-radius: 4px;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.course-cancel-btn:hover {
+  background: #f5f6fa;
+}
+
+
+/* =========================================================
+   UPDATE BUTTON
+========================================================= */
+
+.course-edit-modal .save-course-btn {
+  height: 37px;
+
+  margin-top: 0;
+
+  padding: 0 20px;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+  .course-edit-modal {
+    padding: 25px 20px;
+  }
+
+  .course-edit-modal .course-form-row {
+    flex-direction: column;
+
+    gap: 0;
+  }
+
+  .course-edit-modal-footer {
+    flex-direction: column-reverse;
+
+    align-items: stretch;
+  }
+
+  .course-cancel-btn,
+  .course-edit-modal .save-course-btn {
+    width: 100%;
+  }
+
+}

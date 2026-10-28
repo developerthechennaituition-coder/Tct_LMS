@@ -1,0 +1,953 @@
+/* =========================================================
+   CRYPTO DASHBOARD
+   Responsive DashLite-compatible layout
+   ========================================================= */
+
+.crypto-dashboard {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   PAGE HEADER
+   ========================================================= */
+
+.crypto-page-header {
+  width: 100%;
+  min-width: 0;
+  margin-bottom: 24px;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 20px;
+}
+
+.crypto-page-title {
+  margin: 0;
+  color: #364a63;
+  font-size: 22px;
+  line-height: 1.3;
+  font-weight: 600;
+}
+
+.crypto-page-subtitle {
+  margin: 5px 0 0;
+  color: #8091a7;
+  font-size: 12px;
+}
+
+.crypto-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.crypto-outline-btn {
+  height: 38px;
+  padding: 0 15px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  border: 1px solid #bfa8ff;
+  border-radius: 4px;
+
+  background: #ffffff;
+  color: #7047e8;
+
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.crypto-outline-btn:hover {
+  background: #f8f5ff;
+}
+
+.crypto-add-btn {
+  width: 38px;
+  height: 38px;
+
+  border: 0;
+  border-radius: 4px;
+
+  background: #7549f7;
+  color: #ffffff;
+
+  font-size: 23px;
+  line-height: 1;
+
+  cursor: pointer;
+}
+
+/* =========================================================
+   COMMON CARD
+   ========================================================= */
+
+.crypto-card {
+  width: 100%;
+  min-width: 0;
+
+  background: #ffffff;
+  border: 1px solid #e5e9f2;
+  border-radius: 4px;
+
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.crypto-card-header {
+  min-width: 0;
+  min-height: 47px;
+
+  padding: 14px 18px 12px;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 15px;
+
+  border-bottom: 1px solid #e3e7ef;
+}
+
+.crypto-card-header h3 {
+  margin: 0;
+
+  color: #364a63;
+
+  font-size: 14px;
+  line-height: 1.3;
+  font-weight: 600;
+}
+
+.crypto-card-header p {
+  margin: 4px 0 0;
+
+  color: #8091a7;
+
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.crypto-card-header p span {
+  color: #7549f7;
+  margin-left: 3px;
+}
+
+.crypto-more-btn {
+  padding: 0;
+
+  border: 0;
+  background: transparent;
+
+  color: #52627a;
+
+  font-size: 14px;
+  line-height: 1;
+
+  cursor: pointer;
+
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   TOP GRID
+   ========================================================= */
+
+.crypto-top-grid {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 2fr)
+    minmax(300px, 1fr);
+
+  gap: 20px;
+
+  margin-bottom: 20px;
+
+  min-width: 0;
+}
+
+/* =========================================================
+   ORDERS OVERVIEW
+   ========================================================= */
+
+.orders-card {
+  min-width: 0;
+}
+
+.orders-content {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1.75fr)
+    minmax(250px, 0.85fr);
+
+  gap: 18px;
+
+  padding: 15px 18px 18px;
+
+  min-width: 0;
+}
+
+.orders-chart {
+  width: 100%;
+  min-width: 0;
+  height: 205px;
+}
+
+.orders-summary {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  justify-content: center;
+
+  gap: 18px;
+}
+
+.order-summary-box {
+  min-width: 0;
+
+  padding: 15px;
+
+  border: 1px solid;
+  border-radius: 4px;
+
+  background: #ffffff;
+}
+
+.buy-summary {
+  border-color: #63dfbb;
+}
+
+.sell-summary {
+  border-color: #aa8aff;
+}
+
+.summary-value {
+  color: #16b994;
+
+  font-size: 18px;
+  line-height: 1.2;
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+.sell-summary .summary-value {
+  color: #7549f7;
+}
+
+.summary-value span {
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.summary-last {
+  margin-top: 5px;
+
+  color: #8091a7;
+  font-size: 10px;
+}
+
+.summary-type {
+  margin-top: 8px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  color: #52627a;
+  font-size: 11px;
+}
+
+.summary-icon {
+  width: 24px;
+  height: 24px;
+
+  border-radius: 50%;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 12px;
+}
+
+.buy-icon {
+  background: #eefbf7;
+  color: #17bd97;
+}
+
+.sell-icon {
+  background: #f3efff;
+  color: #7549f7;
+}
+
+/* =========================================================
+   ACTION CENTER
+   ========================================================= */
+
+.action-card {
+  min-width: 0;
+}
+
+.action-list {
+  width: 100%;
+}
+
+.action-item {
+  min-width: 0;
+
+  min-height: 79px;
+
+  padding: 14px 17px;
+
+  display: grid;
+
+  grid-template-columns:
+    24px
+    minmax(0, 1fr)
+    15px;
+
+  align-items: center;
+
+  gap: 10px;
+
+  border-bottom: 1px solid #e3e7ef;
+}
+
+.action-item:last-child {
+  border-bottom: 0;
+}
+
+.action-icon {
+  width: 24px;
+  height: 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #8097b5;
+
+  font-size: 15px;
+}
+
+.action-content {
+  min-width: 0;
+}
+
+.action-content h4 {
+  margin: 0;
+
+  color: #52627a;
+
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.action-content p {
+  margin: 4px 0 0;
+
+  color: #8091a7;
+
+  font-size: 9px;
+  line-height: 1.55;
+
+  overflow-wrap: anywhere;
+}
+
+.action-content strong {
+  color: #52627a;
+  font-weight: 500;
+}
+
+.action-arrow {
+  color: #8091a7;
+  font-size: 23px;
+  line-height: 1;
+}
+
+/* =========================================================
+   MAIN GRID
+   ========================================================= */
+
+.crypto-main-grid {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 2fr)
+    minmax(300px, 1fr);
+
+  gap: 20px;
+
+  min-width: 0;
+}
+
+.activities-card {
+  min-width: 0;
+}
+
+.crypto-right-column {
+  min-width: 0;
+
+  display: grid;
+
+  grid-template-rows:
+    minmax(0, 1fr)
+    minmax(0, 1fr);
+
+  gap: 20px;
+}
+
+/* =========================================================
+   ACTIVITY HEADER
+   ========================================================= */
+
+.title-with-link {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+}
+
+.title-with-link span {
+  color: #7549f7;
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+.activity-filters {
+  display: flex;
+  align-items: center;
+
+  gap: 15px;
+
+  flex-shrink: 0;
+}
+
+.activity-filters button {
+  padding: 0;
+
+  border: 0;
+  background: transparent;
+
+  color: #8091a7;
+
+  font-size: 10px;
+
+  cursor: pointer;
+}
+
+.activity-filters button.active {
+  color: #7549f7;
+  font-weight: 600;
+}
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.crypto-table-wrapper {
+  width: 100%;
+  max-width: 100%;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  -webkit-overflow-scrolling: touch;
+}
+
+.crypto-table {
+  width: 100%;
+  min-width: 820px;
+
+  border-collapse: collapse;
+
+  table-layout: auto;
+}
+
+.crypto-table th {
+  height: 35px;
+
+  padding: 0 12px;
+
+  border-bottom: 1px solid #e0e5ed;
+
+  color: #8091a7;
+
+  font-size: 9px;
+  font-weight: 400;
+
+  text-align: left;
+  white-space: nowrap;
+}
+
+.crypto-table td {
+  height: 54px;
+
+  padding: 0 12px;
+
+  border-bottom: 1px solid #e3e7ef;
+
+  color: #52627a;
+
+  font-size: 10px;
+
+  white-space: nowrap;
+}
+
+.crypto-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.crypto-table tbody tr:hover {
+  background: #fafbff;
+}
+
+.type-icons {
+  display: flex;
+  align-items: center;
+}
+
+.type-arrow {
+  width: 25px;
+  height: 25px;
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 12px;
+
+  z-index: 2;
+}
+
+.type-arrow.buy {
+  background: #e9faf5;
+  color: #19b994;
+}
+
+.type-arrow.sell {
+  background: #f0edff;
+  color: #7549f7;
+}
+
+.crypto-coin-icon {
+  width: 25px;
+  height: 25px;
+
+  margin-left: -7px;
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 12px;
+
+  z-index: 1;
+}
+
+.crypto-coin-icon.bitcoin {
+  background: #fff0e3;
+  color: #f7931a;
+}
+
+.crypto-coin-icon.ethereum {
+  background: #edf0fa;
+  color: #667eea;
+}
+
+.activity-name {
+  color: #52627a;
+  font-weight: 500;
+}
+
+.reference {
+  color: #7549f7;
+}
+
+.crypto-table td:nth-child(3),
+.crypto-table td:nth-child(4) {
+  color: #8091a7;
+}
+
+/* =========================================================
+   TOP COIN
+   ========================================================= */
+
+.top-coin-card {
+  min-width: 0;
+}
+
+.coin-chart {
+  min-width: 0;
+
+  min-height: 170px;
+
+  padding: 20px 18px;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    125px;
+
+  align-items: center;
+
+  gap: 20px;
+}
+
+.coin-bars {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 16px;
+}
+
+.coin-bar-row {
+  width: 100%;
+  min-width: 0;
+
+  height: 6px;
+
+  background: #eef0f5;
+}
+
+.coin-bar {
+  width: 100%;
+  height: 100%;
+}
+
+.coin-bar span {
+  display: block;
+  height: 100%;
+}
+
+.coin-bitcoin {
+  background: #ff914d;
+}
+
+.coin-ethereum {
+  background: #9caafa;
+}
+
+.coin-niocoin {
+  background: #7ee0c2;
+}
+
+.coin-litecoin {
+  background: #6878c8;
+}
+
+.coin-bitcoin-cash {
+  background: #6edfd1;
+}
+
+.coin-legend {
+  display: flex;
+  flex-direction: column;
+
+  gap: 12px;
+
+  min-width: 0;
+}
+
+.coin-legend-item {
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+
+  color: #8091a7;
+
+  font-size: 9px;
+
+  white-space: nowrap;
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+
+  display: inline-block;
+
+  border-radius: 2px;
+
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   USER ACTIVITIES
+   ========================================================= */
+
+.user-activity-card {
+  min-width: 0;
+}
+
+.info-circle {
+  width: 12px;
+  height: 12px;
+
+  margin-left: 4px;
+
+  border: 1px solid #aab4c4;
+  border-radius: 50%;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 7px;
+}
+
+.user-stats {
+  min-width: 0;
+
+  padding: 15px 18px 5px;
+
+  display: grid;
+
+  grid-template-columns:
+    auto
+    minmax(60px, 1fr)
+    auto
+    minmax(60px, 1fr);
+
+  align-items: center;
+
+  gap: 12px;
+}
+
+.user-stat {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+.user-stat-top {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+}
+
+.user-stat-top strong {
+  color: #52627a;
+
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.user-stat > span {
+  color: #8091a7;
+  font-size: 9px;
+}
+
+.user-icon {
+  color: #8091a7;
+  font-size: 18px;
+}
+
+.mini-line {
+  width: 100%;
+  height: 30px;
+
+  min-width: 50px;
+}
+
+.mini-line svg {
+  width: 100%;
+  height: 100%;
+}
+
+.user-chart {
+  width: 100%;
+  height: 90px;
+
+  padding: 0 8px 5px;
+
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+/* Large desktop */
+@media (max-width: 1400px) {
+  .crypto-top-grid,
+  .crypto-main-grid {
+    grid-template-columns:
+      minmax(0, 1.7fr)
+      minmax(300px, 1fr);
+  }
+
+  .orders-content {
+    grid-template-columns:
+      minmax(0, 1.5fr)
+      minmax(230px, 0.9fr);
+  }
+
+  .summary-value {
+    font-size: 16px;
+  }
+}
+
+/* Tablet / smaller desktop */
+@media (max-width: 1100px) {
+  .crypto-top-grid,
+  .crypto-main-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .crypto-right-column {
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(0, 1fr);
+
+    grid-template-rows: none;
+  }
+
+  .orders-content {
+    grid-template-columns:
+      minmax(0, 1.5fr)
+      minmax(240px, 1fr);
+  }
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+  .crypto-page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .crypto-header-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .orders-content {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .orders-chart {
+    height: 230px;
+  }
+
+  .orders-summary {
+    display: grid;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(0, 1fr);
+  }
+
+  .crypto-right-column {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .coin-chart {
+    grid-template-columns:
+      minmax(0, 1fr)
+      130px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+  .crypto-page-title {
+    font-size: 20px;
+  }
+
+  .crypto-header-actions {
+    flex-wrap: wrap;
+  }
+
+  .crypto-outline-btn {
+    flex: 1;
+  }
+
+  .crypto-add-btn {
+    flex-shrink: 0;
+  }
+
+  .orders-summary {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .crypto-card-header {
+    padding: 13px 14px;
+  }
+
+  .crypto-card-header h3 {
+    font-size: 13px;
+  }
+
+  .crypto-card-header p {
+    font-size: 9px;
+  }
+
+  .coin-chart {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .coin-legend {
+    display: grid;
+
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 10px;
+  }
+
+  .user-stats {
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(0, 1fr);
+  }
+
+  .mini-line {
+    display: none;
+  }
+}
+
+/* Very small mobile */
+@media (max-width: 400px) {
+  .crypto-header-actions {
+    display: grid;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(0, 1fr);
+
+    width: 100%;
+  }
+
+  .crypto-add-btn {
+    width: 100%;
+  }
+}

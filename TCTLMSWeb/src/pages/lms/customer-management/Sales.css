@@ -1,0 +1,1497 @@
+.customer-sales-page {
+  min-height: 100vh;
+  padding: 24px;
+  background: #f5f6fa;
+  color: #364a63;
+}
+
+/* =========================================================
+   SECTION HEADER
+========================================================= */
+
+.sales-section-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
+
+.sales-section-header h2 {
+  margin: 0;
+  color: #364a63;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.sales-section-header p {
+  margin: 5px 0 0;
+  color: #8091a7;
+  font-size: 11px;
+}
+
+.sales-header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* =========================================================
+   SECONDARY BUTTON
+========================================================= */
+
+.sales-secondary-button {
+  height: 38px;
+  padding: 0 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  border: 1px solid #dfe3eb;
+  border-radius: 4px;
+  color: #526484;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.sales-secondary-button:hover {
+  background: #f8f9fc;
+}
+
+/* =========================================================
+   ADD BUTTON
+========================================================= */
+
+.sales-add-button {
+  height: 38px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  border-radius: 4px;
+  background: #8544ff;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sales-add-button:hover {
+  background: #7034dc;
+}
+
+.sales-add-button span {
+  font-size: 20px;
+  font-weight: 300;
+}
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.sales-card {
+  margin-bottom: 22px;
+  background: #ffffff;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+/* =========================================================
+   CARD HEADER
+========================================================= */
+
+.sales-card-header {
+  height: 58px;
+  padding: 0 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #dfe3eb;
+}
+
+.sales-card-header h3 {
+  margin: 0;
+  color: #364a63;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.sales-card-tools {
+  display: flex;
+  align-items: center;
+}
+
+.sales-card-tools button {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-left: 1px solid #edf0f5;
+  background: #ffffff;
+  color: #526484;
+  font-size: 17px;
+  cursor: pointer;
+}
+
+.sales-card-tools button:hover {
+  background: #f8f9fc;
+}
+
+/* =========================================================
+   TOOLBAR
+========================================================= */
+
+.sales-toolbar {
+  height: 55px;
+  padding: 0 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #e5e9f2;
+}
+
+.sales-bulk-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bulk-action-button {
+  height: 30px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  background: #ffffff;
+  border: 1px solid #d9e1ed;
+  border-radius: 3px;
+  color: #526484;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.bulk-action-button:hover {
+  background: #f8f9fc;
+}
+
+.apply-button {
+  height: 30px;
+  padding: 0 13px;
+  background: #f8f9fc;
+  border: 1px solid #d9e1ed;
+  border-radius: 3px;
+  color: #b7c1d1;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.apply-button:hover {
+  background: #eef1f6;
+}
+
+.sales-toolbar-icons {
+  display: flex;
+  align-items: center;
+}
+
+.sales-toolbar-icons button {
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-left: 1px solid #edf0f5;
+  background: #ffffff;
+  color: #526484;
+  font-size: 17px;
+  cursor: pointer;
+}
+
+.sales-toolbar-icons button:hover {
+  background: #f8f9fc;
+}
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.sales-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.sales-table {
+  width: 100%;
+  min-width: 1050px;
+  border-collapse: collapse;
+}
+
+.sales-table th {
+  height: 38px;
+  padding: 0 15px;
+  background: #ffffff;
+  border-bottom: 1px solid #dfe3eb;
+  color: #8091a7;
+  font-size: 9px;
+  font-weight: 500;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.sales-table td {
+  height: 52px;
+  padding: 0 15px;
+  border-bottom: 1px solid #e5e9f2;
+  color: #526484;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.sales-table tbody tr:hover {
+  background: #fafbfe;
+}
+
+.checkbox-cell {
+  width: 42px;
+}
+
+.sales-table input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  accent-color: #8544ff;
+}
+
+/* =========================================================
+   LINKS
+========================================================= */
+
+.purple-link {
+  color: #8544ff;
+  cursor: pointer;
+}
+
+.purple-link:hover {
+  text-decoration: underline;
+}
+
+.amount-text {
+  color: #364a63 !important;
+  font-weight: 500;
+}
+
+/* =========================================================
+   USER
+========================================================= */
+
+.sales-user {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #364a63;
+  font-weight: 500;
+}
+
+.sales-avatar {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #8544ff;
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.sales-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+}
+
+.sales-status span {
+  font-size: 7px;
+}
+
+/* Payment */
+
+.sales-status.paid {
+  color: #20c997;
+}
+
+.sales-status.due {
+  color: #f7a800;
+}
+
+.sales-status.canceled {
+  color: #ff4d4f;
+}
+
+/* Products */
+
+.sales-status.available {
+  color: #20c997;
+}
+
+.sales-status.low-stock {
+  color: #f7a800;
+}
+
+.sales-status.out-of-stock {
+  color: #ff4d4f;
+}
+
+/* Estimates */
+
+.sales-status.estimate-accepted {
+  color: #20c997;
+}
+
+.sales-status.estimate-declined {
+  color: #f7a800;
+}
+
+.sales-status.estimate-expired {
+  color: #ff4d4f;
+}
+
+.sales-status.estimate-new {
+  color: #00a8e8;
+}
+
+/* Expenses */
+
+.sales-status.expense-paid {
+  color: #20c997;
+}
+
+.sales-status.expense-due {
+  color: #f7a800;
+}
+
+.sales-status.expense-billable {
+  color: #00a8e8;
+}
+
+/* =========================================================
+   VERIFIED
+========================================================= */
+
+.verified-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+}
+
+.verified-text span {
+  font-size: 7px;
+}
+
+.verified-email {
+  color: #20c997;
+}
+
+.verified-pending {
+  color: #f7a800;
+}
+
+.verified-not {
+  color: #ff4d4f;
+}
+
+/* =========================================================
+   ACTION
+========================================================= */
+
+.sales-action-button {
+  padding: 4px 8px;
+  border: none;
+  background: transparent;
+  color: #8091a7;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.sales-action-button:hover {
+  color: #364a63;
+}
+
+/* =========================================================
+   PAGINATION
+========================================================= */
+
+.sales-pagination {
+  display: flex;
+  align-items: center;
+  padding: 14px 18px;
+}
+
+.sales-pagination button {
+  min-width: 28px;
+  height: 27px;
+  padding: 0 8px;
+  margin-right: -1px;
+  background: #ffffff;
+  border: 1px solid #dfe3eb;
+  color: #526484;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.sales-pagination button:hover {
+  background: #f5f6fa;
+}
+
+.sales-pagination .pagination-active {
+  position: relative;
+  z-index: 2;
+  background: #8544ff;
+  border-color: #8544ff;
+  color: #ffffff;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 768px) {
+  .customer-sales-page {
+    padding: 15px;
+  }
+
+  .sales-section-header {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .sales-header-buttons {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .sales-table {
+    min-width: 1050px;
+  }
+}
+/* =========================================================
+   PAYMENT MODAL OVERLAY
+========================================================= */
+
+.payment-modal-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(40, 55, 75, 0.52);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   PAYMENT MODAL
+========================================================= */
+
+.payment-modal {
+  width: 620px;
+  max-width: 100%;
+  background: #ffffff;
+  border-radius: 5px;
+  box-shadow: 0 10px 45px rgba(0, 0, 0, 0.20);
+  overflow: hidden;
+  animation: paymentModalShow 0.18s ease-out;
+}
+
+@keyframes paymentModalShow {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+/* =========================================================
+   MODAL HEADER
+========================================================= */
+
+.payment-modal-header {
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  box-sizing: border-box;
+}
+
+.payment-modal-header h2 {
+  margin: 0;
+  color: #364a63;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.payment-modal-close {
+  border: 0;
+  background: transparent;
+  color: #a7b1c2;
+  font-size: 28px;
+  font-weight: 300;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.payment-modal-close:hover {
+  color: #526484;
+}
+
+
+/* =========================================================
+   FORM
+========================================================= */
+
+.payment-modal form {
+  padding: 0 32px 32px;
+}
+
+
+/* =========================================================
+   FORM GRID
+========================================================= */
+
+.payment-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 24px;
+  row-gap: 20px;
+}
+
+
+/* =========================================================
+   FORM GROUP
+========================================================= */
+
+.payment-form-group {
+  min-width: 0;
+}
+
+.payment-form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #364a63;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   NORMAL INPUT
+========================================================= */
+
+.payment-form-group input {
+  width: 100%;
+  height: 40px;
+  box-sizing: border-box;
+  border: 1px solid #dbdfea;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #364a63;
+  padding: 0 13px;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s ease,
+              box-shadow 0.15s ease;
+}
+
+.payment-form-group input::placeholder {
+  color: #b6c1d2;
+}
+
+.payment-form-group input:focus {
+  border-color: #6576ff;
+  box-shadow: 0 0 0 3px rgba(101, 118, 255, 0.08);
+}
+
+
+/* =========================================================
+   AMOUNT
+========================================================= */
+
+.payment-input-with-icon {
+  position: relative;
+  width: 100%;
+}
+
+.payment-input-with-icon > span {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #b6c1d2;
+  font-size: 13px;
+  z-index: 2;
+}
+
+.payment-input-with-icon input {
+  padding-left: 27px;
+}
+
+
+/* =========================================================
+   DATE INPUT
+========================================================= */
+
+.payment-date-input {
+  position: relative;
+}
+
+.payment-date-input input {
+  padding-right: 42px;
+}
+
+.payment-date-input > span {
+  position: absolute;
+  right: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #8091a7;
+  font-size: 14px;
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   SELECT
+========================================================= */
+
+.payment-select-wrapper {
+  position: relative;
+}
+
+.payment-select-wrapper select {
+  width: 100%;
+  height: 40px;
+  box-sizing: border-box;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid #dbdfea;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #526484;
+  padding: 0 38px 0 13px;
+  font-size: 13px;
+  outline: none;
+  cursor: pointer;
+}
+
+.payment-select-wrapper select:focus {
+  border-color: #6576ff;
+  box-shadow: 0 0 0 3px rgba(101, 118, 255, 0.08);
+}
+
+.payment-select-wrapper > span {
+  position: absolute;
+  right: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #526484;
+  font-size: 15px;
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   MODAL FOOTER
+========================================================= */
+
+.payment-modal-footer {
+  margin-top: 24px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+
+/* =========================================================
+   ADD PAYMENT BUTTON
+========================================================= */
+
+.payment-submit-button {
+  height: 40px;
+  padding: 0 17px;
+  border: 0;
+  border-radius: 4px;
+  background: #00b686;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease,
+              box-shadow 0.15s ease;
+}
+
+.payment-submit-button:hover {
+  background: #009f76;
+  box-shadow: 0 4px 10px rgba(0, 182, 134, 0.20);
+}
+
+
+/* =========================================================
+   PAYMENT ACTION BUTTON
+========================================================= */
+
+.payment-table .sales-action-button {
+  opacity: 0.75;
+}
+
+.payment-table tr:hover .sales-action-button {
+  opacity: 1;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+  .payment-modal {
+    width: 100%;
+  }
+
+  .payment-modal-header {
+    padding: 0 20px;
+  }
+
+  .payment-modal form {
+    padding: 0 20px 24px;
+  }
+
+  .payment-form-grid {
+    grid-template-columns: 1fr;
+    row-gap: 16px;
+  }
+
+}
+/* =========================================================
+   MODAL OVERLAY
+========================================================= */
+
+.sales-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(35, 48, 68, 0.48);
+
+  padding: 20px;
+}
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.sales-modal {
+  width: 100%;
+  max-width: 620px;
+
+  background: #ffffff;
+
+  border-radius: 6px;
+
+  box-shadow:
+    0 12px 35px rgba(0, 0, 0, 0.16);
+
+  animation: salesModalOpen 0.18s ease-out;
+}
+
+.product-modal {
+  max-width: 620px;
+}
+
+.payment-modal {
+  max-width: 620px;
+}
+
+/* =========================================================
+   MODAL ANIMATION
+========================================================= */
+
+@keyframes salesModalOpen {
+  from {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* =========================================================
+   MODAL HEADER
+========================================================= */
+
+.sales-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 27px 34px 17px;
+}
+
+.sales-modal-header h2 {
+  margin: 0;
+
+  color: #364a63;
+
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.sales-modal-close {
+  border: 0;
+  background: transparent;
+
+  color: #9aa8b8;
+
+  font-size: 27px;
+  line-height: 1;
+
+  cursor: pointer;
+
+  padding: 0;
+}
+
+.sales-modal-close:hover {
+  color: #52637a;
+}
+
+/* =========================================================
+   FORM
+========================================================= */
+
+.sales-modal form {
+  padding: 0 34px 30px;
+}
+
+.sales-form-grid {
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  column-gap: 24px;
+  row-gap: 23px;
+}
+
+.sales-form-field {
+  min-width: 0;
+}
+
+.sales-form-field label,
+.sales-form-full label {
+  display: block;
+
+  margin-bottom: 9px;
+
+  color: #364a63;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.sales-form-field input,
+.sales-form-full textarea,
+.sales-form-field select {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  border: 1px solid #d9e1eb;
+
+  border-radius: 4px;
+
+  background: #ffffff;
+
+  color: #52637a;
+
+  font-family: inherit;
+
+  font-size: 13px;
+
+  outline: none;
+
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.sales-form-field input {
+  height: 46px;
+
+  padding: 0 13px;
+}
+
+.sales-form-full {
+  margin-top: 23px;
+}
+
+.sales-form-full textarea {
+  min-height: 92px;
+
+  padding: 12px 13px;
+
+  resize: vertical;
+}
+
+.sales-form-field input::placeholder,
+.sales-form-full textarea::placeholder {
+  color: #b7c3d3;
+}
+
+.sales-form-field input:focus,
+.sales-form-full textarea:focus,
+.sales-form-field select:focus {
+  border-color: #8c6cff;
+
+  box-shadow:
+    0 0 0 2px rgba(101, 77, 255, 0.08);
+}
+
+/* =========================================================
+   SELECT
+========================================================= */
+
+.sales-select-wrapper {
+  position: relative;
+}
+
+.sales-select-wrapper::after {
+  content: "⌄";
+
+  position: absolute;
+
+  right: 13px;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  color: #789;
+
+  pointer-events: none;
+
+  font-size: 14px;
+}
+
+.sales-form-field select {
+  height: 46px;
+
+  padding: 0 38px 0 13px;
+
+  appearance: none;
+
+  cursor: pointer;
+}
+
+/* =========================================================
+   MODAL FOOTER
+========================================================= */
+
+.sales-modal-footer {
+  margin-top: 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.sales-modal-submit {
+  min-width: 101px;
+  height: 42px;
+
+  padding: 0 17px;
+
+  border: 0;
+  border-radius: 4px;
+
+  background: #00b686;
+
+  color: #ffffff;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease;
+}
+
+.sales-modal-submit:hover {
+  background: #00a47a;
+}
+
+.sales-modal-submit:active {
+  transform: translateY(1px);
+}
+
+/* =========================================================
+   RESPONSIVE MODAL
+========================================================= */
+
+@media (max-width: 700px) {
+  .sales-modal-overlay {
+    padding: 12px;
+  }
+
+  .sales-modal {
+    max-height: 94vh;
+
+    overflow-y: auto;
+  }
+
+  .sales-modal-header {
+    padding: 22px 22px 15px;
+  }
+
+  .sales-modal form {
+    padding: 0 22px 24px;
+  }
+
+  .sales-form-grid {
+    grid-template-columns: 1fr;
+
+    row-gap: 18px;
+  }
+
+  .sales-form-full {
+    margin-top: 18px;
+  }
+}
+/* =========================================================
+   ESTIMATES HEADER ACTIONS
+========================================================= */
+
+.sales-estimate-header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+
+  position: relative;
+
+  margin-top: 0;
+}
+
+
+/* =========================================================
+   ESTIMATE PLUS BUTTON
+========================================================= */
+
+.sales-add-small-button {
+  width: 32px;
+  height: 32px;
+
+  padding: 0;
+
+  border: 0;
+  border-radius: 4px;
+
+  background: #10b981;
+
+  color: #ffffff;
+
+  font-size: 22px;
+  font-weight: 400;
+
+  line-height: 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.sales-add-small-button:hover {
+  background: #0da875;
+}
+
+
+/* =========================================================
+   PLUS WRAPPER
+========================================================= */
+
+.estimate-add-wrapper {
+  position: relative;
+}
+
+
+/* =========================================================
+   ESTIMATE DROPDOWN
+========================================================= */
+
+.estimate-add-dropdown {
+  position: absolute;
+
+  top: 40px;
+  right: 0;
+
+  width: 154px;
+
+  padding: 8px 0;
+
+  background: #ffffff;
+
+  border: 1px solid #e5e9f2;
+
+  border-radius: 4px;
+
+  box-shadow:
+    0 5px 15px rgba(0, 0, 0, 0.08),
+    0 10px 30px rgba(0, 0, 0, 0.05);
+
+  z-index: 9999;
+}
+
+
+/* =========================================================
+   DROPDOWN ITEMS
+========================================================= */
+
+.estimate-add-dropdown button {
+  width: 100%;
+
+  display: block;
+
+  padding: 10px 16px;
+
+  border: 0;
+
+  background: transparent;
+
+  color: #526484;
+
+  font-size: 13px;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.estimate-add-dropdown button:hover {
+  background: #f5f6fa;
+  color: #854fff;
+}
+
+
+/* =========================================================
+   ESTIMATE CARD
+========================================================= */
+
+.estimate-card {
+  position: relative;
+}
+
+
+/* =========================================================
+   ADD ESTIMATE MODAL OVERLAY
+========================================================= */
+
+.sales-modal-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  background: rgba(30, 42, 58, 0.48);
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  z-index: 10000;
+
+  padding: 20px;
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.sales-modal {
+  width: 620px;
+  max-width: 100%;
+
+  background: #ffffff;
+
+  border-radius: 5px;
+
+  box-shadow:
+    0 15px 50px rgba(0, 0, 0, 0.18);
+
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   MODAL HEADER
+========================================================= */
+
+.sales-modal-header {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding: 20px 24px;
+
+  border-bottom: 1px solid #e5e9f2;
+}
+
+.sales-modal-header h3 {
+  margin: 0;
+
+  color: #364a63;
+
+  font-size: 18px;
+
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   CLOSE BUTTON
+========================================================= */
+
+.sales-modal-close {
+  width: 30px;
+  height: 30px;
+
+  border: 0;
+
+  background: transparent;
+
+  color: #8091a7;
+
+  font-size: 24px;
+
+  cursor: pointer;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+}
+
+.sales-modal-close:hover {
+  color: #364a63;
+}
+
+
+/* =========================================================
+   MODAL BODY
+========================================================= */
+
+.sales-modal-body {
+  padding: 24px;
+}
+
+
+/* =========================================================
+   FORM GRID
+========================================================= */
+
+.sales-form-grid {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 18px 24px;
+}
+
+
+/* =========================================================
+   FORM GROUP
+========================================================= */
+
+.sales-form-group {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 7px;
+}
+
+.sales-form-group label {
+  color: #364a63;
+
+  font-size: 13px;
+
+  font-weight: 600;
+}
+
+.sales-form-group input,
+.sales-form-group select {
+  width: 100%;
+
+  height: 40px;
+
+  padding: 0 12px;
+
+  border: 1px solid #dce2eb;
+
+  border-radius: 4px;
+
+  background: #ffffff;
+
+  color: #526484;
+
+  font-size: 13px;
+
+  outline: none;
+
+  box-sizing: border-box;
+}
+
+.sales-form-group input:focus,
+.sales-form-group select:focus {
+  border-color: #854fff;
+
+  box-shadow:
+    0 0 0 2px rgba(133, 79, 255, 0.08);
+}
+
+
+/* =========================================================
+   MODAL FOOTER
+========================================================= */
+
+.sales-modal-footer {
+  display: flex;
+
+  justify-content: flex-end;
+
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 16px 24px;
+
+  border-top: 1px solid #e5e9f2;
+}
+
+
+/* =========================================================
+   CANCEL
+========================================================= */
+
+.sales-modal-cancel {
+  height: 38px;
+
+  padding: 0 18px;
+
+  border: 1px solid #dce2eb;
+
+  border-radius: 4px;
+
+  background: #ffffff;
+
+  color: #526484;
+
+  font-size: 13px;
+
+  cursor: pointer;
+}
+
+.sales-modal-cancel:hover {
+  background: #f5f6fa;
+}
+
+
+/* =========================================================
+   SUBMIT
+========================================================= */
+
+.sales-modal-submit {
+  height: 38px;
+
+  padding: 0 18px;
+
+  border: 0;
+
+  border-radius: 4px;
+
+  background: #10b981;
+
+  color: #ffffff;
+
+  font-size: 13px;
+
+  cursor: pointer;
+}
+
+.sales-modal-submit:hover {
+  background: #0da875;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 768px) {
+
+  .sales-estimate-header-actions {
+    margin-top: 12px;
+
+    justify-content: flex-start;
+  }
+
+  .sales-section-header {
+    flex-direction: column;
+
+    align-items: flex-start;
+  }
+
+  .sales-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sales-modal {
+    width: 100%;
+  }
+
+}

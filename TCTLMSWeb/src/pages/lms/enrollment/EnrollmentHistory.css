@@ -1,0 +1,256 @@
+/* Enrollment History — Coordinator view only. Every selector is under .tct-eh, which the page adds
+   for the Coordinator role; other roles and other pages are not affected. */
+
+/* ─── Title + search on one line ────────────────────────────────────────── */
+.tct-eh .nk-block-head { padding-bottom: 18px; }
+.tct-eh .nk-block-head .nk-block-between { flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+.tct-eh .nk-block-head .nk-block-title { margin: 0; font-size: 1.6rem; font-weight: 700; line-height: 1.25; color: #1c2b46; }
+.tct-eh .nk-block-head .nk-block-between > .nk-block-head-content:last-child {
+  display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex: 0 1 420px; min-width: 0;
+}
+.tct-eh .tct-eh-search { flex: 1 1 auto; min-width: 0; }
+.tct-eh .tct-eh-search-field { position: relative; }
+.tct-eh .tct-eh-search-icon {
+  position: absolute; top: 50%; left: 14px; transform: translateY(-50%);
+  font-size: 16px; color: #8094ae; pointer-events: none;
+}
+.tct-eh .tct-eh-search .form-control {
+  height: 40px; padding: 0 38px 0 40px; border: 1px solid #dbdfea; border-radius: 10px;
+  font-size: 14px; color: #1c2b46; background: #fff; box-shadow: none;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.tct-eh .tct-eh-search .form-control::placeholder { color: #a7b2c3; }
+.tct-eh .tct-eh-search .form-control:hover { border-color: #c5cbe0; }
+.tct-eh .tct-eh-search .form-control:focus { border-color: #854fff; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.14); outline: none; }
+.tct-eh .tct-eh-search .form-control:focus ~ .tct-eh-search-icon,
+.tct-eh .tct-eh-search-field:focus-within .tct-eh-search-icon { color: #854fff; }
+.tct-eh .tct-eh-search .form-control::-webkit-search-cancel-button { display: none; }
+.tct-eh .tct-eh-search-clear {
+  position: absolute; top: 50%; right: 6px; transform: translateY(-50%);
+  display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; padding: 0;
+  border: 0; border-radius: 7px; background: transparent; color: #8094ae; font-size: 14px; cursor: pointer;
+}
+.tct-eh .tct-eh-search-clear:hover { color: #1c2b46; background: #f1f3f8; }
+.tct-eh .tct-eh-search-clear:focus-visible { outline: none; color: #6a35e8; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.2); }
+
+/* ─── Table card ────────────────────────────────────────────────────────── */
+.tct-eh .tct-eh-table {
+  overflow: hidden; border: 1px solid #e5e9f2; border-radius: 12px; background: #fff;
+  box-shadow: 0 1px 3px rgba(28, 43, 70, 0.05);
+}
+.tct-eh .tct-eh-table .rdt_Table { background: #fff; }
+.tct-eh .tct-eh-table .rdt_TableHeadRow { min-height: 46px; background: #f5f6fa; border-bottom: 1px solid #e5e9f2; }
+.tct-eh .tct-eh-table .rdt_TableCol {
+  padding-left: 16px; padding-right: 16px;
+  font-size: 11.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #6b7a90;
+}
+.tct-eh .tct-eh-table .rdt_TableCol_Sortable { color: #6b7a90; }
+.tct-eh .tct-eh-table .rdt_TableCol_Sortable:hover { color: #1c2b46; }
+.tct-eh .tct-eh-table .__rdt_custom_sort_icon__ { margin-left: 6px; font-size: 12px; color: #b7c2d0; }
+.tct-eh .tct-eh-table .rdt_TableRow {
+  min-height: 66px; border-bottom: 1px solid #eef0f5 !important; font-size: 14px; color: #526484;
+  transition: background .15s ease;
+}
+.tct-eh .tct-eh-table .rdt_TableRow:last-child { border-bottom: 0 !important; }
+.tct-eh .tct-eh-table .rdt_TableRow:hover { background: #faf9ff; }
+/* Header and body cells share the column widths set in the page (no min-width override here,
+   so both rows size identically). The table scrolls inside its card when the width runs out. */
+.tct-eh .tct-eh-table .rdt_TableCell { padding-left: 16px; padding-right: 16px; }
+.tct-eh .tct-eh-table .rdt_TableCell[data-column-id] { align-items: center; }
+.tct-eh .tct-eh-table .rdt_TableCol .rdt_TableCol_Sortable { gap: 2px; }
+.tct-eh .tct-eh-table .rdt_TableCol .rdt_TableCol_Sortable > div:first-child,
+.tct-eh .tct-eh-table .rdt_TableCol > div > div { overflow: visible; text-overflow: clip; }
+.tct-eh .tct-eh-table .rdt_Table { min-width: 1320px; }
+@media (max-width: 959.98px) { .tct-eh .tct-eh-table .rdt_Table { min-width: 1140px; } } /* date column hides below md */
+.tct-eh .tct-eh-table > div:first-child { overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: thin; scrollbar-color: #d9cbff transparent; }
+.tct-eh .tct-eh-table .rdt_TableCell > span { overflow-wrap: anywhere; }
+
+/* Student: avatar + name (the profile link) */
+.tct-eh .tct-eh-table .rdt_TableCell > a.user-card { gap: 12px; margin: 8px 0 !important; min-width: 0; text-decoration: none; }
+.tct-eh .tct-eh-table .rdt_TableCell > a.user-card .user-avatar,
+.tct-eh .tct-eh-table .rdt_TableCell > a.user-card [class*="user-avatar"] { flex-shrink: 0; width: 40px; height: 40px; font-size: 13px; font-weight: 700; }
+.tct-eh .tct-eh-table .rdt_TableCell > a.user-card .user-info { min-width: 0; margin-left: 0; }
+.tct-eh .tct-eh-table .rdt_TableCell > a.user-card .tb-lead {
+  display: block; font-size: 14px; font-weight: 600; color: #1c2b46; overflow-wrap: anywhere; transition: color .15s ease;
+}
+.tct-eh .tct-eh-table .rdt_TableCell > a.user-card:hover .tb-lead { color: #6a35e8; }
+
+/* Courses: course name with the View More action underneath */
+.tct-eh .tct-eh-table .rdt_TableCell > div[style] { white-space: normal !important; min-width: 0; }
+.tct-eh .tct-eh-table .rdt_TableCell > div > span:first-child { display: block; font-weight: 600; color: #364a63; overflow-wrap: anywhere; }
+.tct-eh .tct-eh-table .rdt_TableCell > div > span:first-child + a.user-card {
+  display: inline-flex; margin: 3px 0 0 !important; font-size: 12.5px; font-weight: 600; color: #854fff; cursor: pointer;
+}
+.tct-eh .tct-eh-table .rdt_TableCell > div > span:first-child + a.user-card:hover { color: #6a35e8; text-decoration: underline; }
+
+/* Row actions */
+.tct-eh .tct-eh-table .rdt_TableCell:last-child { gap: 4px; justify-content: flex-end; }
+.tct-eh .tct-eh-table .rdt_TableCell:last-child > a.user-card,
+.tct-eh .tct-eh-table .rdt_TableCell:last-child > span { display: inline-flex; align-items: center; margin: 0 !important; }
+.tct-eh .tct-eh-table .rdt_TableCell a.user-card:has(.btn-trigger) { margin: 0 !important; }
+.tct-eh .tct-eh-table .rdt_TableCell .btn-trigger.btn-icon {
+  width: 34px; height: 34px; border-radius: 9px; color: #8094ae; font-size: 17px;
+  transition: color .15s ease, background .15s ease;
+}
+.tct-eh .tct-eh-table .rdt_TableCell .btn-trigger.btn-icon:hover { color: #6a35e8; background: #f1ecff; }
+.tct-eh .tct-eh-table .rdt_TableCell .btn-trigger.btn-icon::before { display: none; }
+
+/* Empty table */
+.tct-eh .tct-eh-table .rdt_Table + div .p-2,
+.tct-eh .tct-eh-table .p-2 { padding: 36px 16px !important; font-size: 14px; color: #8094ae; }
+
+/* ─── Pager: page buttons left · range centre · Rows per page right ────── */
+.tct-eh .tutor-list-pager {
+  position: relative; display: flex; align-items: center; flex-wrap: wrap; gap: 12px 16px;
+  min-height: 64px; padding: 14px 18px; border-top: 1px solid #eef0f5; background: #fff;
+}
+.tct-eh .tutor-list-pager-size { display: contents; }
+.tct-eh .tutor-list-pager > nav { order: 1; }
+.tct-eh .tutor-list-pager-range {
+  order: 2; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  font-size: 13.5px; font-weight: 600; color: #526484; white-space: nowrap; font-variant-numeric: tabular-nums;
+}
+.tct-eh .tutor-list-pager-size label { order: 3; margin: 0 0 0 auto; font-size: 13px; font-weight: 500; line-height: 34px; color: #6b7a90; white-space: nowrap; }
+.tct-eh .tutor-list-pager-size .form-control-select { order: 4; position: relative; }
+.tct-eh .tutor-list-pager-size .form-control-select::after { display: none; }
+/* Rows per page: the same native <select> (values, keyboard and events unchanged), restyled. */
+.tct-eh .tutor-list-pager-size select.form-control {
+  -webkit-appearance: none; appearance: none;
+  width: 72px; height: 34px; padding: 0 28px 0 12px; border: 1px solid #dbdfea; border-radius: 9px;
+  font-size: 13px; font-weight: 600; line-height: 32px; color: #364a63; cursor: pointer; box-shadow: none;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%238094ae' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 11px center;
+  font-variant-numeric: tabular-nums; transition: border-color .15s ease, box-shadow .15s ease;
+}
+.tct-eh .tutor-list-pager-size select.form-control:hover { border-color: #c5b3ff; }
+.tct-eh .tutor-list-pager-size select.form-control:focus,
+.tct-eh .tutor-list-pager-size select.form-control:focus-visible { border-color: #854fff; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.16); outline: none; }
+
+/* Option list: styled where the browser supports customizable <select> (Chrome / Edge 135+);
+   it renders in the top layer, so the footer and table card cannot clip it. Other browsers keep the native list. */
+@supports (appearance: base-select) {
+  .tct-eh .tutor-list-pager-size select.form-control,
+  .tct-eh .tutor-list-pager-size select.form-control::picker(select) { appearance: base-select; }
+  .tct-eh .tutor-list-pager-size select.form-control { display: flex; align-items: center; }
+  .tct-eh .tutor-list-pager-size select.form-control::picker-icon { display: none; }
+  .tct-eh .tutor-list-pager-size select.form-control:open {
+    border-color: #854fff; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.16);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 5l4-4 4 4' fill='none' stroke='%23854fff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  }
+  .tct-eh .tutor-list-pager-size select.form-control::picker(select) {
+    position-area: top span-left; position-try-fallbacks: flip-block;
+    min-width: anchor-size(width); margin: 0 0 6px; padding: 5px;
+    border: 1px solid #e5e9f2; border-radius: 10px; background: #fff;
+    box-shadow: 0 12px 28px rgba(28, 43, 70, 0.16);
+  }
+  .tct-eh .tutor-list-pager-size select.form-control option {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    min-height: 32px; padding: 0 10px; border-radius: 7px;
+    font-size: 13px; font-weight: 500; color: #364a63; cursor: pointer;
+  }
+  .tct-eh .tutor-list-pager-size select.form-control option + option { margin-top: 2px; }
+  .tct-eh .tutor-list-pager-size select.form-control option::checkmark { order: 1; content: "\2713"; font-size: 12px; }
+  .tct-eh .tutor-list-pager-size select.form-control option:not(:checked)::checkmark { visibility: hidden; }
+  .tct-eh .tutor-list-pager-size select.form-control option:hover,
+  .tct-eh .tutor-list-pager-size select.form-control option:focus-visible { outline: none; background: #f5f1ff; color: #6a35e8; }
+  .tct-eh .tutor-list-pager-size select.form-control option:checked { background: #854fff; color: #fff; font-weight: 600; }
+}
+
+.tct-eh .tutor-list-pager .pagination { margin: 0; padding: 0; border-top: 0; gap: 0; }
+.tct-eh .tutor-list-pager .page-link {
+  display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+  min-width: 36px; height: 34px; padding: 0 10px; border-color: #e5e9f2;
+  font-size: 13px; font-weight: 600; color: #526484; background: #fff; cursor: pointer;
+}
+.tct-eh .tutor-list-pager .page-link:hover { color: #6a35e8; background: #f5f1ff; border-color: #e5e9f2; }
+.tct-eh .tutor-list-pager .page-link:focus { box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.18); z-index: 3; }
+.tct-eh .tutor-list-pager .page-item:first-child .page-link { border-top-left-radius: 9px; border-bottom-left-radius: 9px; }
+.tct-eh .tutor-list-pager .page-item:last-child .page-link { border-top-right-radius: 9px; border-bottom-right-radius: 9px; }
+.tct-eh .tutor-list-pager .page-item.active .page-link { color: #fff; background: #854fff; border-color: #854fff; }
+.tct-eh .tutor-list-pager .page-item.disabled .page-link { color: #c1c9d6; background: #fafbfd; cursor: not-allowed; }
+
+/* Tablet: page buttons on their own row, range left + Rows per page right below. */
+@media (max-width: 991.98px) {
+  .tct-eh .tutor-list-pager > nav { flex: 1 1 100%; }
+  .tct-eh .tutor-list-pager-range { position: static; transform: none; order: 2; }
+}
+/* Phone: search under the title, full width. */
+@media (max-width: 575.98px) {
+  .tct-eh .nk-block-head .nk-block-between > .nk-block-head-content { flex: 1 1 100%; }
+  .tct-eh .nk-block-head .nk-block-title { font-size: 1.35rem; }
+  .tct-eh .tutor-list-pager { padding: 12px 14px; }
+}
+
+/* ─── Upload coordinator instructions popup (portal; scoped by its own .tct-eh-upload class) ─── */
+.modal-dialog.tct-eh-upload { max-width: 560px; }
+.tct-eh-upload .modal-content {
+  border: 1px solid #e5e9f2; border-radius: 16px; overflow: hidden;
+  box-shadow: 0 24px 64px rgba(28, 43, 70, 0.24), 0 2px 6px rgba(28, 43, 70, 0.06);
+}
+.tct-eh-upload .ehu-head { display: flex; align-items: flex-start; gap: 14px; padding: 20px 22px 16px; border-bottom: 1px solid #eef0f5; }
+.tct-eh-upload .ehu-icon {
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+  width: 44px; height: 44px; border-radius: 12px; font-size: 21px; color: #854fff; background: #f1ecff;
+}
+.tct-eh-upload .ehu-head-text { flex: 1 1 auto; min-width: 0; }
+.tct-eh-upload .ehu-title { margin: 0; font-size: 1.1rem; font-weight: 700; line-height: 1.35; color: #1c2b46; }
+.tct-eh-upload .ehu-sub { margin: 3px 0 0; font-size: 13px; color: #6b7a90; }
+.tct-eh-upload .ehu-close {
+  flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; margin: -4px -6px 0 0; padding: 0; border: 0; border-radius: 9px;
+  background: transparent; color: #8094ae; font-size: 17px; cursor: pointer; transition: background .15s ease, color .15s ease;
+}
+.tct-eh-upload .ehu-close:hover { background: #f1f3f8; color: #1c2b46; }
+.tct-eh-upload .ehu-close:focus-visible { outline: none; color: #6a35e8; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.2); }
+.tct-eh-upload .modal-body { padding: 18px 22px 20px; }
+
+.tct-eh-upload .ehu-student {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 18px; padding: 12px 14px;
+  border: 1px solid #ebe4ff; border-radius: 12px; background: #faf8ff;
+}
+.tct-eh-upload .ehu-student .user-avatar,
+.tct-eh-upload .ehu-student [class*="user-avatar"] { flex-shrink: 0; width: 40px; height: 40px; font-size: 13px; font-weight: 700; }
+.tct-eh-upload .ehu-student-text { display: flex; flex-direction: column; min-width: 0; }
+.tct-eh-upload .ehu-student-name { font-size: 14.5px; font-weight: 700; color: #1c2b46; overflow-wrap: anywhere; }
+.tct-eh-upload .ehu-student-meta { margin-top: 2px; font-size: 12.5px; color: #6b7a90; overflow-wrap: anywhere; }
+.tct-eh-upload .ehu-student-meta b { font-weight: 600; color: #364a63; }
+.tct-eh-upload .ehu-student-meta i { margin: 0 8px; font-style: normal; color: #c9d0dc; }
+
+.tct-eh-upload .form-label { margin-bottom: 8px; font-size: 13px; font-weight: 600; color: #364a63; }
+.tct-eh-upload .ehu-drop {
+  position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; margin: 0;
+  padding: 22px 16px; border: 1.5px dashed #cdbdff; border-radius: 12px; background: #fcfbff;
+  text-align: center; cursor: pointer; transition: border-color .15s ease, background .15s ease, box-shadow .15s ease;
+}
+.tct-eh-upload .ehu-drop:hover { border-color: #854fff; background: #f8f5ff; }
+.tct-eh-upload .ehu-drop:focus-within { border-color: #854fff; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.15); }
+.tct-eh-upload .ehu-drop.has-file { border-style: solid; border-color: #c5b3ff; background: #f8f5ff; }
+/* Native input stays in the DOM (keyboard focus, accept list, onChange); only visually hidden. */
+.tct-eh-upload .ehu-file-input { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); border: 0; }
+.tct-eh-upload .ehu-drop-icon { font-size: 30px; line-height: 1; color: #854fff; }
+.tct-eh-upload .ehu-drop-text { display: flex; flex-direction: column; gap: 2px; max-width: 100%; }
+.tct-eh-upload .ehu-drop-text b { font-size: 13.5px; font-weight: 600; color: #364a63; }
+.tct-eh-upload .ehu-drop-text .ehu-file-name { color: #1c2b46; overflow-wrap: anywhere; }
+.tct-eh-upload .ehu-drop-text small { font-size: 12px; color: #8094ae; }
+.tct-eh-upload .ehu-browse {
+  margin-top: 4px; padding: 6px 16px; border: 1px solid #854fff; border-radius: 8px; background: #fff;
+  font-size: 13px; font-weight: 600; color: #6a35e8; transition: background .15s ease, color .15s ease;
+}
+.tct-eh-upload .ehu-drop:hover .ehu-browse { background: #854fff; color: #fff; }
+.tct-eh-upload .ehu-hint { margin-top: 8px; font-size: 12px; color: #8094ae; text-align: center; }
+
+.tct-eh-upload .modal-footer { justify-content: flex-end; gap: 10px; padding: 14px 22px; border-top: 1px solid #eef0f5; background: #fafbfd; }
+.tct-eh-upload .modal-footer > * { margin: 0; }
+.tct-eh-upload .modal-footer .btn { min-width: 96px; height: 38px; justify-content: center; gap: 6px; border-radius: 9px; font-weight: 600; }
+.tct-eh-upload .modal-footer .btn-light { color: #364a63; background: #fff; border-color: #dbdfea; }
+.tct-eh-upload .modal-footer .btn-light:hover:not(:disabled) { background: #f5f6fa; }
+.tct-eh-upload .modal-footer .btn-primary { background: #854fff; border-color: #854fff; }
+.tct-eh-upload .modal-footer .btn-primary:hover:not(:disabled) { background: #6a35e8; border-color: #6a35e8; }
+
+@media (max-width: 575.98px) {
+  .modal-dialog.tct-eh-upload { max-width: none; margin: 8px; }
+  .tct-eh-upload .ehu-head { padding: 16px; gap: 12px; }
+  .tct-eh-upload .ehu-icon { width: 38px; height: 38px; font-size: 18px; }
+  .tct-eh-upload .modal-body { padding: 16px; }
+  .tct-eh-upload .modal-footer { padding: 12px 16px; }
+  .tct-eh-upload .modal-footer .btn { flex: 1 1 0; }
+}

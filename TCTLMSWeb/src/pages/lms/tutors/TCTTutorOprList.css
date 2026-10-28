@@ -1,0 +1,170 @@
+/* Tutor Attendance List (/tct-tutor-opr-list). Every rule is under .tct-tal, the page's own wrapper. */
+
+.tct-tal .nk-block-head { padding-bottom: 14px; }
+.tct-tal .nk-block-head .nk-block-title { margin: 0; font-size: 1.5rem; font-weight: 700; color: #1c2b46; }
+
+/* ─── Filter panel: one compact auto-fit grid instead of two loosely filled rows ─── */
+.tct-tal .tct-tal-filters {
+  margin-bottom: 16px !important; border: 1px solid #e5e9f2; border-radius: 14px; background: #fff;
+  box-shadow: 0 1px 3px rgba(28, 43, 70, 0.05);
+}
+.tct-tal .tct-tal-filters > .card-inner { padding: 16px 18px; }
+.tct-tal .tct-tal-filters .row {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); align-items: end;
+  gap: 12px 14px; margin: 0 !important;
+}
+.tct-tal .tct-tal-filters .row > [class*="col"] { flex: none; width: auto; max-width: none; padding: 0 !important; margin: 0 !important; }
+.tct-tal .tct-tal-filters .form-group { margin: 0; }
+.tct-tal .tct-tal-filters label {
+  margin-bottom: 6px; font-size: 11.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #6b7a90;
+}
+
+/* Inputs + selects (filters, search, rows per page) */
+.tct-tal .form-control,
+.tct-tal .form-select {
+  height: 40px; padding: 0 12px; border: 1px solid #dbdfea; border-radius: 10px;
+  font-size: 13.5px; color: #1c2b46; background-color: #fff; box-shadow: none;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.tct-tal .form-control::placeholder { color: #98a4b6; }
+.tct-tal .form-control:hover,
+.tct-tal .form-select:hover { border-color: #c5b3ff; }
+.tct-tal .form-control:focus,
+.tct-tal .form-select:focus { border-color: #854fff; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.14); outline: none; }
+.tct-tal select.form-control,
+.tct-tal select.form-select {
+  -webkit-appearance: none; appearance: none; padding-right: 34px; cursor: pointer; text-overflow: ellipsis;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23854fff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 13px center;
+}
+/* Dashlite draws its own arrow on .form-control-select; this page uses the background arrow above. */
+.tct-tal .form-control-select::after { display: none; }
+
+/* Option lists: styled where the browser supports customizable <select> (Chrome / Edge 135+). Same <select>,
+   same options, values and keyboard behaviour; other browsers keep their native list. */
+@supports (appearance: base-select) {
+  .tct-tal select.form-control,
+  .tct-tal select.form-select,
+  .tct-tal select.form-control::picker(select),
+  .tct-tal select.form-select::picker(select) { appearance: base-select; }
+  .tct-tal select.form-control,
+  .tct-tal select.form-select { display: flex; align-items: center; }
+  .tct-tal select.form-control::picker-icon,
+  .tct-tal select.form-select::picker-icon { display: none; }
+  .tct-tal select.form-control:open,
+  .tct-tal select.form-select:open {
+    border-color: #854fff; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.14);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 5l4-4 4 4' fill='none' stroke='%23854fff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  }
+  .tct-tal select.form-control::picker(select),
+  .tct-tal select.form-select::picker(select) {
+    min-width: anchor-size(width); max-height: 320px; margin-top: 6px; padding: 5px; overflow-y: auto;
+    border: 1px solid #e5e9f2; border-radius: 10px; background: #fff; box-shadow: 0 12px 28px rgba(28, 43, 70, 0.16);
+    scrollbar-width: thin; scrollbar-color: #d9cbff transparent;
+  }
+  .tct-tal select.form-control option,
+  .tct-tal select.form-select option {
+    min-height: 34px; padding: 7px 10px; border-radius: 7px; font-size: 13.5px; color: #364a63; cursor: pointer; white-space: normal;
+  }
+  .tct-tal select.form-control option::checkmark,
+  .tct-tal select.form-select option::checkmark { display: none; }
+  .tct-tal select.form-control option:hover,
+  .tct-tal select.form-control option:focus-visible,
+  .tct-tal select.form-select option:hover,
+  .tct-tal select.form-select option:focus-visible { outline: none; background: #f5f1ff; color: #6a35e8; }
+  .tct-tal select.form-control option:checked,
+  .tct-tal select.form-select option:checked { background: #854fff; color: #fff; font-weight: 600; }
+}
+
+/* Reset / View Attendance */
+.tct-tal .tct-tal-filters .btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 40px; border-radius: 10px; font-size: 13.5px; font-weight: 600;
+}
+.tct-tal .tct-tal-filters .btn-light { border: 1px solid #dbdfea; color: #526484; background: #f5f6fa; }
+.tct-tal .tct-tal-filters .btn-light:hover { border-color: #c5b3ff; color: #6a35e8; background: #f5f1ff; }
+.tct-tal .tct-tal-filters .btn .icon { margin: 0 !important; }
+
+/* ─── Search + counts, select-all ─────────────────────────────────────── */
+.tct-tal .tct-tal-toolbar { margin-bottom: 10px !important; }
+.tct-tal .tct-tal-toolbar .form-control {
+  padding-left: 38px;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='%238094ae' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-3.5-3.5'/%3E%3C/svg%3E") no-repeat 13px center;
+}
+.tct-tal .tct-tal-toolbar > .text-muted { font-size: 13px !important; font-weight: 500; color: #6b7a90 !important; }
+.tct-tal .tct-tal-selectall { margin-bottom: 10px !important; }
+.tct-tal .tct-tal-selectall input[type="checkbox"] { accent-color: #854fff; }
+
+/* ─── Table ───────────────────────────────────────────────────────────── */
+.tct-tal .tct-tal-table-wrap {
+  border: 1px solid #e5e9f2; border-radius: 12px; background: #fff; box-shadow: 0 1px 3px rgba(28, 43, 70, 0.05);
+  scrollbar-width: thin; scrollbar-color: #d9cbff transparent;
+}
+.tct-tal .tct-tal-table { margin: 0; border: 0; border-collapse: separate; border-spacing: 0; }
+.tct-tal .tct-tal-table > thead > tr > th {
+  padding: 12px 16px; border: 0; border-bottom: 1px solid #e5e9f2; background: #f5f6fa;
+  font-size: 11.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #6b7a90; white-space: nowrap;
+}
+.tct-tal .tct-tal-table > thead > tr { background: transparent !important; }
+.tct-tal .tct-tal-table > tbody > tr > td { padding: 11px 16px; border: 0; border-bottom: 1px solid #eef0f5; color: #364a63; }
+.tct-tal .tct-tal-table > tbody > tr:last-child > td { border-bottom: 0; }
+/* Group rows: white with a soft lavender hover instead of a solid lavender band */
+.tct-tal .tct-tal-table > tbody > tr[style] { background-color: #fff !important; transition: background-color .15s ease; }
+.tct-tal .tct-tal-table > tbody > tr[style]:hover { background-color: #faf8ff !important; }
+.tct-tal .tct-tal-table > tbody > tr[style] > td:first-child .icon {
+  display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 7px;
+  font-size: 14px; color: #854fff; background: #f1ecff;
+}
+.tct-tal .tct-tal-table > tbody > tr[style] > td:nth-child(2) { color: #1c2b46; }
+.tct-tal .tct-tal-table .badge { padding: 4px 8px; border-radius: 7px; font-weight: 700; }
+
+/* Expanded details */
+.tct-tal .tct-tal-table > tbody > tr:not([style]) > td { border-bottom: 1px solid #eef0f5; background: #fafbfd !important; }
+.tct-tal .tct-tal-table > tbody > tr:not([style]) > td > div { margin: 0 16px 12px 58px; border: 1px solid #e5e9f2; border-radius: 10px; background: #fff; }
+.tct-tal .tct-tal-table .table-sm { margin: 0; }
+.tct-tal .tct-tal-table .table-sm th { padding: 8px 12px; border-top: 0; background: #f5f6fa !important; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #6b7a90; }
+.tct-tal .tct-tal-table .table-sm td { padding: 8px 12px; border-top: 1px solid #f1f3f8; }
+.tct-tal .tct-tal-table .table-sm tfoot td { background: #f8f9fc; border-top: 1px solid #e5e9f2; }
+.tct-tal .tct-tal-table .table-sm thead tr,
+.tct-tal .tct-tal-table .table-sm tfoot tr { background: transparent !important; }
+
+/* Row actions */
+.tct-tal .tct-tal-table .btn-sm {
+  display: inline-flex; align-items: center; gap: 4px; height: 32px; padding: 0 12px; border-radius: 8px;
+  font-size: 12.5px; font-weight: 600; box-shadow: none;
+}
+.tct-tal .tct-tal-table .btn-sm .icon { margin: 0 !important; font-size: 14px; }
+.tct-tal .tct-tal-table .btn-warning { border-color: #f4bd0e; background: #f4bd0e; }
+.tct-tal .tct-tal-table .btn-warning:disabled { opacity: 1; border-color: #f7e2a6; background: #fdf3d6; color: #b28a1d !important; }
+.tct-tal .tct-tal-table .btn-success { border-color: #1ee0ac; background: #1ee0ac; }
+
+/* ─── Pager: pages left · range centre · Rows per page right ─────────── */
+.tct-tal .tct-tal-pager {
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px 16px; margin-top: 12px;
+}
+.tct-tal .tct-tal-pager-nav { justify-self: start; display: flex; flex-wrap: wrap; gap: 4px; }
+.tct-tal .tct-tal-pager-nav .btn {
+  min-width: 34px; height: 34px; padding: 0 12px; justify-content: center; border: 1px solid #e5e9f2; border-radius: 9px;
+  font-size: 13px; font-weight: 600; color: #526484; background: #fff; box-shadow: none;
+}
+.tct-tal .tct-tal-pager-nav .btn:hover:not(:disabled) { color: #6a35e8; background: #f5f1ff; border-color: #d9cbff; }
+.tct-tal .tct-tal-pager-nav .btn-primary { color: #fff; background: #854fff; border-color: #854fff; }
+.tct-tal .tct-tal-pager-nav .btn-primary:hover:not(:disabled) { color: #fff; background: #6a35e8; border-color: #6a35e8; }
+.tct-tal .tct-tal-pager-nav .btn:disabled { color: #c1c9d6; background: #fafbfd; opacity: 1; }
+.tct-tal .tct-tal-pager-range {
+  justify-self: center; font-size: 13.5px !important; font-weight: 600; color: #526484 !important; white-space: nowrap; font-variant-numeric: tabular-nums;
+}
+.tct-tal .tct-tal-pager-size { justify-self: end; display: flex; align-items: center; gap: 10px; }
+.tct-tal .tct-tal-pager-size label { margin: 0; font-size: 13px; font-weight: 500; color: #6b7a90; white-space: nowrap; }
+.tct-tal .tct-tal-pager-size select.form-control { width: 80px; height: 34px; font-weight: 600; }
+
+/* ─── Responsive ──────────────────────────────────────────────────────── */
+@media (max-width: 767.98px) {
+  .tct-tal .tct-tal-filters > .card-inner { padding: 14px; }
+  .tct-tal .tct-tal-filters .row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tct-tal .tct-tal-toolbar .form-control { max-width: none !important; }
+  .tct-tal .tct-tal-pager { grid-template-columns: 1fr auto; }
+  .tct-tal .tct-tal-pager-nav { grid-column: 1 / -1; }
+  .tct-tal .tct-tal-pager-range { justify-self: start; }
+}
+@media (max-width: 420px) {
+  .tct-tal .tct-tal-filters .row { grid-template-columns: minmax(0, 1fr); }
+}

@@ -1,0 +1,31 @@
+﻿ALTER TABLE TctLearningExperienceFeedback
+DROP CONSTRAINT PK__TctLearn__3214EC07BED9A708;
+
+ALTER TABLE TctLearningExperienceFeedback
+DROP COLUMN Id;
+
+
+ALTER TABLE TctLearningExperienceFeedback
+ADD NewId UNIQUEIDENTIFIER NOT NULL
+DEFAULT NEWSEQUENTIALID();
+
+ALTER TABLE TctLearningExperienceFeedback
+ADD CONSTRAINT PK_TctLearningExperienceFeedback
+PRIMARY KEY (Id);
+
+
+ALTER TABLE TctLearningExperienceFeedback
+DROP COLUMN CreatedByUserId;
+
+
+ALTER TABLE TctLearningExperienceFeedback
+ADD CreatedByUserId UNIQUEIDENTIFIER   NULL
+DEFAULT NEWSEQUENTIALID();
+
+ALTER TABLE TctLearningExperienceFeedback
+DROP COLUMN UserId;
+
+
+ALTER TABLE TctLearningExperienceFeedback
+ADD UserId UNIQUEIDENTIFIER NOT NULL
+DEFAULT NEWSEQUENTIALID();

@@ -1,0 +1,289 @@
+/* Enroll a Student (Sales → Enrollment), Coordinator view only. Every rule is under .tct-enroll, which the
+   page adds for the Coordinator role. The Enroll New Course popup renders in a portal, so it is scoped with
+   body:has(.tct-enroll) — it only matches while this page is open. */
+
+/* ─── Page title ────────────────────────────────────────────────────────── */
+.tct-enroll .nk-block-head { padding-bottom: 18px; }
+.tct-enroll .nk-block-head .nk-block-title { margin: 0; font-size: 1.6rem; font-weight: 700; color: #1c2b46; }
+.tct-enroll .nk-block-head .nk-block-des { margin-top: 4px; font-size: 14px; color: #6b7a90; }
+
+/* ─── Form card ─────────────────────────────────────────────────────────── */
+.tct-enroll > .card {
+  border: 1px solid #e5e9f2; border-radius: 16px; background: #fff;
+  box-shadow: 0 1px 3px rgba(28, 43, 70, 0.05);
+}
+.tct-enroll > .card > .card-inner { padding: 8px 28px 28px; }
+
+/* ─── Step tabs ─────────────────────────────────────────────────────────── */
+.tct-enroll .nav-tabs { margin-top: 0 !important; gap: 4px 28px; border-bottom: 1px solid #e5e9f2; flex-wrap: wrap; }
+.tct-enroll .nav-tabs .nav-item { padding: 0; margin: 0; }
+.tct-enroll .nav-tabs .nav-link {
+  display: inline-flex; align-items: center; gap: 8px; padding: 16px 2px 14px; cursor: pointer;
+  border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px;
+  font-size: 14.5px; font-weight: 600; color: #526484; transition: color .15s ease, border-color .15s ease;
+}
+.tct-enroll .nav-tabs .nav-link::after { display: none; }
+.tct-enroll .nav-tabs .nav-link .icon {
+  display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; margin: 0;
+  border-radius: 8px; font-size: 16px; color: #8094ae; background: #f5f6fa; transition: color .15s ease, background .15s ease;
+}
+.tct-enroll .nav-tabs .nav-link:hover { color: #1c2b46; }
+.tct-enroll .nav-tabs .nav-link.active { color: #6a35e8; border-bottom-color: #854fff; background: transparent; }
+.tct-enroll .nav-tabs .nav-link.active .icon { color: #fff; background: #854fff; }
+.tct-enroll .nav-tabs .nav-link.disabled { color: #b7c2d0; }
+.tct-enroll .nav-tabs .nav-link.disabled .icon { color: #c1c9d6; background: #f7f8fa; }
+
+/* ─── Labels and inputs ─────────────────────────────────────────────────── */
+.tct-enroll .tab-content .form-group { margin-bottom: 0; }
+.tct-enroll .tab-content .form-label { margin-bottom: 8px; font-size: 13.5px; font-weight: 600; line-height: 1.45; color: #364a63; }
+.tct-enroll .tab-content .form-label .text-danger { color: #e85347 !important; }
+.tct-enroll .tab-content .form-control {
+  height: 42px; padding: 0 14px; border: 1px solid #dbdfea; border-radius: 10px;
+  font-size: 14px; color: #1c2b46; background-color: #fff; box-shadow: none;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.tct-enroll .tab-content .form-control::placeholder { color: #98a4b6; }
+.tct-enroll .tab-content .form-control:hover { border-color: #c5cbe0; }
+.tct-enroll .tab-content .form-control:focus { border-color: #854fff; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.14); outline: none; }
+.tct-enroll .tab-content .react-datepicker-wrapper { display: block; width: 100%; }
+.tct-enroll .tab-content .date-picker,
+.tct-enroll .customer-connected-datetime-picker .form-control {
+  padding-right: 40px;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238094ae' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5' width='18' height='16' rx='2'/%3E%3Cpath d='M16 3v4M8 3v4M3 11h18'/%3E%3C/svg%3E") no-repeat right 14px center;
+}
+.tct-enroll .tab-content .invalid { display: block; margin-top: 6px; font-size: 12px !important; font-style: normal !important; color: #e85347 !important; }
+
+/* react-select (RSelect) */
+.tct-enroll .tab-content .react-select__control {
+  min-height: 42px; border: 1px solid #dbdfea; border-radius: 10px; box-shadow: none; transition: border-color .15s ease, box-shadow .15s ease;
+}
+.tct-enroll .tab-content .react-select__control:hover { border-color: #c5cbe0; }
+.tct-enroll .tab-content .react-select__control--is-focused { border-color: #854fff !important; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.14) !important; }
+.tct-enroll .tab-content .react-select__value-container { padding: 0 12px; }
+.tct-enroll .tab-content .react-select__placeholder { font-size: 14px; color: #98a4b6; }
+.tct-enroll .tab-content .react-select__single-value { font-size: 14px; color: #1c2b46; }
+.tct-enroll .tab-content .react-select__indicator-separator { display: none; }
+.tct-enroll .tab-content .react-select__indicator { color: #8094ae; }
+.tct-enroll .tab-content .react-select__menu { z-index: 20; margin-top: 6px; border: 1px solid #e5e9f2; border-radius: 10px; box-shadow: 0 12px 28px rgba(28, 43, 70, 0.14); overflow: hidden; }
+.tct-enroll .tab-content .react-select__option { font-size: 14px; }
+.tct-enroll .tab-content .react-select__option--is-focused { background: #f5f1ff; color: #6a35e8; }
+.tct-enroll .tab-content .react-select__option--is-selected { background: #854fff; color: #fff; }
+.tct-enroll .tab-content .react-select__input input { box-shadow: none !important; border: 0 !important; height: auto !important; }
+
+/* Phone: flag + number in one field */
+.tct-enroll .tab-content .PhoneInput {
+  display: flex; align-items: center; height: 42px; padding: 0 0 0 12px; border: 1px solid #dbdfea; border-radius: 10px;
+  background: #fff; transition: border-color .15s ease, box-shadow .15s ease;
+}
+.tct-enroll .tab-content .PhoneInput:hover { border-color: #c5cbe0; }
+.tct-enroll .tab-content .PhoneInput:focus-within { border-color: #854fff; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.14); }
+.tct-enroll .tab-content .PhoneInputCountry { flex-shrink: 0; margin-right: 0; padding-right: 10px; border-right: 1px solid #e5e9f2; height: 24px; }
+.tct-enroll .tab-content .PhoneInputCountryIcon { width: 22px; height: 15px; }
+.tct-enroll .tab-content .PhoneInputInput {
+  flex: 1 1 auto; min-width: 0; height: 100%; padding: 0 12px; border: 0 !important; outline: none; box-shadow: none !important;
+  font-size: 14px; color: #1c2b46; background: transparent;
+}
+
+/* ─── Additional Information: radio groups ──────────────────────────────── */
+.tct-enroll .tab-content .d-flex.flex-wrap.gap-3 { display: flex; flex-wrap: wrap; gap: 8px; }
+.tct-enroll .tab-content .form-check {
+  position: relative; display: inline-flex; align-items: center; gap: 8px; margin: 0 !important; padding: 7px 12px 7px 10px;
+  border: 1px solid #e5e9f2; border-radius: 9px; background: #fff; cursor: pointer; transition: border-color .15s ease, background .15s ease;
+}
+.tct-enroll .tab-content .form-check:hover { border-color: #c5b3ff; background: #faf8ff; }
+.tct-enroll .tab-content .form-check:has(.form-check-input:checked) { border-color: #854fff; background: #f5f1ff; }
+.tct-enroll .tab-content .form-check-input {
+  -webkit-appearance: none; appearance: none; position: static !important; flex-shrink: 0;
+  width: 16px !important; height: 16px !important; min-width: 0; margin: 0 !important; padding: 0;
+  border: 1.5px solid #b7c2d0; border-radius: 50%; background: #fff; cursor: pointer; transition: border-color .15s ease, box-shadow .15s ease;
+}
+.tct-enroll .tab-content .form-check-input:checked { border-color: #854fff; box-shadow: inset 0 0 0 3.5px #fff; background: #854fff; }
+.tct-enroll .tab-content .form-check-input:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.2); }
+.tct-enroll .tab-content .form-check-input:checked:focus-visible { box-shadow: inset 0 0 0 3.5px #fff, 0 0 0 3px rgba(133, 79, 255, 0.2); }
+.tct-enroll .tab-content .form-check-label {
+  position: static; margin: 0; padding: 0; font-size: 13.5px; font-weight: 500; line-height: 1.3; color: #364a63; cursor: pointer;
+}
+.tct-enroll .tab-content .form-check-label::before,
+.tct-enroll .tab-content .form-check-label::after { display: none !important; }
+.tct-enroll .tab-content .form-check:has(.form-check-input:checked) .form-check-label { color: #6a35e8; font-weight: 600; }
+
+/* ─── Upload areas ──────────────────────────────────────────────────────── */
+.tct-enroll .tab-content .dropzone.upload-zone {
+  display: flex; align-items: center; justify-content: center; min-height: 128px; padding: 0;
+  border: 1.5px dashed #cdbdff; border-radius: 12px; background: #fcfbff; cursor: pointer;
+  transition: border-color .15s ease, background .15s ease;
+}
+.tct-enroll .tab-content .dropzone.upload-zone:hover,
+.tct-enroll .tab-content .dropzone.upload-zone:focus-within { border-color: #854fff; background: #f8f5ff; }
+.tct-enroll .tab-content .dropzone .dz-message { display: flex; flex-direction: column; align-items: center; gap: 4px; margin: 0; }
+.tct-enroll .tab-content .tct-en-dz-icon { font-size: 28px; line-height: 1; color: #854fff; }
+.tct-enroll .tab-content .dropzone .dz-message-text { font-size: 13.5px; color: #526484; }
+.tct-enroll .tab-content .dropzone .dz-message-text b { font-weight: 600; color: #6a35e8; }
+.tct-enroll .tab-content .tct-en-dz-hint { font-size: 12px; color: #8094ae; }
+.tct-enroll .tab-content .dropzone .btn-danger { border-radius: 8px; }
+
+/* ─── Primary buttons (Next / Save / Add) ──────────────────────────────── */
+.tct-enroll .tab-content .btn-primary,
+.tct-enroll .card-inner > .mt-4 > .btn-primary {
+  position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 12px;
+  height: 46px; padding: 0 8px 0 22px; overflow: hidden;
+  border: 0; border-radius: 12px; font-size: 14.5px; font-weight: 600; letter-spacing: 0.01em; color: #fff;
+  background: linear-gradient(135deg, #9a6bff 0%, #854fff 45%, #6a35e8 100%);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset, 0 6px 16px rgba(106, 53, 232, 0.28);
+  transition: box-shadow .2s ease, transform .2s ease, filter .2s ease;
+}
+/* Arrow / plus icon sits in its own soft chip */
+.tct-enroll .tab-content .btn-primary .icon,
+.tct-enroll .card-inner > .mt-4 > .btn-primary .icon {
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+  width: 30px; height: 30px; margin: 0; border-radius: 9px; font-size: 16px;
+  background: rgba(255, 255, 255, 0.18); transition: transform .2s ease, background .2s ease;
+}
+/* Soft sheen that sweeps across on hover */
+.tct-enroll .tab-content .btn-primary::after,
+.tct-enroll .card-inner > .mt-4 > .btn-primary::after {
+  content: ""; position: absolute; top: 0; left: -60%; width: 40%; height: 100%; pointer-events: none;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+  transform: skewX(-20deg); transition: left .5s ease;
+}
+.tct-enroll .tab-content .btn-primary:hover:not(:disabled),
+.tct-enroll .card-inner > .mt-4 > .btn-primary:hover:not(:disabled) {
+  color: #fff; transform: translateY(-1px); filter: saturate(1.08);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset, 0 10px 22px rgba(106, 53, 232, 0.36);
+}
+.tct-enroll .tab-content .btn-primary:hover:not(:disabled)::after,
+.tct-enroll .card-inner > .mt-4 > .btn-primary:hover:not(:disabled)::after { left: 120%; }
+.tct-enroll .tab-content .btn-primary:hover:not(:disabled) .icon,
+.tct-enroll .card-inner > .mt-4 > .btn-primary:hover:not(:disabled) .icon { background: rgba(255, 255, 255, 0.28); }
+.tct-enroll .tab-content .btn-primary:hover:not(:disabled) .ni-arrow-right,
+.tct-enroll .card-inner > .mt-4 > .btn-primary:hover:not(:disabled) .ni-arrow-right { transform: translateX(3px); }
+.tct-enroll .tab-content .btn-primary:active:not(:disabled),
+.tct-enroll .card-inner > .mt-4 > .btn-primary:active:not(:disabled) { transform: translateY(0); box-shadow: 0 4px 10px rgba(106, 53, 232, 0.28); }
+.tct-enroll .tab-content .btn-primary:focus-visible,
+.tct-enroll .card-inner > .mt-4 > .btn-primary:focus-visible {
+  outline: none; box-shadow: 0 0 0 3px #fff, 0 0 0 5px rgba(133, 79, 255, 0.55), 0 6px 16px rgba(106, 53, 232, 0.28);
+}
+.tct-enroll .tab-content .btn-primary:disabled,
+.tct-enroll .card-inner > .mt-4 > .btn-primary:disabled { opacity: .55; box-shadow: none; cursor: not-allowed; }
+
+/* Step footer: divider, Next button on the right (wizard convention) */
+.tct-enroll .tab-pane form > .mt-4,
+.tct-enroll .tab-pane > .row > .col-md-12:last-child {
+  display: flex; justify-content: flex-end; margin-top: 8px; padding-top: 20px; border-top: 1px solid #eef0f5;
+}
+
+/* Add (Enrolled Courses header): compact version, plus icon first */
+.tct-enroll .tab-pane .nk-block-head .btn-primary { height: 42px; gap: 10px; padding: 0 20px 0 7px; font-size: 14px; }
+.tct-enroll .tab-pane .nk-block-head .btn-primary .icon { width: 28px; height: 28px; font-size: 15px; }
+.tct-enroll .tab-pane .nk-block-head .btn-primary:hover:not(:disabled) .icon { transform: rotate(90deg); }
+
+/* ─── Enroll New Course step: Enrolled Courses card ──────────────────── */
+.tct-enroll .tab-pane .nk-block-head { padding-bottom: 14px; }
+.tct-enroll .tab-pane .nk-block-head .nk-block-between { align-items: center; }
+.tct-enroll .tab-pane .nk-block-head .nk-block-title { font-size: 1.1rem; font-weight: 700; color: #1c2b46; }
+.tct-enroll .tab-pane .nk-block-head li { list-style: none; }
+
+.tct-enroll .tab-pane .nk-tb-list.is-separate {
+  margin-bottom: 0 !important; border: 1px solid #e5e9f2; border-radius: 12px 12px 0 0; border-spacing: 0; overflow: hidden;
+}
+.tct-enroll .tab-pane .nk-tb-list.is-separate .nk-tb-item { box-shadow: none; }
+.tct-enroll .tab-pane .nk-tb-list.is-separate .nk-tb-col { padding: 13px 18px; border-top: 1px solid #eef0f5; font-size: 14px; color: #526484; background: #fff; }
+.tct-enroll .tab-pane .nk-tb-list.is-separate .nk-tb-head .nk-tb-col { padding-top: 12px; padding-bottom: 12px; border-top: 0; background: #f5f6fa; }
+.tct-enroll .tab-pane .nk-tb-list.is-separate .nk-tb-head .sub-text {
+  font-size: 11.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #6b7a90; white-space: nowrap;
+}
+.tct-enroll .tab-pane .nk-tb-list.is-separate .nk-tb-item:not(.nk-tb-head):hover .nk-tb-col { background: #faf9ff; }
+.tct-enroll .tab-pane .nk-tb-list.is-separate .icon.ni-edit,
+.tct-enroll .tab-pane .nk-tb-list.is-separate .icon.ni-trash {
+  display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 8px;
+  font-size: 16px; color: #8094ae; cursor: pointer; transition: color .15s ease, background .15s ease;
+}
+.tct-enroll .tab-pane .nk-tb-list.is-separate .icon.ni-edit:hover { color: #6a35e8; background: #f1ecff; }
+.tct-enroll .tab-pane .nk-tb-list.is-separate .icon.ni-trash:hover { color: #e85347; background: #fdecea; }
+/* When there are rows, round the bottom of the table instead of leaving it open */
+.tct-enroll .tab-pane .nk-tb-list.is-separate:not(:has(+ .card)) { border-radius: 12px; }
+
+/* Empty state ("No data found") */
+.tct-enroll .tab-pane .nk-tb-list + .card {
+  margin: 0; border: 1px solid #e5e9f2; border-top: 0; border-radius: 0 0 12px 12px; box-shadow: none; background: #fff;
+}
+.tct-enroll .tab-pane .nk-tb-list + .card .card-inner { padding: 34px 16px; }
+.tct-enroll .tab-pane .nk-tb-list + .card .text-center { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.tct-enroll .tab-pane .nk-tb-list + .card .text-center::before {
+  content: "\e971"; font-family: "Nioicon"; display: inline-flex; align-items: center; justify-content: center;
+  width: 48px; height: 48px; border-radius: 14px; font-size: 22px; color: #854fff; background: #f1ecff;
+}
+.tct-enroll .tab-pane .nk-tb-list + .card .text-silent { font-size: 14px; font-weight: 500; color: #6b7a90; }
+
+/* ─── Enroll New Course popup (portal) ──────────────────────────────────── */
+body:has(.tct-enroll) .modal-dialog.modal-dialog-centered.modal-lg { max-width: 760px; }
+body:has(.tct-enroll) .modal-dialog.modal-dialog-centered.modal-lg .modal-content {
+  border: 1px solid #e5e9f2; border-radius: 16px; overflow: visible;
+  box-shadow: 0 24px 64px rgba(28, 43, 70, 0.24), 0 2px 6px rgba(28, 43, 70, 0.06);
+}
+body:has(.tct-enroll) .modal-dialog.modal-dialog-centered.modal-lg .modal-body { position: relative; padding: 24px 26px 24px; }
+body:has(.tct-enroll) .modal-dialog.modal-dialog-centered.modal-lg .modal-body > .close {
+  position: absolute; top: 16px; right: 16px; display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 10px; color: #8094ae; opacity: 1; transition: background .15s ease, color .15s ease;
+}
+body:has(.tct-enroll) .modal-dialog.modal-dialog-centered.modal-lg .modal-body > .close:hover { background: #f1f3f8; color: #1c2b46; }
+body:has(.tct-enroll) .modal-dialog.modal-dialog-centered.modal-lg .modal-body > .p-2 { padding: 0 !important; }
+body:has(.tct-enroll) .modal-dialog.modal-dialog-centered.modal-lg .title {
+  margin: 0 48px 0 0; padding-bottom: 16px; border-bottom: 1px solid #eef0f5; font-size: 1.2rem; font-weight: 700; color: #1c2b46;
+}
+body:has(.tct-enroll) .modal-dialog.modal-dialog-centered.modal-lg .title + .mt-4 { margin-top: 20px !important; }
+/* Flatten the nested row/col-12 wrappers so every field shares one grid gutter */
+body:has(.tct-enroll) .modal-dialog.modal-dialog-centered.modal-lg form > .row { row-gap: 16px; }
+body:has(.tct-enroll) .modal-dialog.modal-dialog-centered.modal-lg form > .row > .col-md-12 > .row.col-md-12 { margin: 0 -10px; padding: 0; row-gap: 16px; }
+body:has(.tct-enroll) .modal-dialog.modal-dialog-centered.modal-lg form .row.col-md-12 > [class*="col-md-"] { padding: 0 10px; }
+body:has(.tct-enroll) .modal-dialog.modal-dialog-centered.modal-lg .form-group { margin-bottom: 0; }
+body:has(.tct-enroll) .modal-dialog.modal-dialog-centered.modal-lg .form-label { margin-bottom: 8px; font-size: 13.5px; font-weight: 600; line-height: 1.45; color: #364a63; }
+body:has(.tct-enroll) .modal-dialog.modal-dialog-centered.modal-lg .form-label .text-danger { color: #e85347 !important; }
+body:has(.tct-enroll) .modal-dialog.modal-dialog-centered.modal-lg .form-control {
+  height: 42px; padding: 0 14px; border: 1px solid #dbdfea; border-radius: 10px; font-size: 14px; color: #1c2b46; box-shadow: none;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+body:has(.tct-enroll) .modal-dialog.modal-dialog-centered.modal-lg .form-control::placeholder { color: #98a4b6; }
+body:has(.tct-enroll) .modal-dialog.modal-dialog-centered.modal-lg .form-control:focus { border-color: #854fff; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.14); outline: none; }
+body:has(.tct-enroll) .modal-dialog.modal-dialog-centered.modal-lg .form-control:disabled { color: #8094ae; background: #f5f6fa; border-color: #e5e9f2; }
+body:has(.tct-enroll) .modal-dialog.modal-dialog-centered.modal-lg .react-select__control {
+  min-height: 42px; border: 1px solid #dbdfea; border-radius: 10px; box-shadow: none;
+}
+body:has(.tct-enroll) .modal-dialog.modal-dialog-centered.modal-lg .react-select__control--is-focused { border-color: #854fff !important; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.14) !important; }
+body:has(.tct-enroll) .modal-dialog.modal-dialog-centered.modal-lg .react-select__value-container { padding: 0 12px; }
+body:has(.tct-enroll) .modal-dialog.modal-dialog-centered.modal-lg .react-select__placeholder { font-size: 14px; color: #98a4b6; }
+body:has(.tct-enroll) .modal-dialog.modal-dialog-centered.modal-lg .react-select__indicator-separator { display: none; }
+body:has(.tct-enroll) .modal-dialog.modal-dialog-centered.modal-lg .react-select__menu { z-index: 30; margin-top: 6px; border: 1px solid #e5e9f2; border-radius: 10px; box-shadow: 0 12px 28px rgba(28, 43, 70, 0.14); overflow: hidden; }
+body:has(.tct-enroll) .modal-dialog.modal-dialog-centered.modal-lg .react-select__option--is-focused { background: #f5f1ff; color: #6a35e8; }
+body:has(.tct-enroll) .modal-dialog.modal-dialog-centered.modal-lg .react-select__option--is-selected { background: #854fff; color: #fff; }
+body:has(.tct-enroll) .modal-dialog.modal-dialog-centered.modal-lg .react-select__input input { box-shadow: none !important; border: 0 !important; height: auto !important; }
+body:has(.tct-enroll) .modal-dialog.modal-dialog-centered.modal-lg .invalid { display: block; margin-top: 6px; font-size: 12px !important; font-style: normal !important; }
+/* Footer row with the Enroll Course button */
+body:has(.tct-enroll) .modal-dialog.modal-dialog-centered.modal-lg form > .row > :last-child {
+  display: flex; justify-content: flex-end; margin-top: 6px; padding-top: 18px; border-top: 1px solid #eef0f5;
+}
+body:has(.tct-enroll) .modal-dialog.modal-dialog-centered.modal-lg .btn-primary {
+  display: inline-flex; align-items: center; gap: 6px; height: 42px; padding: 0 22px; border-color: #854fff; border-radius: 10px;
+  background: #854fff; font-weight: 600; box-shadow: 0 4px 12px rgba(133, 79, 255, 0.22);
+}
+body:has(.tct-enroll) .modal-dialog.modal-dialog-centered.modal-lg .btn-primary:hover:not(:disabled) { background: #6a35e8; border-color: #6a35e8; }
+body:has(.tct-enroll) .modal-dialog.modal-dialog-centered.modal-lg .btn-primary:focus-visible { box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.3); }
+
+/* ─── Responsive ────────────────────────────────────────────────────────── */
+@media (max-width: 767.98px) {
+  .tct-enroll > .card > .card-inner { padding: 4px 16px 20px; }
+  .tct-enroll .nav-tabs { gap: 0 18px; }
+  .tct-enroll .nav-tabs .nav-link { padding: 12px 0 10px; font-size: 13.5px; }
+  .tct-enroll .tab-pane .nk-tb-list.is-separate { display: block; overflow-x: auto; }
+  body:has(.tct-enroll) .modal-dialog.modal-dialog-centered.modal-lg .modal-body { padding: 18px 16px; }
+}
+@media (max-width: 575.98px) {
+  .tct-enroll .nk-block-head .nk-block-title { font-size: 1.35rem; }
+  .tct-enroll .nav-tabs .nav-link span { font-size: 13px; }
+  body:has(.tct-enroll) .modal-dialog.modal-dialog-centered.modal-lg { margin: 8px; }
+  body:has(.tct-enroll) .modal-dialog.modal-dialog-centered.modal-lg form > .row > :last-child .btn-primary { width: 100%; justify-content: center; }
+}
+
+/* Buttons without an icon (e.g. "Saving..." state) keep even padding */
+.tct-enroll .tab-content .btn-primary:not(:has(.icon)),
+.tct-enroll .card-inner > .mt-4 > .btn-primary:not(:has(.icon)) { padding: 0 22px; }

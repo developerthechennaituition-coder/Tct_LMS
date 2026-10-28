@@ -1,0 +1,192 @@
+/* My Calendar page. Every rule is under .my-calendar (this page's wrapper). */
+
+.my-calendar .mc-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.my-calendar .mc-title { margin: 0; font-size: 1.6rem; font-weight: 700; color: #1c2b46; }
+.my-calendar .mc-sub { margin: 4px 0 0; font-size: 14px; color: #6b7a90; }
+
+/* Page tabs */
+.my-calendar .mc-tabs { display: flex; gap: 8px; margin-bottom: 14px; border-bottom: 1px solid #e5e9f2; }
+.my-calendar .mc-tabs button {
+  display: inline-flex; align-items: center; gap: 8px; margin-bottom: -1px; padding: 10px 14px;
+  border: 0; border-bottom: 2px solid transparent; background: transparent;
+  font-size: 14.5px; font-weight: 600; color: #526484; cursor: pointer; transition: color .15s ease, border-color .15s ease;
+}
+.my-calendar .mc-tabs button .icon { font-size: 17px; }
+.my-calendar .mc-tabs button:hover { color: #1c2b46; }
+.my-calendar .mc-tabs button.is-active { color: #6a35e8; border-bottom-color: #854fff; }
+.my-calendar .mc-tabs button:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.2); border-radius: 8px 8px 0 0; }
+
+/* Calendar panel */
+.my-calendar .mc-panel { padding: 14px 16px 16px; border: 1px solid #e5e9f2; border-radius: 14px; background: #fff; box-shadow: 0 1px 3px rgba(28, 43, 70, 0.05); }
+.my-calendar .mc-cal-bar { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 18px; margin-bottom: 10px; font-size: 13px; color: #526484; }
+.my-calendar .mc-legend { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; }
+.my-calendar .mc-legend-dot { width: 12px; height: 12px; border-radius: 3px; background: #09c2de; }
+.my-calendar .mc-cal-status { display: inline-flex; align-items: center; gap: 6px; color: #6b7a90; }
+.my-calendar .mc-cal-status.is-error { color: #e85347; }
+
+/* Tasks layout */
+.my-calendar .mc-tasks { display: grid; grid-template-columns: minmax(320px, 420px) minmax(0, 1fr); gap: 16px; align-items: start; }
+.my-calendar .mc-card { border: 1px solid #e5e9f2; border-radius: 14px; background: #fff; box-shadow: 0 1px 3px rgba(28, 43, 70, 0.05); }
+.my-calendar .mc-assign { padding: 18px; }
+/* Tasks → Critical: the list takes the full width; Assign a task is only hidden (its form keeps its input). */
+.my-calendar .mc-tasks.is-critical { grid-template-columns: minmax(0, 1fr); }
+.my-calendar .mc-tasks.is-critical .mc-assign { display: none; }
+.my-calendar .mc-critical-bar { display: flex; align-items: center; padding: 12px 14px 0; }
+.my-calendar .mc-critical-bar .btn { display: inline-flex; align-items: center; gap: 6px; }
+.my-calendar .mc-critical-group { display: flex; flex-direction: column; gap: 10px; }
+.my-calendar .mc-critical-group + .mc-critical-group { margin-top: 8px; }
+.my-calendar .mc-critical-head { display: flex; align-items: center; gap: 8px; margin: 4px 0 0; font-size: 13.5px; font-weight: 700; color: #1c2b46; }
+.my-calendar .mc-card-head { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px; }
+.my-calendar .mc-card-icon {
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 40px; height: 40px;
+  border-radius: 11px; font-size: 19px; color: #854fff; background: #f1ecff;
+}
+.my-calendar .mc-card-title { margin: 0; font-size: 1.05rem; font-weight: 700; color: #1c2b46; }
+.my-calendar .mc-card-sub { margin: 2px 0 0; font-size: 12.5px; color: #8094ae; }
+
+.my-calendar .mc-form { display: flex; flex-direction: column; gap: 14px; }
+.my-calendar .mc-field { display: flex; flex-direction: column; min-width: 0; }
+.my-calendar .mc-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.my-calendar .form-label { margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #364a63; }
+.my-calendar .form-control { border: 1px solid #dbdfea; border-radius: 10px; font-size: 14px; color: #1c2b46; box-shadow: none; }
+.my-calendar input.form-control,
+.my-calendar select.form-control { height: 40px; }
+.my-calendar textarea.form-control { min-height: 96px; padding-top: 10px; resize: vertical; }
+.my-calendar .form-control:focus { border-color: #854fff; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.14); }
+.my-calendar .mc-error { margin-top: 5px; font-size: 12px; color: #e85347; }
+
+.my-calendar .mc-select .react-select__control { min-height: 40px; border: 1px solid #dbdfea; border-radius: 10px; box-shadow: none; }
+.my-calendar .mc-select .react-select__control--is-focused { border-color: #854fff; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.14); }
+.my-calendar .mc-select .react-select__indicator-separator { display: none; }
+.my-calendar .mc-select .react-select__menu { z-index: 30; border: 1px solid #e5e9f2; border-radius: 10px; box-shadow: 0 12px 28px rgba(28, 43, 70, 0.14); overflow: hidden; }
+.my-calendar .mc-select .react-select__option--is-focused { background: #f5f1ff; }
+.my-calendar .mc-select .react-select__option--is-selected { background: #854fff; }
+.my-calendar .mc-select .react-select__option--is-selected .mc-opt-roles,
+.my-calendar .mc-select .react-select__option--is-selected .mc-opt-meta { color: #efe9ff; }
+.my-calendar .mc-select .react-select__input input { box-shadow: none !important; }
+.my-calendar .mc-opt { display: flex; flex-direction: column; line-height: 1.35; }
+.my-calendar .mc-opt-name { font-weight: 600; }
+.my-calendar .mc-opt-roles { font-size: 12px; color: #6a35e8; }
+.my-calendar .mc-opt-meta { font-size: 11.5px; color: #8094ae; }
+.my-calendar .mc-opt-inline-role { font-size: 12.5px; color: #8094ae; }
+
+.my-calendar .mc-form-actions { display: flex; justify-content: flex-end; gap: 10px; }
+.my-calendar .btn { display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 16px; border-radius: 10px; font-weight: 600; }
+.my-calendar .btn-primary { border-color: #854fff; background: #854fff; }
+.my-calendar .btn-primary:hover:not(:disabled) { border-color: #6a35e8; background: #6a35e8; }
+.my-calendar .btn-light { border: 1px solid #dbdfea; background: #fff; color: #526484; }
+.my-calendar .btn-sm { height: 30px; padding: 0 10px; font-size: 12.5px; }
+
+.my-calendar .mc-review dl { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 8px 12px; margin: 0 0 16px; padding: 14px; border: 1px solid #ebe4ff; border-radius: 12px; background: #faf8ff; }
+.my-calendar .mc-review dt { font-size: 12px; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; color: #8094ae; }
+.my-calendar .mc-review dd { margin: 0; font-size: 14px; color: #1c2b46; overflow-wrap: anywhere; }
+.my-calendar .mc-review-desc { white-space: pre-wrap; }
+
+/* Task list */
+.my-calendar .mc-list-tabs { display: flex; gap: 4px; padding: 8px 10px 0; border-bottom: 1px solid #eef0f5; }
+.my-calendar .mc-list-tabs button {
+  display: inline-flex; align-items: center; gap: 6px; margin-bottom: -1px; padding: 10px 12px;
+  border: 0; border-bottom: 2px solid transparent; background: transparent; font-size: 13.5px; font-weight: 600; color: #526484; cursor: pointer;
+}
+.my-calendar .mc-list-tabs button.is-active { color: #6a35e8; border-bottom-color: #854fff; }
+.my-calendar .mc-count { min-width: 22px; padding: 1px 7px; border-radius: 999px; font-size: 11.5px; font-weight: 700; color: #fff; background: #854fff; text-align: center; }
+.my-calendar .mc-count.is-muted { color: #6a35e8; background: #f1ecff; }
+.my-calendar .mc-task-list { display: flex; flex-direction: column; gap: 10px; padding: 14px; max-height: 70vh; overflow-y: auto; }
+.my-calendar .mc-task { padding: 14px 16px; border: 1px solid #e5e9f2; border-radius: 12px; background: #fff; transition: border-color .2s ease, box-shadow .2s ease; }
+.my-calendar .mc-task-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.my-calendar .mc-task-title { margin: 0; font-size: 14.5px; font-weight: 700; color: #1c2b46; overflow-wrap: anywhere; }
+.my-calendar .mc-task-desc { margin: 6px 0 10px; font-size: 13.5px; color: #526484; white-space: pre-wrap; overflow-wrap: anywhere; }
+.my-calendar .mc-task-meta { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12.5px; color: #6b7a90; }
+.my-calendar .mc-task-meta .icon { margin-right: 3px; }
+.my-calendar .mc-badge { flex-shrink: 0; padding: 3px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 700; }
+.my-calendar .mc-badge.is-pending { color: #b46d00; background: #fff4e0; }
+.my-calendar .mc-badge.is-overdue { color: #c4382d; background: #fdecea; }
+.my-calendar .mc-badge.is-done { color: #0b8f6c; background: #e3f8f1; }
+.my-calendar .mc-badge.is-short-followup { color: #c4382d; background: #fdecea; }
+.my-calendar .mc-badge.is-long-followup { color: #6a35e8; background: #f0eaff; }
+.my-calendar .mc-badge.is-dday { color: #4b1fb8; background: #f1ecff; border: 1px dashed #854fff; }
+.my-calendar .mc-demo-badges { display: inline-flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+.my-calendar .mc-priority { padding: 0 8px; border-radius: 6px; font-weight: 600; }
+.my-calendar .mc-priority.is-high { color: #c4382d; background: #fdecea; }
+.my-calendar .mc-priority.is-medium { color: #b46d00; background: #fff4e0; }
+.my-calendar .mc-priority.is-low { color: #526484; background: #f1f3f8; }
+.my-calendar .mc-task-actions { display: flex; align-items: center; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid #f1f3f8; }
+.my-calendar .mc-task-actions .form-control { width: 160px; height: 36px; }
+.my-calendar .mc-task-actions .btn { height: 36px; }
+
+.my-calendar .mc-state {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 32px 16px;
+  text-align: center; font-size: 14px; color: #6b7a90;
+}
+.my-calendar .mc-state > .icon { font-size: 24px; color: #854fff; }
+.my-calendar .mc-state.is-error,
+.my-calendar .mc-state.is-error > .icon { color: #e85347; }
+.my-calendar > .nk-block > .mc-state { border: 1px solid #e5e9f2; border-radius: 14px; background: #fff; }
+
+@media (max-width: 991.98px) {
+  .my-calendar .mc-tasks { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 575.98px) {
+  .my-calendar .mc-field-row { grid-template-columns: minmax(0, 1fr); }
+  .my-calendar .mc-panel { padding: 10px; }
+  .my-calendar .mc-review dl { grid-template-columns: minmax(0, 1fr); }
+  .my-calendar .mc-task-actions { flex-wrap: wrap; }
+  .my-calendar .mc-task-actions .form-control { flex: 1 1 auto; width: auto; }
+}
+
+/* ─── Demo status workflow ─────────────────────────────────────────────── */
+.my-calendar .mc-filter { display: inline-flex; align-items: center; gap: 8px; margin-right: 6px; }
+.my-calendar .mc-filter label { margin: 0; font-size: 13px; font-weight: 600; color: #364a63; white-space: nowrap; }
+.my-calendar .mc-filter .form-control { width: 260px; max-width: 60vw; height: 36px; padding: 0 10px; font-size: 13.5px; }
+.my-calendar .mc-legend-dot.is-followup { background: #fff1d6; border: 1px solid #f0a020; }
+/* Follow-up windows: amber bars, distinct from the cyan demo classes */
+.my-calendar .fc .mc-followup-event,
+.my-calendar .fc .mc-followup-event.fc-event { background: #fff1d6 !important; border: 1px solid #f0a020 !important; color: #7a4a00 !important; }
+.my-calendar .fc .mc-followup-event .tct-followup-bar { padding: 1px 6px; font-size: 11.5px; font-weight: 600; color: #7a4a00; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Demo Date Reminder (D-N) markers: dashed purple, distinct from demos (cyan) and reminders (amber) */
+.my-calendar .mc-filter-dday .form-control { width: 190px; }
+.my-calendar .mc-legends { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 6px 14px; }
+.my-calendar .mc-legend-dot.is-dday { background: #f1ecff; border: 1px dashed #854fff; }
+.my-calendar .mc-legend-dot.is-class { background: #e3f8f1; border: 1px solid #0b8f6c; }
+.my-calendar .fc .mc-class-event,
+.my-calendar .fc .mc-class-event.fc-event { background: #e3f8f1 !important; border: 1px solid #0b8f6c !important; color: #0b5e47 !important; }
+.my-calendar .fc .mc-dday-event,
+.my-calendar .fc .mc-dday-event.fc-event { background: #f1ecff !important; border: 1px dashed #854fff !important; color: #4b1fb8 !important; }
+.my-calendar .fc .mc-dday-event .tct-followup-bar { padding: 1px 6px; font-size: 11.5px; font-weight: 600; color: #4b1fb8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Status modal (renders in a portal; scoped by its own class) */
+.mc-status-modal .modal-content { border: 1px solid #e5e9f2; border-radius: 16px; overflow: hidden; box-shadow: 0 24px 64px rgba(28, 43, 70, 0.24); }
+.mc-status-modal .mc-sm-head { display: flex; align-items: center; gap: 12px; padding: 18px 20px 14px; border-bottom: 1px solid #eef0f5; background: linear-gradient(180deg, #faf8ff 0%, #fff 100%); }
+.mc-status-modal .mc-sm-icon { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 40px; height: 40px; border-radius: 11px; font-size: 19px; color: #854fff; background: #f1ecff; }
+.mc-status-modal .mc-sm-head-text { flex: 1 1 auto; min-width: 0; }
+.mc-status-modal .mc-sm-title { margin: 0; font-size: 1.1rem; font-weight: 700; color: #1c2b46; overflow-wrap: anywhere; }
+.mc-status-modal .mc-sm-sub { margin: 2px 0 0; font-size: 12.5px; color: #8094ae; }
+.mc-status-modal .mc-sm-close { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border: 0; border-radius: 9px; background: transparent; color: #8094ae; font-size: 17px; }
+.mc-status-modal .mc-sm-close:hover { background: #f1f3f8; color: #1c2b46; }
+.mc-status-modal .modal-body { padding: 16px 20px; }
+.mc-status-modal .mc-sm-details { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 6px 12px; margin: 0 0 14px; padding: 12px 14px; border: 1px solid #ebe4ff; border-radius: 12px; background: #faf8ff; }
+.mc-status-modal .mc-sm-details dt { font-size: 11.5px; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; color: #8094ae; }
+.mc-status-modal .mc-sm-details dd { margin: 0; font-size: 13.5px; color: #1c2b46; overflow-wrap: anywhere; }
+.mc-status-modal .mc-status-pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12.5px; font-weight: 600; color: #6a35e8; background: #f1ecff; }
+.mc-status-modal .mc-sm-note { margin: 0; font-size: 13px; color: #6b7a90; }
+.mc-status-modal .mc-sm-form { display: flex; flex-direction: column; gap: 12px; }
+.mc-status-modal .mc-field { display: flex; flex-direction: column; min-width: 0; }
+.mc-status-modal .mc-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.mc-status-modal .form-label { margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #364a63; }
+.mc-status-modal .form-control { height: 40px; border: 1px solid #dbdfea; border-radius: 10px; font-size: 14px; box-shadow: none; }
+.mc-status-modal .form-control:focus { border-color: #854fff; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.14); }
+.mc-status-modal .mc-error { margin-top: 5px; font-size: 12px; color: #e85347; }
+.mc-status-modal .mc-state { display: flex; align-items: center; gap: 8px; padding: 12px 0; font-size: 13.5px; color: #6b7a90; }
+.mc-status-modal .mc-state.is-error { color: #e85347; }
+.mc-status-modal .modal-footer { justify-content: flex-end; gap: 8px; padding: 12px 20px; border-top: 1px solid #eef0f5; background: #fafbfd; }
+.mc-status-modal .modal-footer > * { margin: 0; }
+.mc-status-modal .btn { display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 0 16px; border-radius: 10px; font-weight: 600; }
+.mc-status-modal .btn-primary { border-color: #854fff; background: #854fff; }
+.mc-status-modal .btn-primary:hover:not(:disabled) { border-color: #6a35e8; background: #6a35e8; }
+.mc-status-modal .btn-light { border: 1px solid #dbdfea; background: #fff; color: #526484; }
+@media (max-width: 575.98px) {
+  .my-calendar .mc-filter { width: 100%; }
+  .my-calendar .mc-filter .form-control { flex: 1 1 auto; width: auto; max-width: none; }
+  .mc-status-modal .mc-sm-details { grid-template-columns: minmax(0, 1fr); }
+  .mc-status-modal .mc-field-row { grid-template-columns: minmax(0, 1fr); }
+}
