@@ -168,38 +168,130 @@ public class ChatController : ControllerBase
         return Ok(response);
     }
 
+    // "Delete for everyone": only the message's sender. The row is kept (ID, conversation, timestamps) but its
+    // text is replaced by the placeholder and its attachments are deactivated (files stay in storage).
     [HttpPost("DeleteMessage")]
     public async Task<ActionResult> DeleteMessage(DeleteChatMessageRequest input)
     {
         if (input.MessageId <= 0) return BadRequest(new { succeeded = false, message = "A valid message ID is required." });
-        var callerId = User.Claims
-            .Where(c => c.Type.Equals("UserId", StringComparison.OrdinalIgnoreCase)
-                     || c.Type == ClaimTypes.NameIdentifier
-                     || c.Type.EndsWith("/nameidentifier", StringComparison.OrdinalIgnoreCase)
-                     || c.Type.Equals("sub", StringComparison.OrdinalIgnoreCase))
-            .Select(c => Guid.TryParse(c.Value, out var value) ? value : Guid.Empty)
-            .FirstOrDefault(value => value != Guid.Empty);
+        var callerId = GetCallerUserId();
         if (callerId == Guid.Empty || callerId != input.SenderId) return Forbid();
 
         var message = await _context.Messages.FirstOrDefaultAsync(m => m.MessageId == input.MessageId);
         if (message == null) return NotFound(new { succeeded = false, message = "Message was not found." });
         var conversation = await _context.Conversations.FirstOrDefaultAsync(c => c.ConversationId == message.ConversationId);
         if (conversation == null) return NotFound(new { succeeded = false, message = "Conversation was not found." });
-        var isParticipant = conversation.SenderId == callerId || conversation.ReceiverId == callerId ||
-            (conversation.GroupId.HasValue && await _context.GroupMembers.AnyAsync(g =>
-                g.GroupId == conversation.GroupId.Value && g.UserId == callerId && g.IsActive));
-        if (!isParticipant) return Forbid();
+        if (!await IsConversationParticipantAsync(conversation, callerId)) return Forbid();
+        if (!ChatMessageDeletionRules.CanDeleteForEveryone(conversation, callerId))
+            return StatusCode(StatusCodes.Status403Forbidden, new { succeeded = false, message = "Only the sender can delete this message for everyone." });
+        if (message.IsDeleted) return Ok(new { succeeded = true });
 
         message.IsDeleted = true;
+        message.MessageText = ChatMessageDeletionRules.DeletedPlaceholder;
         message.ModifiedDate = DateTime.UtcNow;
-        await _context.SaveChangesAsync();
-        var deleteMessageConnections = PushNotificationHub.GetConnectionIdsForUsers(new[] { callerId, input.ReceiverId });
-        if (deleteMessageConnections.Count > 0)
+
+        // Attachments are Documents referencing Messages.Id. A group send with several texts shares one Id,
+        // so leave them active while another undeleted message still uses it.
+        var attachmentStillReferenced = await _context.Messages.AnyAsync(m =>
+            m.Id == message.Id && m.MessageId != message.MessageId && !m.IsDeleted);
+        if (!attachmentStillReferenced)
         {
-            await _hubContext.Clients.Clients(deleteMessageConnections).SendAsync("ReceivePushMessage", "deletemessages",
-                new { SenderId = callerId, ReceiverId = input.ReceiverId });
+            var attachments = await _context.Documents.Where(d => d.ReferenceId == message.Id && d.IsActive).ToListAsync();
+            foreach (var attachment in attachments)
+            {
+                attachment.IsActive = false;
+                attachment.ModifiedBy = callerId;
+                attachment.ModifiedDate = DateTime.UtcNow;
+            }
         }
+        await _context.SaveChangesAsync();
+
+        await PushMessageDeletedAsync(await GetConversationParticipantIdsAsync(conversation), message, conversation, "everyone");
         return Ok(new { succeeded = true });
+    }
+
+    // "Delete for me": hides the message for the caller only; nothing else changes for other participants.
+    [HttpPost("DeleteMessageForMe")]
+    public async Task<ActionResult> DeleteMessageForMe(DeleteChatMessageRequest input)
+    {
+        if (input.MessageId <= 0) return BadRequest(new { succeeded = false, message = "A valid message ID is required." });
+        var callerId = GetCallerUserId();
+        if (callerId == Guid.Empty) return Forbid();
+
+        var message = await _context.Messages.AsNoTracking().FirstOrDefaultAsync(m => m.MessageId == input.MessageId);
+        if (message == null) return NotFound(new { succeeded = false, message = "Message was not found." });
+        var conversation = await _context.Conversations.AsNoTracking().FirstOrDefaultAsync(c => c.ConversationId == message.ConversationId);
+        if (conversation == null) return NotFound(new { succeeded = false, message = "Conversation was not found." });
+        if (!await IsConversationParticipantAsync(conversation, callerId)) return Forbid();
+
+        if (await _context.MessageUserDeletions.AnyAsync(d => d.MessageId == message.MessageId && d.UserId == callerId))
+            return Ok(new { succeeded = true });
+
+        _context.MessageUserDeletions.Add(new MessageUserDeletion
+        {
+            Id = Guid.NewGuid(),
+            MessageId = message.MessageId,
+            UserId = callerId,
+            DeletedAt = DateTime.UtcNow
+        });
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException)
+        {
+            // A concurrent request may already have hidden it (unique MessageId + UserId).
+            if (!await _context.MessageUserDeletions.AsNoTracking().AnyAsync(d => d.MessageId == message.MessageId && d.UserId == callerId)) throw;
+            return Ok(new { succeeded = true });
+        }
+
+        // Only the caller's own connections (other tabs/devices), never the other participants.
+        await PushMessageDeletedAsync(new[] { callerId }, message, conversation, "me");
+        return Ok(new { succeeded = true });
+    }
+
+    private Guid GetCallerUserId() => User.Claims
+        .Where(c => c.Type.Equals("UserId", StringComparison.OrdinalIgnoreCase)
+                 || c.Type == ClaimTypes.NameIdentifier
+                 || c.Type.EndsWith("/nameidentifier", StringComparison.OrdinalIgnoreCase)
+                 || c.Type.Equals("sub", StringComparison.OrdinalIgnoreCase))
+        .Select(c => Guid.TryParse(c.Value, out var value) ? value : Guid.Empty)
+        .FirstOrDefault(value => value != Guid.Empty);
+
+    private async Task<bool> IsConversationParticipantAsync(Conversation conversation, Guid userId)
+    {
+        var groupId = ChatMessageDeletionRules.GroupIdOf(conversation);
+        var isActiveGroupMember = groupId.HasValue && await _context.GroupMembers.AnyAsync(g =>
+            g.GroupId == groupId.Value && g.UserId == userId && g.IsActive);
+        return ChatMessageDeletionRules.IsParticipant(conversation, userId, isActiveGroupMember);
+    }
+
+    private async Task<List<Guid>> GetConversationParticipantIdsAsync(Conversation conversation)
+    {
+        var groupId = ChatMessageDeletionRules.GroupIdOf(conversation);
+        var participants = groupId.HasValue
+            ? await _context.GroupMembers.Where(g => g.GroupId == groupId.Value && g.IsActive).Select(g => g.UserId).ToListAsync()
+            : new List<Guid> { conversation.ReceiverId };
+        participants.Add(conversation.SenderId);
+        return participants.Distinct().ToList();
+    }
+
+    private async Task PushMessageDeletedAsync(IEnumerable<Guid> userIds, Message message, Conversation conversation, string scope)
+    {
+        var connections = PushNotificationHub.GetConnectionIdsForUsers(userIds);
+        if (connections.Count == 0) return;
+        var groupId = ChatMessageDeletionRules.GroupIdOf(conversation);
+        await _hubContext.Clients.Clients(connections).SendAsync("MessageDeleted", new
+        {
+            MessageId = message.MessageId,
+            Id = message.Id,
+            ConversationId = conversation.ConversationId,
+            SenderId = conversation.SenderId,
+            ReceiverId = conversation.ReceiverId,
+            IsGroup = groupId.HasValue,
+            GroupId = groupId,
+            Scope = scope
+        });
     }
 
     public sealed class DeleteChatMessageRequest
@@ -837,11 +929,12 @@ public class ChatController : ControllerBase
             foreach (var item in conversations)
             {
                 var msgs = new List<ChatMessage1>();
-                var messages = _context.Messages.Where(s => s.ConversationId == item.ConversationId).OrderBy(s => s.CreatedAt).ToList();
+                var messages = _context.Messages.Where(s => s.ConversationId == item.ConversationId
+                    && !_context.MessageUserDeletions.Any(d => d.MessageId == s.MessageId && d.UserId == userId1)).OrderBy(s => s.CreatedAt).ToList();
                 foreach (var m in messages)
                 {
                     List<FileData>? attachmentData = new List<FileData>();
-                    var attachment = _context.Documents.Where(s => s.ReferenceId != Guid.Empty && s.ReferenceId == m.Id).OrderByDescending(s => s.CreatedDate).FirstOrDefault();
+                    var attachment = m.IsDeleted ? null : _context.Documents.Where(s => s.ReferenceId != Guid.Empty && s.ReferenceId == m.Id).OrderByDescending(s => s.CreatedDate).FirstOrDefault();
                     if (attachment != null)
                     {
                         var docStorage = _context.DocumentStorage.OrderByDescending(s => s.CreatedDate).Where(s => s.DocumentId == attachment.Id);
@@ -869,7 +962,7 @@ public class ChatController : ControllerBase
                         ConversationId = m.ConversationId,
                         MessageId = m.MessageId,
                         MessageDate = m.MessageDate,
-                        MessageText = m.MessageText,
+                        MessageText = m.IsDeleted ? ChatMessageDeletionRules.DeletedPlaceholder : m.MessageText,
                         ScheduleDetailsId = m.ScheduleDetailsId,
                         IsDeleted = m.IsDeleted,
                         IsFromMe = m.IsFromMe,
@@ -899,7 +992,7 @@ public class ChatController : ControllerBase
                     Id = item.ConversationId,
                     Me = item.SenderId == userId1,
                     Date = (messages != null && messages.Count > 0) ? messages.MaxBy(s => s.CreatedAt).CreatedAt.ToString("dd/MM/yyyy HH:mm:ss") : string.Empty,
-                    Chat = messages.Select(s => s.MessageText).ToList(),
+                    Chat = messages.Select(s => s.IsDeleted ? ChatMessageDeletionRules.DeletedPlaceholder : s.MessageText).ToList(),
                     Chat1 = msgs
                 });
             }
@@ -1001,7 +1094,8 @@ public class ChatController : ControllerBase
                     var message = _context.Messages
                         .Where(s =>
                             s.ConversationId == senderConv.ConversationId &&
-                            s.IsDeleted == false)
+                            s.IsDeleted == false &&
+                            !_context.MessageUserDeletions.Any(d => d.MessageId == s.MessageId && d.UserId == userId))
                         .ToList()
                         .MaxBy(s => s.CreatedAt);
 
@@ -1107,7 +1201,8 @@ public class ChatController : ControllerBase
                 var message = _context.Messages
                     .Where(s =>
                         s.ConversationId ==
-                        senderConv.ConversationId)
+                        senderConv.ConversationId &&
+                        !_context.MessageUserDeletions.Any(d => d.MessageId == s.MessageId && d.UserId == userId))
                     .ToList()
                     .MaxBy(s => s.CreatedAt);
 
@@ -1135,7 +1230,7 @@ public class ChatController : ControllerBase
                     Unread = senderConv.Unread,
                     UnReadCount = individualUnreadCount,
                     Delivered = true,
-                    MessageText = message?.MessageText,
+                    MessageText = message?.IsDeleted == true ? ChatMessageDeletionRules.DeletedPlaceholder : message?.MessageText,
                     LastMessageDate = message?.CreatedAt,
                     User = new List<UserDTO>()
                 });
@@ -1428,11 +1523,12 @@ public class ChatController : ControllerBase
                             var message = _context.Messages
                                 .Where(s =>
                                     s.ConversationId ==
-                                    senderConv.ConversationId)
+                                    senderConv.ConversationId &&
+                                    !_context.MessageUserDeletions.Any(d => d.MessageId == s.MessageId && d.UserId == userId))
                                 .ToList()
                                 .MaxBy(s => s.CreatedAt);
 
-                            messageText = message?.MessageText;
+                            messageText = message?.IsDeleted == true ? ChatMessageDeletionRules.DeletedPlaceholder : message?.MessageText;
                         }
 
                         var users = _context.GroupMembers
@@ -1995,22 +2091,34 @@ public class ChatController : ControllerBase
         var senderIds = conversations.Select(c => c.SenderId).Distinct().ToList();
 
         // One query for all messages across all conversations, instead of one query per conversation.
+        // Messages userId1 deleted for themselves ("Delete for me") are left out.
         var allMessages = await _context.Messages
             .AsNoTracking()
-            .Where(m => conversationIds.Contains(m.ConversationId))
+            .Where(m => conversationIds.Contains(m.ConversationId)
+                && !_context.MessageUserDeletions.Any(d => d.MessageId == m.MessageId && d.UserId == userId1))
             .OrderBy(m => m.CreatedAt)
             .Skip(skip)
             .Take(take)
             .ToListAsync(ct);
 
+        // Conversations with a message hidden for userId1; one left with nothing visible is not returned.
+        var conversationsWithHiddenMessages = (await _context.MessageUserDeletions
+            .AsNoTracking()
+            .Where(d => d.UserId == userId1)
+            .Join(_context.Messages.Where(m => conversationIds.Contains(m.ConversationId)), d => d.MessageId, m => m.MessageId, (d, m) => m.ConversationId)
+            .Distinct()
+            .ToListAsync(ct)).ToHashSet();
+
         var messageIds = allMessages.Select(m => m.Id).ToList();
+        // Attachments of messages deleted for everyone are never loaded or returned.
+        var attachmentMessageIds = allMessages.Where(m => !m.IsDeleted).Select(m => m.Id).ToList();
 
         // One query for message read/delivery status, instead of one per message.
         var receiverIds = conversations.Select(c => c.ReceiverId).Distinct().ToList();
         var statuses = await _context.MessageStatus.AsNoTracking().Where(s => messageIds.Contains(s.MessageId) && receiverIds.Contains(s.UserId)).ToListAsync(ct);
         var statusByMessage = statuses.GroupBy(s => s.MessageId).ToDictionary(g => g.Key, g => g.First());
         // One query for all attachment "Documents" rows tied to any of these messages.
-        var attachmentDocs = await _context.Documents.AsNoTracking().Where(d => d.ReferenceId != Guid.Empty && messageIds.Contains(d.ReferenceId.Value)).ToListAsync(ct);
+        var attachmentDocs = await _context.Documents.AsNoTracking().Where(d => d.ReferenceId != Guid.Empty && attachmentMessageIds.Contains(d.ReferenceId.Value)).ToListAsync(ct);
         var attachmentDocIds = attachmentDocs.Select(d => d.Id).ToList();
 
         // One query for all storage rows for those documents.
@@ -2042,15 +2150,19 @@ public class ChatController : ControllerBase
         foreach (var item in conversations)
         {
             var messages = messagesByConversation.TryGetValue(item.ConversationId, out var msgList) ? msgList : new List<Message>();
+            if (messages.Count == 0 && conversationsWithHiddenMessages.Contains(item.ConversationId))
+            {
+                continue;
+            }
 
             var msgs = messages.Select(m => new ChatMessage1
             {
                 Id = m.Id,
-                FileDatas = attachmentsByMessageId.TryGetValue(m.Id, out var files) ? files : new List<FileData>(),
+                FileDatas = !m.IsDeleted && attachmentsByMessageId.TryGetValue(m.Id, out var files) ? files : new List<FileData>(),
                 ConversationId = m.ConversationId,
                 MessageId = m.MessageId,
                 MessageDate = m.MessageDate,
-                MessageText = m.MessageText,
+                MessageText = m.IsDeleted ? ChatMessageDeletionRules.DeletedPlaceholder : m.MessageText,
                 ScheduleDetailsId = m.ScheduleDetailsId,
                 IsDeleted = m.IsDeleted,
                 IsFromMe = m.IsFromMe,

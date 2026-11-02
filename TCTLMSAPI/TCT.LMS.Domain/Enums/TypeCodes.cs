@@ -193,6 +193,21 @@ ScheduleChangeRequest = 100469,
 [Description("Schedule Change Decision")]
 ScheduleChangeDecision = 100470,
 
+[Description("Task Submitted for Verification")]
+TaskVerificationSubmitted = 100471,
+
+[Description("Task Verified")]
+TaskVerified = 100472,
+
+[Description("Task Changes Requested")]
+TaskChangesRequested = 100473,
+
+[Description("Task Due Reminder")]
+TaskDueReminder = 100474,
+
+[Description("Task Overdue")]
+TaskOverdue = 100475,
+
 }
 
 public enum FollowUpStatus

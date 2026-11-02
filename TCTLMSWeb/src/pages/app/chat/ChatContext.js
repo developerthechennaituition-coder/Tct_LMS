@@ -146,7 +146,12 @@ const toggleMuteVoiceCall = (shouldMute) => {
             setUChatMsg(response);
           });
         }
-      } 
+      }
+    });
+    // A deleted message may be a chat's latest one, so refresh the sidebar previews. The open chat
+    // itself is updated in place by ChatBody's MessageDeleted handler.
+    newConnection.on("MessageDeleted", async () => {
+      await fetchChatData();
     });
         // ==================== VOICE CALL SIGNALING ====================
 

@@ -1,5 +1,7 @@
 using System.Net;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using TCT.LMS.Application.Interfaces.Repositories;
 using TCT.LMS.Data.Common;
 using TCT.LMS.Domain.Entities;
@@ -12,9 +14,17 @@ public sealed class MyCalendarRepository : IMyCalendarRepository
 {
     private const string DemoScheduleType = "Demo";
     private const string ClassScheduleType = "Class";
+    /// <summary>Document.DocumentTypeId of task verification proof files (same convention as the assessment documents).</summary>
+    private static readonly Guid TaskProofDocumentTypeId = new("A0000000-0000-0000-0000-000000000003");
     private readonly ApplicationDbContext _dbContext;
+    private readonly string _proofStoragePath;
 
-    public MyCalendarRepository(ApplicationDbContext dbContext) => _dbContext = dbContext;
+    public MyCalendarRepository(ApplicationDbContext dbContext, IConfiguration configuration)
+    {
+        _dbContext = dbContext;
+        // Same storage root as FileService ("FileDirectory", default FileStorage).
+        _proofStoragePath = Path.GetFullPath(Path.Combine(configuration["FileDirectory"] ?? "FileStorage", "TaskVerification"));
+    }
 
     // ─── Demo calendar ────────────────────────────────────────────────────────────
 
@@ -220,18 +230,71 @@ public sealed class MyCalendarRepository : IMyCalendarRepository
             CreatedDate = t.CreatedDate,
             CompletedDate = t.CompletedDate,
             CompletedByName = doneUser == null ? null : (doneUser.FirstName + " " + doneUser.LastName).Trim(),
+            DueTime = t.DueTime,
+            WorkflowStatus = t.WorkflowStatus,
         };
 
     public async Task<IReadOnlyList<UserTaskDto>> GetTasksForUserAsync(Guid userId, CancellationToken token) =>
-        await TaskQuery()
+        await WithVerificationAsync(await TaskQuery()
             .Where(t => t.AssignedToUserId == userId || t.AssignedByUserId == userId)
             .OrderBy(t => t.Status == UserTaskStatus.Completed)
             .ThenBy(t => t.DueDate)
             .ThenByDescending(t => t.CreatedDate)
-            .ToListAsync(token);
+            .ToListAsync(token), token);
 
-    public Task<UserTaskDto?> GetTaskAsync(Guid taskId, CancellationToken token) =>
-        TaskQuery().FirstOrDefaultAsync(t => t.Id == taskId, token);
+    public async Task<UserTaskDto?> GetTaskAsync(Guid taskId, CancellationToken token)
+    {
+        var task = await TaskQuery().FirstOrDefaultAsync(t => t.Id == taskId, token);
+        return task == null ? null : (await WithVerificationAsync(new List<UserTaskDto> { task }, token))[0];
+    }
+
+    /// <summary>Sets each task's effective workflow status and attaches its verification history (with proof files), newest first.</summary>
+    private async Task<List<UserTaskDto>> WithVerificationAsync(List<UserTaskDto> tasks, CancellationToken token)
+    {
+        foreach (var task in tasks) task.VerificationStatus = UserTaskWorkflowStatus.Effective(task.Status, task.WorkflowStatus);
+
+        // Every workflow action sets WorkflowStatus, so tasks without it have no history.
+        var taskIds = tasks.Where(t => t.WorkflowStatus != null).Select(t => t.Id).ToList();
+        if (taskIds.Count == 0) return tasks;
+
+        var history = await (
+            from h in _dbContext.UserTaskVerificationHistory.AsNoTracking()
+            where h.IsActive && taskIds.Contains(h.UserTaskId)
+            join u in _dbContext.User.AsNoTracking() on h.PerformedByUserId equals u.Id into performedBy
+            from u in performedBy.DefaultIfEmpty()
+            orderby h.PerformedDate descending
+            select new UserTaskVerificationHistoryDto
+            {
+                Id = h.Id,
+                UserTaskId = h.UserTaskId,
+                Action = h.Action,
+                PreviousStatus = h.PreviousStatus,
+                NewStatus = h.NewStatus,
+                Comments = h.Comments,
+                PerformedByUserId = h.PerformedByUserId,
+                PerformedByName = u == null ? null : (u.FirstName + " " + u.LastName).Trim(),
+                PerformedDate = h.PerformedDate,
+            }).ToListAsync(token);
+
+        var historyIds = history.Select(h => h.Id).ToList();
+        var files = historyIds.Count == 0
+            ? new List<(Guid HistoryId, UserTaskAttachmentDto File)>()
+            : (await (
+                from d in _dbContext.Documents.AsNoTracking()
+                join s in _dbContext.DocumentStorage.AsNoTracking() on d.Id equals s.DocumentId
+                where d.IsActive && s.IsActive && d.DocumentTypeId == TaskProofDocumentTypeId
+                    && d.ReferenceId != null && historyIds.Contains(d.ReferenceId.Value)
+                orderby s.CreatedDate
+                select new { HistoryId = d.ReferenceId!.Value, s.Id, s.FileName, s.ContentType, s.FileSize }).ToListAsync(token))
+                .Select(f => (f.HistoryId, File: new UserTaskAttachmentDto(f.Id, f.FileName, f.ContentType, f.FileSize)))
+                .ToList();
+
+        foreach (var entry in history)
+            entry.Attachments = files.Where(f => f.HistoryId == entry.Id).Select(f => f.File).ToList();
+        foreach (var task in tasks)
+            task.VerificationHistory = history.Where(h => h.UserTaskId == task.Id).ToList();
+        return tasks;
+    }
 
     private async Task<string> UserNameAsync(Guid userId, CancellationToken token)
     {
@@ -271,7 +334,7 @@ public sealed class MyCalendarRepository : IMyCalendarRepository
     }
 
     public async Task<Guid> CreateTaskAsync(Guid assignedByUserId, Guid assignedToUserId, string title, string description,
-        DateTime dueDate, string? priority, CancellationToken token)
+        DateTime dueDate, TimeSpan? dueTime, string? priority, CancellationToken token)
     {
         var now = DateTime.UtcNow;
         var task = new UserTask
@@ -282,6 +345,7 @@ public sealed class MyCalendarRepository : IMyCalendarRepository
             AssignedToUserId = assignedToUserId,
             AssignedByUserId = assignedByUserId,
             DueDate = dueDate,
+            DueTime = dueTime,
             Priority = priority,
             Status = UserTaskStatus.Pending,
             CreatedBy = assignedByUserId,
@@ -298,7 +362,7 @@ public sealed class MyCalendarRepository : IMyCalendarRepository
             var assignerName = await UserNameAsync(assignedByUserId, token);
             var message =
                 $"<b>{WebUtility.HtmlEncode(assignerName)}</b> assigned you a task: <b>{WebUtility.HtmlEncode(title)}</b>" +
-                $" (due {dueDate:dd-MMM-yyyy}{(string.IsNullOrWhiteSpace(priority) ? "" : $", {WebUtility.HtmlEncode(priority)} priority")}). " +
+                $" (due {dueDate:dd-MMM-yyyy}{(dueTime.HasValue ? $" {dueDate.Add(dueTime.Value):hh:mm tt}" : "")}{(string.IsNullOrWhiteSpace(priority) ? "" : $", {WebUtility.HtmlEncode(priority)} priority")}). " +
                 "Open My Calendar → Tasks to view the details.";
             task.AssignedNotificationId = AddNotification(assignedByUserId, assignedToUserId, NotificationType.TaskAssigned, message, now).Id;
         }
@@ -354,6 +418,346 @@ public sealed class MyCalendarRepository : IMyCalendarRepository
         await transaction.CommitAsync(token);
         return CompleteTaskOutcome.Completed;
     }
+
+    // ─── Task verification workflow ───────────────────────────────────────────────
+
+    public async Task<IReadOnlyList<UserTaskDto>> GetPendingVerificationTasksAsync(Guid? assignedByUserId, CancellationToken token)
+    {
+        var query = TaskQuery().Where(t => t.Status == UserTaskStatus.Completed && t.WorkflowStatus == UserTaskWorkflowStatus.PendingVerification);
+        if (assignedByUserId.HasValue)
+        {
+            var assigner = assignedByUserId.Value;
+            query = query.Where(t => t.AssignedByUserId == assigner);
+        }
+        return await WithVerificationAsync(await query.OrderBy(t => t.DueDate).ThenBy(t => t.CreatedDate).ToListAsync(token), token);
+    }
+
+    private sealed record TaskSnapshot(Guid AssignedToUserId, Guid AssignedByUserId, string Title, string Status, string? WorkflowStatus);
+
+    private Task<TaskSnapshot?> TaskSnapshotAsync(Guid taskId, CancellationToken token) =>
+        _dbContext.UserTask.AsNoTracking()
+            .Where(t => t.Id == taskId && t.IsActive)
+            .Select(t => new TaskSnapshot(t.AssignedToUserId, t.AssignedByUserId, t.Title, t.Status, t.WorkflowStatus))
+            .FirstOrDefaultAsync(token);
+
+    private UserTaskVerificationHistory AddHistory(Guid taskId, string action, string previousStatus, string newStatus,
+        string? comments, Guid userId, DateTime now)
+    {
+        var history = new UserTaskVerificationHistory
+        {
+            Id = Guid.NewGuid(),
+            UserTaskId = taskId,
+            Action = action,
+            PreviousStatus = previousStatus,
+            NewStatus = newStatus,
+            Comments = comments,
+            PerformedByUserId = userId,
+            PerformedDate = now,
+            CreatedBy = userId,
+            CreatedDate = now,
+            IsActive = true,
+        };
+        _dbContext.UserTaskVerificationHistory.Add(history);
+        return history;
+    }
+
+    public async Task<TaskWorkflowOutcome> StartTaskAsync(Guid taskId, Guid callerUserId, CancellationToken token)
+    {
+        var task = await TaskSnapshotAsync(taskId, token);
+        if (task == null) return TaskWorkflowOutcome.NotFound;
+        if (task.AssignedToUserId != callerUserId) return TaskWorkflowOutcome.NotAssignee;
+        if (task.Status != UserTaskStatus.Pending || task.WorkflowStatus != null) return TaskWorkflowOutcome.InvalidState;
+
+        var now = DateTime.UtcNow;
+        await using var transaction = await _dbContext.Database.BeginTransactionAsync(token);
+        // Conditional update: only the assignee, only from Assigned (repeated requests affect 0 rows).
+        var updated = await _dbContext.UserTask
+            .Where(t => t.Id == taskId && t.IsActive && t.AssignedToUserId == callerUserId
+                && t.Status == UserTaskStatus.Pending && t.WorkflowStatus == null)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(t => t.WorkflowStatus, UserTaskWorkflowStatus.InProgress)
+                .SetProperty(t => t.ModifiedBy, callerUserId)
+                .SetProperty(t => t.ModifiedDate, now), token);
+        if (updated == 0)
+        {
+            await transaction.RollbackAsync(token);
+            return TaskWorkflowOutcome.InvalidState;
+        }
+
+        AddHistory(taskId, UserTaskVerificationAction.Started, UserTaskWorkflowStatus.Assigned, UserTaskWorkflowStatus.InProgress, null, callerUserId, now);
+        await _dbContext.SaveChangesAsync(token);
+        await transaction.CommitAsync(token);
+        return TaskWorkflowOutcome.Done;
+    }
+
+    public async Task<TaskWorkflowOutcome> SubmitForVerificationAsync(Guid taskId, Guid callerUserId, string? notes,
+        IReadOnlyList<TaskVerificationFile> files, CancellationToken token)
+    {
+        var task = await TaskSnapshotAsync(taskId, token);
+        if (task == null) return TaskWorkflowOutcome.NotFound;
+        if (task.AssignedToUserId != callerUserId) return TaskWorkflowOutcome.NotAssignee;
+        if (task.AssignedByUserId == callerUserId) return TaskWorkflowOutcome.SelfAssigned;
+        // Assigned / In Progress: completing the task submits it (one step). Completed: an older task completed before
+        // the workflow (or with the plain Complete action). Changes Requested: a resubmission.
+        var previous = UserTaskWorkflowStatus.Effective(task.Status, task.WorkflowStatus);
+        if (previous is not (UserTaskWorkflowStatus.Assigned or UserTaskWorkflowStatus.InProgress
+            or UserTaskWorkflowStatus.Completed or UserTaskWorkflowStatus.ChangesRequested))
+            return TaskWorkflowOutcome.InvalidState;
+        var completing = task.Status == UserTaskStatus.Pending;
+
+        var now = DateTime.UtcNow;
+        var saved = new List<(TaskVerificationFile File, string Path)>();
+        try
+        {
+            // Files first; only these newly written files are removed if anything below fails.
+            if (files.Count > 0) Directory.CreateDirectory(_proofStoragePath);
+            foreach (var file in files)
+            {
+                var path = Path.Combine(_proofStoragePath, Guid.NewGuid().ToString("N") + Path.GetExtension(file.FileName).ToLowerInvariant());
+                saved.Add((file, path));
+                await using var stream = new FileStream(path, FileMode.CreateNew);
+                await file.Content.CopyToAsync(stream, token);
+            }
+
+            await using var transaction = await _dbContext.Database.BeginTransactionAsync(token);
+            // Conditional update: only the assignee, only from the status read above (Status and WorkflowStatus both
+            // matched) — a repeated or concurrent submission affects 0 rows and sends no second notification.
+            // Completing sets the existing completion fields the same way CompleteTaskAsync does.
+            var updated = await _dbContext.UserTask
+                .Where(t => t.Id == taskId && t.IsActive && t.AssignedToUserId == callerUserId && t.AssignedByUserId != callerUserId
+                    && t.Status == task.Status && t.WorkflowStatus == task.WorkflowStatus)
+                .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(t => t.Status, UserTaskStatus.Completed)
+                    .SetProperty(t => t.CompletedDate, t => completing ? now : t.CompletedDate)
+                    .SetProperty(t => t.CompletedByUserId, t => completing ? callerUserId : t.CompletedByUserId)
+                    .SetProperty(t => t.WorkflowStatus, UserTaskWorkflowStatus.PendingVerification)
+                    .SetProperty(t => t.ModifiedBy, callerUserId)
+                    .SetProperty(t => t.ModifiedDate, now), token);
+            if (updated == 0)
+            {
+                await transaction.RollbackAsync(token);
+                DeleteFiles(saved);
+                return TaskWorkflowOutcome.InvalidState;
+            }
+
+            var resubmission = previous == UserTaskWorkflowStatus.ChangesRequested;
+            var history = AddHistory(taskId, resubmission ? UserTaskVerificationAction.Resubmitted : UserTaskVerificationAction.Submitted,
+                previous, UserTaskWorkflowStatus.PendingVerification, notes, callerUserId, now);
+
+            // The EF model has no Document → DocumentStorage relationship, so in a single SaveChanges EF may insert
+            // DocumentStorage first and violate FK_DocumentStorage_Documents. Documents are therefore saved before
+            // their storage rows (as AssessmentRepository does), both inside this transaction.
+            var storages = new List<DocumentStorage>();
+            foreach (var (file, path) in saved)
+            {
+                var document = new Document
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = callerUserId,
+                    DocumentName = "Task Verification Proof",
+                    DocumentDescription = task.Title,
+                    ReferenceId = history.Id,
+                    DocumentTypeId = TaskProofDocumentTypeId,
+                    CreatedBy = callerUserId,
+                    CreatedDate = now,
+                    IsActive = true,
+                };
+                _dbContext.Documents.Add(document);
+                storages.Add(new DocumentStorage
+                {
+                    Id = Guid.NewGuid(),
+                    DocumentId = document.Id,
+                    FileName = Path.GetFileName(file.FileName),
+                    FilePath = path,
+                    ContentType = ProofContentType(file.FileName),
+                    FileSize = file.Length.ToString(),
+                    CreatedBy = callerUserId,
+                    CreatedDate = now,
+                    IsActive = true,
+                });
+            }
+            await _dbContext.SaveChangesAsync(token);
+            _dbContext.DocumentStorage.AddRange(storages);
+
+            var submitterName = await UserNameAsync(callerUserId, token);
+            var message =
+                $"<b>{WebUtility.HtmlEncode(submitterName)}</b> {(resubmission ? "resubmitted" : completing ? "completed and submitted" : "submitted")} the task " +
+                $"<b>{WebUtility.HtmlEncode(task.Title)}</b> for verification. Open My Calendar → Tasks → Pending Verification to review it.";
+            var notification = AddNotification(callerUserId, task.AssignedByUserId, NotificationType.TaskVerificationSubmitted, message, now);
+            history.NotificationId = notification.Id;
+            await _dbContext.SaveChangesAsync(token);
+
+            // One notification only: when this step completed the task, it is also the completion notification.
+            if (completing)
+                await _dbContext.UserTask
+                    .Where(t => t.Id == taskId)
+                    .ExecuteUpdateAsync(setters => setters.SetProperty(t => t.CompletedNotificationId, notification.Id), token);
+
+            await transaction.CommitAsync(token);
+            return TaskWorkflowOutcome.Done;
+        }
+        catch
+        {
+            DeleteFiles(saved);
+            throw;
+        }
+    }
+
+    public async Task<TaskWorkflowOutcome> ReviewTaskAsync(Guid taskId, Guid callerUserId, bool callerIsAdmin, bool approve,
+        string? comment, CancellationToken token)
+    {
+        var task = await TaskSnapshotAsync(taskId, token);
+        if (task == null) return TaskWorkflowOutcome.NotFound;
+        // Never the assignee (also not an administrator reviewing their own task); otherwise the assigner or an administrator.
+        if (task.AssignedToUserId == callerUserId || (task.AssignedByUserId != callerUserId && !callerIsAdmin))
+            return TaskWorkflowOutcome.NotVerifier;
+        if (task.Status != UserTaskStatus.Completed || task.WorkflowStatus != UserTaskWorkflowStatus.PendingVerification)
+            return TaskWorkflowOutcome.InvalidState;
+
+        var newStatus = approve ? UserTaskWorkflowStatus.Verified : UserTaskWorkflowStatus.ChangesRequested;
+        var now = DateTime.UtcNow;
+        await using var transaction = await _dbContext.Database.BeginTransactionAsync(token);
+        // The permission and status checks are repeated in the update itself, so a concurrent review affects 0 rows.
+        var updated = await _dbContext.UserTask
+            .Where(t => t.Id == taskId && t.IsActive && t.Status == UserTaskStatus.Completed
+                && t.WorkflowStatus == UserTaskWorkflowStatus.PendingVerification
+                && t.AssignedToUserId != callerUserId && (t.AssignedByUserId == callerUserId || callerIsAdmin))
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(t => t.WorkflowStatus, newStatus)
+                .SetProperty(t => t.ModifiedBy, callerUserId)
+                .SetProperty(t => t.ModifiedDate, now), token);
+        if (updated == 0)
+        {
+            await transaction.RollbackAsync(token);
+            return TaskWorkflowOutcome.InvalidState;
+        }
+
+        var history = AddHistory(taskId, approve ? UserTaskVerificationAction.Verified : UserTaskVerificationAction.ChangesRequested,
+            UserTaskWorkflowStatus.PendingVerification, newStatus, comment, callerUserId, now);
+
+        var reviewerName = await UserNameAsync(callerUserId, token);
+        var message = approve
+            ? $"<b>{WebUtility.HtmlEncode(reviewerName)}</b> verified the task <b>{WebUtility.HtmlEncode(task.Title)}</b>." +
+              (string.IsNullOrWhiteSpace(comment) ? "" : $" Comment: {WebUtility.HtmlEncode(Shorten(comment))}")
+            : $"<b>{WebUtility.HtmlEncode(reviewerName)}</b> requested changes to the task <b>{WebUtility.HtmlEncode(task.Title)}</b>: " +
+              $"{WebUtility.HtmlEncode(Shorten(comment ?? ""))} Open My Calendar → Tasks to update and resubmit it.";
+        history.NotificationId = AddNotification(callerUserId, task.AssignedToUserId,
+            approve ? NotificationType.TaskVerified : NotificationType.TaskChangesRequested, message, now).Id;
+
+        await _dbContext.SaveChangesAsync(token);
+        await transaction.CommitAsync(token);
+        return TaskWorkflowOutcome.Done;
+    }
+
+    public Task<UserTaskAttachmentFile?> GetTaskAttachmentAsync(Guid attachmentId, CancellationToken token) =>
+        (from s in _dbContext.DocumentStorage.AsNoTracking()
+         join d in _dbContext.Documents.AsNoTracking() on s.DocumentId equals d.Id
+         join h in _dbContext.UserTaskVerificationHistory.AsNoTracking() on d.ReferenceId equals (Guid?)h.Id
+         where s.Id == attachmentId && s.IsActive && d.IsActive && h.IsActive && d.DocumentTypeId == TaskProofDocumentTypeId
+         select new UserTaskAttachmentFile(h.UserTaskId, s.FileName, s.ContentType, s.FilePath)).FirstOrDefaultAsync(token);
+
+    // ─── Deadline reminders ───────────────────────────────────────────────────────
+
+    public async Task<IReadOnlyList<TaskReminderCandidate>> GetDueTaskRemindersAsync(DateTime now, CancellationToken token)
+    {
+        // Every milestone falls between the day after the due date (overdue) and seven days before it.
+        var fromDate = now.Date.AddDays(-1);
+        var toDate = now.Date.AddDays(7);
+        var tasks = await _dbContext.UserTask.AsNoTracking()
+            .Where(t => t.IsActive && t.Status == UserTaskStatus.Pending && t.DueDate >= fromDate && t.DueDate < toDate.AddDays(1))
+            .Select(t => new { t.Id, t.Title, t.AssignedToUserId, t.AssignedByUserId, t.DueDate, t.DueTime })
+            .ToListAsync(token);
+
+        var due = tasks
+            .Select(t => new TaskReminderCandidate(t.Id, t.Title, t.AssignedToUserId, t.AssignedByUserId, t.DueDate, t.DueTime,
+                UserTaskDeadline.ReminderMilestone(t.DueDate, t.DueTime, now) ?? ""))
+            .Where(r => r.Milestone != "")
+            .ToList();
+        if (due.Count == 0) return due;
+
+        var taskIds = due.Select(r => r.TaskId).ToList();
+        var sent = (await _dbContext.UserTaskReminder.AsNoTracking()
+                .Where(r => taskIds.Contains(r.UserTaskId))
+                .Select(r => new { r.UserTaskId, r.RecipientUserId, r.Milestone })
+                .ToListAsync(token))
+            .Select(r => (r.UserTaskId, r.RecipientUserId, r.Milestone))
+            .ToHashSet();
+        return due.Where(r => !sent.Contains((r.TaskId, r.AssignedToUserId, r.Milestone))).ToList();
+    }
+
+    public async Task<bool> SendTaskReminderAsync(TaskReminderCandidate reminder, CancellationToken token)
+    {
+        var now = DateTime.UtcNow;
+        await using var transaction = await _dbContext.Database.BeginTransactionAsync(token);
+        try
+        {
+            // Checked again inside the transaction: a task completed or submitted since it was listed gets no reminder.
+            var stillOpen = await _dbContext.UserTask.AnyAsync(
+                t => t.Id == reminder.TaskId && t.IsActive && t.Status == UserTaskStatus.Pending, token);
+            if (!stillOpen) return false;
+
+            var deadline = $"{reminder.DueDate:dd-MMM-yyyy}{(reminder.DueTime.HasValue ? $" {reminder.DueDate.Date.Add(reminder.DueTime.Value):hh:mm tt}" : "")}";
+            var title = WebUtility.HtmlEncode(reminder.Title);
+            var overdue = reminder.Milestone == UserTaskDeadline.Overdue;
+            var message = reminder.Milestone switch
+            {
+                UserTaskDeadline.SevenDaysBefore => $"Reminder: the task <b>{title}</b> is due in 7 days (due {deadline}).",
+                UserTaskDeadline.DayBefore => $"Reminder: the task <b>{title}</b> is due tomorrow (due {deadline}).",
+                UserTaskDeadline.DueDate => $"Reminder: the task <b>{title}</b> is due today (due {deadline}).",
+                _ => $"The task <b>{title}</b> is <b>overdue</b>. It was due {deadline}.",
+            } + " Open My Calendar → Tasks to view the details.";
+
+            var notification = AddNotification(reminder.AssignedByUserId, reminder.AssignedToUserId,
+                overdue ? NotificationType.TaskOverdue : NotificationType.TaskDueReminder, message, now);
+            _dbContext.UserTaskReminder.Add(new UserTaskReminder
+            {
+                Id = Guid.NewGuid(),
+                UserTaskId = reminder.TaskId,
+                RecipientUserId = reminder.AssignedToUserId,
+                Milestone = reminder.Milestone,
+                NotificationId = notification.Id,
+                SentDate = now,
+            });
+            // The reminder row and its notification are saved together: the unique index rejects a reminder that
+            // another run already sent, and the notification is rolled back with it.
+            await _dbContext.SaveChangesAsync(token);
+            await transaction.CommitAsync(token);
+            return true;
+        }
+        catch (DbUpdateException ex) when (ex.InnerException is SqlException sql && (sql.Number == 2601 || sql.Number == 2627))
+        {
+            return false;
+        }
+        finally
+        {
+            // The reminder job sends each reminder with its own context; nothing tracked here is reused.
+            _dbContext.ChangeTracker.Clear();
+        }
+    }
+
+    private static string Shorten(string text) => text.Length <= 300 ? text : text[..297] + "...";
+
+    private static void DeleteFiles(IEnumerable<(TaskVerificationFile File, string Path)> saved)
+    {
+        foreach (var (_, path) in saved)
+        {
+            try { if (File.Exists(path)) File.Delete(path); }
+            catch (IOException) { /* best effort: an orphaned file must not hide the original error */ }
+        }
+    }
+
+    private static string ProofContentType(string fileName) => Path.GetExtension(fileName).ToLowerInvariant() switch
+    {
+        ".pdf" => "application/pdf",
+        ".png" => "image/png",
+        ".jpg" or ".jpeg" => "image/jpeg",
+        ".doc" => "application/msword",
+        ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        ".xls" => "application/vnd.ms-excel",
+        ".xlsx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        ".txt" => "text/plain",
+        _ => "application/octet-stream",
+    };
 
     // ─── Demo status workflow ─────────────────────────────────────────────────────
 

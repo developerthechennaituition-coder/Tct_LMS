@@ -78,7 +78,7 @@ import OperationsHelpPlaceholder from "../pages/lms/operation/OperationsHelpPlac
 import SupportHelp from "../pages/lms/operation/SupportHelp.jsx";
 import ChangeRequestPage from "../pages/lms/changerequests/ChangeRequestPage.jsx";
 import OperationsChangeRequests from "../pages/lms/changerequests/OperationsChangeRequests.jsx";
-import MyCalendar from "../pages/lms/mycalendar/MyCalendar.jsx";
+import MyCalendar, { MyTasks } from "../pages/lms/mycalendar/MyCalendar.jsx";
 import OperationsReports from "../pages/lms/operation/reports/OperationsReports.jsx";
 import OperationsReportView from "../pages/lms/operation/reports/OperationsReportView.jsx";
 import AccountsReports from "../pages/lms/accounts/reports/AccountsReports.jsx";
@@ -335,6 +335,11 @@ const Pages = () => {
           exact
           path={`${process.env.PUBLIC_URL}/lms/my-calendar`}
           component={MyCalendar}
+        ></Route>
+        <Route
+          exact
+          path={`${process.env.PUBLIC_URL}/lms/tasks`}
+          component={MyTasks}
         ></Route>
         <Route
           exact

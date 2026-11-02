@@ -1,5 +1,7 @@
+using System.Globalization;
 using TCT.LMS.Application.Interfaces.Repositories;
 using TCT.LMS.Application.Interfaces.Services;
+using TCT.LMS.Domain.Entities;
 
 namespace TCT.LMS.Application.Services;
 
@@ -59,8 +61,8 @@ public sealed class MyCalendarService : IMyCalendarService
     public Task<IReadOnlyList<TaskAssigneeDto>> GetTaskAssigneesAsync(CancellationToken token) =>
         _repository.GetTaskAssigneesAsync(ExcludedRoleNames, token);
 
-    public Task<IReadOnlyList<UserTaskDto>> GetTasksAsync(Guid callerUserId, CancellationToken token) =>
-        _repository.GetTasksForUserAsync(callerUserId, token);
+    public async Task<IReadOnlyList<UserTaskDto>> GetTasksAsync(Guid callerUserId, CancellationToken token) =>
+        WithPermissions(await _repository.GetTasksForUserAsync(callerUserId, token), callerUserId, callerIsAdmin: false);
 
     public async Task<MyCalendarResult<UserTaskDto>> CreateTaskAsync(Guid callerUserId, CreateUserTaskRequest request, CancellationToken token)
     {
@@ -84,6 +86,17 @@ public sealed class MyCalendarService : IMyCalendarService
         var dueDate = request.DueDate.Value.Date;
         if (dueDate < DateTime.UtcNow.Date.AddDays(-1))
             return MyCalendarResult<UserTaskDto>.Fail(400, "Due date cannot be in the past.");
+        // Optional deadline time (older clients send none: the task stays date-only, as before).
+        TimeSpan? dueTime = null;
+        if (!string.IsNullOrWhiteSpace(request.DueTime))
+        {
+            if (!TimeSpan.TryParseExact(request.DueTime.Trim(), DueTimeFormats, CultureInfo.InvariantCulture, out var parsed)
+                || parsed < TimeSpan.Zero || parsed >= TimeSpan.FromDays(1))
+                return MyCalendarResult<UserTaskDto>.Fail(400, "Please enter a valid due time.");
+            dueTime = new TimeSpan(parsed.Hours, parsed.Minutes, 0);
+            if (IsDeadlineInPast(dueDate.Add(dueTime.Value), request.TimeZoneOffsetMinutes, DateTime.UtcNow))
+                return MyCalendarResult<UserTaskDto>.Fail(400, "The deadline cannot be earlier than the current date and time.");
+        }
         if (priority != null && !Priorities.Contains(priority))
             return MyCalendarResult<UserTaskDto>.Fail(400, "Priority must be Low, Medium or High.");
         if (priority != null)
@@ -94,21 +107,146 @@ public sealed class MyCalendarService : IMyCalendarService
         if (!await _repository.IsEligibleAssigneeAsync(request.AssignedToUserId, ExcludedRoleNames, token))
             return MyCalendarResult<UserTaskDto>.Fail(400, "Tasks can only be assigned to active staff users (not tutors or students).");
 
-        var taskId = await _repository.CreateTaskAsync(callerUserId, request.AssignedToUserId, title, description, dueDate, priority, token);
+        var taskId = await _repository.CreateTaskAsync(callerUserId, request.AssignedToUserId, title, description, dueDate, dueTime, priority, token);
         var task = await _repository.GetTaskAsync(taskId, token);
-        return MyCalendarResult<UserTaskDto>.Ok(task!, "Task assigned successfully.");
+        return MyCalendarResult<UserTaskDto>.Ok(WithPermissions(task!, callerUserId, callerIsAdmin: false), "Task assigned successfully.");
     }
+
+    private static readonly string[] DueTimeFormats = { @"hh\:mm", @"hh\:mm\:ss", @"h\:mm" };
+
+    /// <summary>
+    /// True when the deadline (a wall-clock date and time in the assigner's browser time zone) is already past.
+    /// With the browser's offset (UTC − local, minutes) the check is exact (one minute of grace for clock skew);
+    /// without it, only deadlines past in every time zone (UTC−12) are rejected.
+    /// </summary>
+    public static bool IsDeadlineInPast(DateTime localDeadline, int? timeZoneOffsetMinutes, DateTime utcNow) =>
+        timeZoneOffsetMinutes is >= -14 * 60 and <= 12 * 60
+            ? localDeadline.AddMinutes(timeZoneOffsetMinutes.Value) < utcNow.AddMinutes(-1)
+            : localDeadline < utcNow.AddHours(-12);
 
     public async Task<MyCalendarResult<UserTaskDto>> CompleteTaskAsync(Guid callerUserId, Guid taskId, CancellationToken token)
     {
         var outcome = await _repository.CompleteTaskAsync(taskId, callerUserId, token);
         return outcome switch
         {
-            CompleteTaskOutcome.Completed => MyCalendarResult<UserTaskDto>.Ok((await _repository.GetTaskAsync(taskId, token))!, "Task marked as completed."),
+            CompleteTaskOutcome.Completed => MyCalendarResult<UserTaskDto>.Ok(
+                WithPermissions((await _repository.GetTaskAsync(taskId, token))!, callerUserId, callerIsAdmin: false), "Task marked as completed."),
             CompleteTaskOutcome.NotFound => MyCalendarResult<UserTaskDto>.Fail(404, "Task not found."),
             CompleteTaskOutcome.NotAssignee => MyCalendarResult<UserTaskDto>.Fail(403, "Only the person this task is assigned to can complete it."),
             _ => MyCalendarResult<UserTaskDto>.Fail(409, "This task is already completed."),
         };
+    }
+
+    // ─── Task verification workflow ───────────────────────────────────────────────
+    // Assigned → In Progress → (Completed) → Pending Verification → Verified, or → Changes Requested → Pending Verification.
+    // Only the assignee starts / submits; only the assigner or an administrator (never the assignee) verifies.
+
+    private static readonly string[] AdminRoleNames = { "SuperAdmin", "Admin" };
+    private const int NotesMaxLength = 2000;
+    private const int MaxProofFiles = 5;
+    private const long MaxProofFileBytes = 10 * 1024 * 1024;
+    private const long MaxProofTotalBytes = 25 * 1024 * 1024;
+    private static readonly HashSet<string> ProofExtensions = new(StringComparer.OrdinalIgnoreCase)
+        { ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".jpg", ".jpeg", ".png", ".txt" };
+
+    private static bool IsAdmin(IReadOnlyCollection<string> roles) =>
+        roles.Any(r => AdminRoleNames.Contains(r?.Trim() ?? string.Empty, StringComparer.OrdinalIgnoreCase));
+
+    /// <summary>Sets what the caller may do with the task. The repository re-checks the same rules in its updates.</summary>
+    private static UserTaskDto WithPermissions(UserTaskDto task, Guid callerUserId, bool callerIsAdmin)
+    {
+        var isAssignee = task.AssignedToUserId == callerUserId;
+        // Assigned / In Progress: Complete opens the completion form, which submits it. Completed (older tasks) /
+        // Changes Requested: submit or resubmit.
+        task.CanSubmitForVerification = isAssignee && task.AssignedByUserId != callerUserId
+            && task.VerificationStatus is UserTaskWorkflowStatus.Assigned or UserTaskWorkflowStatus.InProgress
+                or UserTaskWorkflowStatus.Completed or UserTaskWorkflowStatus.ChangesRequested;
+        task.CanVerify = task.VerificationStatus == UserTaskWorkflowStatus.PendingVerification && !isAssignee
+            && (task.AssignedByUserId == callerUserId || callerIsAdmin);
+        return task;
+    }
+
+    private static IReadOnlyList<UserTaskDto> WithPermissions(IReadOnlyList<UserTaskDto> tasks, Guid callerUserId, bool callerIsAdmin)
+    {
+        foreach (var task in tasks) WithPermissions(task, callerUserId, callerIsAdmin);
+        return tasks;
+    }
+
+    private async Task<MyCalendarResult<UserTaskDto>> WorkflowResultAsync(TaskWorkflowOutcome outcome, Guid taskId, Guid callerUserId,
+        bool callerIsAdmin, string successMessage, string invalidStateMessage, CancellationToken token) =>
+        outcome switch
+        {
+            TaskWorkflowOutcome.Done => MyCalendarResult<UserTaskDto>.Ok(
+                WithPermissions((await _repository.GetTaskAsync(taskId, token))!, callerUserId, callerIsAdmin), successMessage),
+            TaskWorkflowOutcome.NotFound => MyCalendarResult<UserTaskDto>.Fail(404, "Task not found."),
+            TaskWorkflowOutcome.NotAssignee => MyCalendarResult<UserTaskDto>.Fail(403, "Only the person this task is assigned to can do this."),
+            TaskWorkflowOutcome.NotVerifier => MyCalendarResult<UserTaskDto>.Fail(403, "Only the person who assigned this task or an administrator can verify it. You cannot verify your own task."),
+            TaskWorkflowOutcome.SelfAssigned => MyCalendarResult<UserTaskDto>.Fail(400, "Tasks you assigned to yourself do not need verification."),
+            _ => MyCalendarResult<UserTaskDto>.Fail(409, invalidStateMessage),
+        };
+
+    public async Task<IReadOnlyList<UserTaskDto>> GetPendingVerificationTasksAsync(Guid callerUserId, IReadOnlyCollection<string> callerRoles, CancellationToken token)
+    {
+        var admin = IsAdmin(callerRoles);
+        var tasks = await _repository.GetPendingVerificationTasksAsync(admin ? null : callerUserId, token);
+        // Nobody verifies their own task, so it is never listed for them.
+        return WithPermissions(tasks.Where(t => t.AssignedToUserId != callerUserId).ToList(), callerUserId, admin);
+    }
+
+    public async Task<MyCalendarResult<UserTaskDto>> StartTaskAsync(Guid callerUserId, Guid taskId, CancellationToken token) =>
+        await WorkflowResultAsync(await _repository.StartTaskAsync(taskId, callerUserId, token), taskId, callerUserId, false,
+            "Task marked as in progress.", "Only a newly assigned task can be marked as in progress.", token);
+
+    public async Task<MyCalendarResult<UserTaskDto>> SubmitForVerificationAsync(Guid callerUserId, Guid taskId, string? notes,
+        IReadOnlyList<TaskVerificationFile> files, CancellationToken token)
+    {
+        notes = string.IsNullOrWhiteSpace(notes) ? null : notes.Trim();
+        files ??= Array.Empty<TaskVerificationFile>();
+        if (notes?.Length > NotesMaxLength)
+            return MyCalendarResult<UserTaskDto>.Fail(400, $"Completion notes must be {NotesMaxLength} characters or fewer.");
+        if (files.Count > MaxProofFiles)
+            return MyCalendarResult<UserTaskDto>.Fail(400, $"Attach up to {MaxProofFiles} files.");
+        if (files.Any(f => f.Length <= 0 || f.Length > MaxProofFileBytes || !ProofExtensions.Contains(Path.GetExtension(f.FileName ?? "")))
+            || files.Sum(f => f.Length) > MaxProofTotalBytes)
+            return MyCalendarResult<UserTaskDto>.Fail(400,
+                "Use PDF, Word, Excel, JPG, PNG or TXT files, up to 10 MB each and 25 MB in total. Empty files are not allowed.");
+
+        var outcome = await _repository.SubmitForVerificationAsync(taskId, callerUserId, notes, files, token);
+        return await WorkflowResultAsync(outcome, taskId, callerUserId, false, "Task submitted for verification.",
+            "This task cannot be submitted now: it is already awaiting verification or has been verified.", token);
+    }
+
+    public async Task<MyCalendarResult<UserTaskDto>> ReviewTaskAsync(Guid callerUserId, IReadOnlyCollection<string> callerRoles, Guid taskId,
+        bool approve, string? comment, CancellationToken token)
+    {
+        comment = string.IsNullOrWhiteSpace(comment) ? null : comment.Trim();
+        if (!approve && comment == null)
+            return MyCalendarResult<UserTaskDto>.Fail(400, "Please describe the changes needed.");
+        if (comment?.Length > NotesMaxLength)
+            return MyCalendarResult<UserTaskDto>.Fail(400, $"The comment must be {NotesMaxLength} characters or fewer.");
+
+        var admin = IsAdmin(callerRoles);
+        var outcome = await _repository.ReviewTaskAsync(taskId, callerUserId, admin, approve, comment, token);
+        return await WorkflowResultAsync(outcome, taskId, callerUserId, admin,
+            approve ? "Task verified." : "Changes requested. The assignee has been notified.",
+            "This task is not awaiting verification (it may already have been reviewed).", token);
+    }
+
+    public async Task<MyCalendarResult<TaskAttachmentContent>> GetTaskAttachmentAsync(Guid callerUserId, IReadOnlyCollection<string> callerRoles,
+        Guid attachmentId, CancellationToken token)
+    {
+        var file = await _repository.GetTaskAttachmentAsync(attachmentId, token);
+        var task = file == null ? null : await _repository.GetTaskAsync(file.UserTaskId, token);
+        if (file == null || task == null)
+            return MyCalendarResult<TaskAttachmentContent>.Fail(404, "File not found.");
+        // The assignee, the assigner and administrators only.
+        if (task.AssignedToUserId != callerUserId && task.AssignedByUserId != callerUserId && !IsAdmin(callerRoles))
+            return MyCalendarResult<TaskAttachmentContent>.Fail(403, "You do not have access to this file.");
+        if (!File.Exists(file.FilePath))
+            return MyCalendarResult<TaskAttachmentContent>.Fail(404, "The file is no longer available.");
+        return MyCalendarResult<TaskAttachmentContent>.Ok(new TaskAttachmentContent(
+            file.FileName, string.IsNullOrWhiteSpace(file.ContentType) ? "application/octet-stream" : file.ContentType,
+            await File.ReadAllBytesAsync(file.FilePath, token)));
     }
 
     // ─── Demo status workflow ─────────────────────────────────────────────────────

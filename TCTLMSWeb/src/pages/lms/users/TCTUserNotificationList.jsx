@@ -670,6 +670,43 @@ const TCTUserNotificationList = () => {
       );
     }
 
+    // Task verification notifications: the reviewer's Pending Verification list, or the assignee's own tasks.
+    if (
+      row.notificationType == NotificationType.TaskVerificationSubmitted ||
+      row.notificationType == NotificationType.TaskVerified ||
+      row.notificationType == NotificationType.TaskChangesRequested
+    ) {
+      const toReview = row.notificationType == NotificationType.TaskVerificationSubmitted;
+      return (
+        <Link to={`/lms/my-calendar?tab=tasks&list=${toReview ? "verification" : "mine"}`}>
+          <TooltipComponent
+            tag="a"
+            containerClassName="btn btn-trigger btn-icon"
+            id={"taskverify" + row.id}
+            icon="task"
+            direction="top"
+            text={toReview ? "Review task" : "Open task"}
+          />
+        </Link>
+      );
+    }
+
+    // Task deadline reminders (D-7, D-1, due date) and overdue notices: the assignee's own tasks.
+    if (row.notificationType == NotificationType.TaskDueReminder || row.notificationType == NotificationType.TaskOverdue) {
+      return (
+        <Link to="/lms/my-calendar?tab=tasks&list=mine">
+          <TooltipComponent
+            tag="a"
+            containerClassName="btn btn-trigger btn-icon"
+            id={"taskdeadline" + row.id}
+            icon="task"
+            direction="top"
+            text="Open task"
+          />
+        </Link>
+      );
+    }
+
     // Class and schedule notifications
     const linkPath = notificationLinkPath(row);
 
