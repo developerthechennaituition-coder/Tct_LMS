@@ -24,6 +24,7 @@ import classNames from "classnames";
 import { getTCTUserById } from '../../../apiservices/UserService';
 import { useLocation, Link } from 'react-router-dom';
 import EditTCTUser from "./EditTCTUser";
+import TimeZoneModal, { formatUtcOffset } from "./TimeZoneModal";
 import { usePermissions } from "../../../hooks/usePermissions";
 
 const TCTUserProfile = ({ sm, updateSm, setProfileName }) => {
@@ -74,6 +75,32 @@ const TCTUserProfile = ({ sm, updateSm, setProfileName }) => {
       isPrimary: true
     }
   });
+  // Time zone: the user may set their own; staff may set a student's or tutor's (the server enforces the same rule).
+  const [timeZoneModal, setTimeZoneModal] = useState(false);
+  const isOwnTimeZone = !!id && id.toLowerCase() === localStorage.getItem("userId")?.toLowerCase();
+  const isStudentOrTutor = formData.role === "Student" || formData.role === "Tutor";
+  // Same role rule as the server (UserTimeZoneController): Super Admin (1) / Coordinator Admin (5) → students and tutors,
+  // Coordinator (6) → students only; Super Admin also → Coordinator, Coordinator Admin, Operations and Operations Admin.
+  // Menu permissions are not used (Tutors hold "Student List" edit).
+  const viewerRoleId = localStorage.getItem("roleId");
+  const canSetTimeZone = isOwnTimeZone
+    || ((viewerRoleId === "1" || viewerRoleId === "5") && isStudentOrTutor)
+    || (viewerRoleId === "6" && formData.role === "Student")
+    || (viewerRoleId === "1" && ["Coordinator", "CoordinatorAdmin", "Operations", "OperationsAdmin"].includes(formData.role));
+  const showTimeZonePrompt = isOwnTimeZone && isStudentOrTutor && formData.id !== defaultGuid && !formData.timeZoneId;
+  const onTimeZoneSaved = (timeZoneId) => {
+    setTimeZoneModal(false);
+    setFormData((prev) => ({ ...prev, timeZoneId }));
+    toast.success(timeZoneId ? "Time zone saved." : "Time zone cleared.", {
+      position: "top-right",
+      autoClose: true,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: false,
+    });
+  };
   const callerRoleId = localStorage.getItem("roleId");
   const hideContactDetails =
     (callerRoleId === "13" && formData.role === "Student") ||
@@ -132,6 +159,14 @@ const TCTUserProfile = ({ sm, updateSm, setProfileName }) => {
       </BlockHead>
 
       <Block>
+        {showTimeZonePrompt && (
+          <div className="alert alert-info d-flex flex-wrap align-items-center justify-content-between" role="status">
+            <span className="mr-2">Set your preferred time zone for your profile.</span>
+            <button type="button" className="btn btn-sm btn-primary" onClick={() => setTimeZoneModal(true)}>
+              Set time zone
+            </button>
+          </div>
+        )}
         <div className="nk-data data-list">
           <div className="data-head">
             <h6 className="overline-title">Basics</h6>
@@ -225,8 +260,27 @@ const TCTUserProfile = ({ sm, updateSm, setProfileName }) => {
               </span>
             </div> */}
           </div>
+          <div className="data-item" onClick={canSetTimeZone ? () => setTimeZoneModal(true) : undefined}>
+            <div className="data-col">
+              <span className="data-label">Time zone</span>
+              <span className="data-value">
+                {formData.timeZoneId
+                  ? `${formData.timeZoneId}${formatUtcOffset(formData.timeZoneId) ? ` (${formatUtcOffset(formData.timeZoneId)} now)` : ""}`
+                  : <span className="text-soft">Not set</span>}
+              </span>
+            </div>
+          </div>
         </div>
       </Block>
+      {timeZoneModal &&
+        <TimeZoneModal
+          isOpen={timeZoneModal}
+          userId={id}
+          currentTimeZoneId={formData.timeZoneId || null}
+          onClose={() => setTimeZoneModal(false)}
+          onSaved={onTimeZoneSaved}
+        />
+      }
       {modal &&
         <EditTCTUser modalOpen={modal} onModalCloseCallback={() => {
           setModal(false);

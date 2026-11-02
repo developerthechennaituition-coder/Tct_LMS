@@ -19,6 +19,7 @@ import {
 } from "../../../apiservices/UserService";
 import { WeekDays, convertToTimeSpan, formatTime24 } from "../../../utils/Utils";
 import DragTimeRangePicker from "./DraggableTimePicker";
+import UserTimeZoneLabel from "./UserTimeZoneLabel";
 
 const defaultGuid = "00000000-0000-0000-0000-000000000000";
 const DAY_ORDER = { Sunday: 0, Monday: 1, Tuesday: 2, Wednesday: 3, Thursday: 4, Friday: 5, Saturday: 6 };
@@ -394,6 +395,8 @@ const TutorAvailabilityModal = ({ isOpen, userId, loggedInUserId, onClose, onSav
     <Modal isOpen={isOpen} toggle={handleClose} className="modal-dialog-centered" size="xl">
       <ModalHeader toggle={handleClose}>{isEdit ? "Edit Availability Slots" : "Add Availability Slots"}</ModalHeader>
       <ModalBody className="pb-0 pt-0">
+        {/* The timezone of the person whose availability this is (not shown for a tutor not yet saved). */}
+        {!draftMode && <UserTimeZoneLabel label="Timezone" userId={userId} className="pt-2" />}
         <PreviewCard>
           <Form className="row pb-0 pt-0" noValidate>
             <Row className="col-md-12">

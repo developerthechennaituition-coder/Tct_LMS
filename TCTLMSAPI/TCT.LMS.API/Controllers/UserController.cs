@@ -316,6 +316,9 @@ public class UserController : ControllerBase
         return CreatedAtAction(nameof(GetUser), new { id = createdUser.Id }, createdUser);
     }
 
+    // Profile fields only (see UserRepository.UpdateUser). Super Admin, or an active role with "User List" Edit;
+    // "Student List" is not used because Tutors hold Student List Edit.
+    [Authorize]
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateUser(Guid id, User user)
     {
@@ -324,9 +327,37 @@ public class UserController : ControllerBase
             return BadRequest();
         }
 
+        var callerId = User.Claims
+            .Where(claim => claim.Type.Equals("UserId", StringComparison.OrdinalIgnoreCase)
+                || claim.Type == System.Security.Claims.ClaimTypes.NameIdentifier
+                || claim.Type.EndsWith("/nameidentifier", StringComparison.OrdinalIgnoreCase)
+                || claim.Type.Equals("sub", StringComparison.OrdinalIgnoreCase))
+            .Select(claim => Guid.TryParse(claim.Value, out var value) ? value : Guid.Empty)
+            .FirstOrDefault(value => value != Guid.Empty);
+        if (callerId == Guid.Empty)
+            return Unauthorized(new { message = "Your login session is invalid. Please sign in again." });
+
+        var canEditUsers = await (from userRole in _dbContext.UserRole
+                                  where userRole.UserId == callerId && userRole.IsActive
+                                        && (userRole.RoleId == (int)UserRoleEnum.SuperAdmin
+                                            || (from permission in _dbContext.RoleMenuPermission
+                                                join menu in _dbContext.Menu on permission.MenuId equals menu.Id
+                                                where permission.RoleId == userRole.RoleId
+                                                      && permission.IsActive
+                                                      && permission.Edit
+                                                      && menu.IsActive
+                                                      && menu.Name == "User List"
+                                                select permission.Id).Any())
+                                  select userRole.Id).AnyAsync();
+        if (!canEditUsers)
+            return Forbid();
+
+        user.ModifiedBy = callerId;
+
         try
         {
             var updatedUser = await _userService.UpdateUser(user);
+            updatedUser.PasswordHash = null; // never returned (same as gettctuserbyid); already saved, so not written
             return Ok(updatedUser);
         }
         catch (Exception)

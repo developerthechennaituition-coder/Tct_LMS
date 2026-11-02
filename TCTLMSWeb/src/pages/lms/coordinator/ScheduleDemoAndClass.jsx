@@ -259,6 +259,16 @@ const ScheduleDemoAndClass = () => {
     };
 
     updateStatus(inputData).then((response) => {
+      // Not saved (e.g. a payment change awaits Super Admin): keep the dialog open.
+      if (response?.succeeded === false) {
+        toast.error(response.message || "The status could not be updated.", {
+          position: "top-right",
+          autoClose: true,
+          hideProgressBar: true,
+          closeOnClick: true,
+        });
+        return;
+      }
       setShowSalesDetails(false);
       getEnrolledCourseList();
       toast.success("Tutor assigned successfully.", {

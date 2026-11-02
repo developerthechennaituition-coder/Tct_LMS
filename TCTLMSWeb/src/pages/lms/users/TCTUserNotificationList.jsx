@@ -46,6 +46,7 @@ import {
   fetchNotificationsById,
   GetSalesDetails,
   MarkAsRead,
+  MarkAllAsRead,
 } from "../../../apiservices/NofiticationService";
 import { Link } from "react-router-dom";
 import NotificationMessage from "../../../components/NotificationMessage";
@@ -212,6 +213,27 @@ const notificationPageStyle = `
   .tct-notif-state.is-error .icon { color: #e85347; }
   .tct-notif-card .dataTables_wrapper .p-2 { padding: 36px 16px !important; font-size: 14px; color: #8094ae; text-align: center; }
 
+  /* ---- Read / unread rows (this page only; overrides the shared .n_read / .n_unread colours) ----
+     Unread rows are found through the Action cell marker, which is shown at every screen size. */
+  .tct-notif-card .rdt_TableRow:has(.tct-notif-actions.is-unread) { background: #f8f5ff; box-shadow: inset 3px 0 0 #854fff; }
+  .tct-notif-card .rdt_TableRow:has(.tct-notif-actions.is-unread):hover { background: #f3edff; }
+  .tct-notif-card .rdt_TableCell .n_unread { color: #1c2b46 !important; font-weight: 600; }
+  .tct-notif-card .rdt_TableCell .n_read { color: #526484 !important; font-weight: 400; }
+
+  /* ---- Action cell: existing action icons stay on one row; the "Mark as Read" button sits beside them
+     and drops below only if the cell is too narrow, so nothing overlaps ---- */
+  .tct-notif-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; }
+  .tct-notif-actions > div { display: flex; flex-wrap: nowrap; align-items: center; gap: 2px; }
+  .tct-notif-actions > div:empty { display: none; }
+  .tct-notif-markread.btn { white-space: nowrap; font-weight: 600; border-radius: 6px; }
+  .tct-notif-markread.btn:disabled { cursor: progress; opacity: 0.55; }
+
+  /* ---- Mark All as Read ---- */
+  .tct-notif-markall { gap: 6px; transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease; }
+  .tct-notif-markall:not(.disabled):hover { box-shadow: 0 6px 14px rgba(133, 79, 255, 0.22); }
+  .tct-notif-markall.disabled,
+  .tct-notif-markall.disabled:hover { opacity: 1; cursor: not-allowed; color: #8094ae; border-color: #dbdfea; background: #f5f6fa; box-shadow: none; }
+
   @media (max-width: 575.98px) {
     .tct-notif-teams { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
     .tct-notif-team { min-height: 88px; padding: 12px; row-gap: 10px; }
@@ -245,12 +267,13 @@ const sourceTeamLabel = (team) => team.replace(/([a-z])([A-Z])/g, "$1 $2");
 
 const TCTUserNotificationList = () => {
   const userId = localStorage.getItem("userId");
-  // Redesigned UI only for Tutor / Coordinator on the Notifications pages (not the profile-embedded lists or other roles).
-  const isStyledNotificationPage =
-    ["Tutor", "Coordinator"].includes(localStorage.getItem("userRole")) &&
-    [`${process.env.PUBLIC_URL}/lms/users/user-notification`, `${process.env.PUBLIC_URL}/lms/users/coordinator-notification`].includes(
-      window.location.pathname.replace(/\/$/, "")
-    );
+  // Redesigned UI (source-team cards, mark as read) for every role on the Notifications pages
+  // (not the profile-embedded lists).
+  const isStyledNotificationPage = [
+    `${process.env.PUBLIC_URL}/lms/users/user-notification`,
+    `${process.env.PUBLIC_URL}/lms/users/coordinator-notification`,
+    `${process.env.PUBLIC_URL}/lms/users/coadmin-notification`,
+  ].includes(window.location.pathname.replace(/\/$/, ""));
   const viewTooltip = isStyledNotificationPage ? "View details" : "View";
   // Rows per page (Tutor / Coordinator Notifications page only). Starts at the existing page size (100);
   // other roles / embedded lists keep the fixed 100.
@@ -274,20 +297,28 @@ const TCTUserNotificationList = () => {
       return true;
     });
   }, [notificationDataSource]);
+  // unread = isRead false, shown as the card number. count = all notifications, used only to keep the
+  // card order stable while notifications are marked as read.
   const sourceTeamCards = useMemo(() => {
     const counts = new Map();
     uniqueNotifications.forEach((row) => {
       const team = notificationSourceTeam(row);
-      counts.set(team, (counts.get(team) || 0) + 1);
+      const entry = counts.get(team) || { count: 0, unread: 0 };
+      entry.count += 1;
+      if (!row?.isRead) entry.unread += 1;
+      counts.set(team, entry);
     });
     return [...counts.entries()]
-      .map(([team, count]) => ({ team, count }))
+      .map(([team, { count, unread }]) => ({ team, count, unread }))
       .sort((a, b) => b.count - a.count || a.team.localeCompare(b.team));
   }, [uniqueNotifications]);
+  const totalUnread = useMemo(() => uniqueNotifications.filter((row) => !row?.isRead).length, [uniqueNotifications]);
   const visibleNotifications = useMemo(
     () => (selectedSourceTeam ? uniqueNotifications.filter((row) => notificationSourceTeam(row) === selectedSourceTeam) : uniqueNotifications),
     [uniqueNotifications, selectedSourceTeam]
   );
+  // "Mark all as read" applies only to the unread rows of the selected card.
+  const visibleUnreadNotifications = useMemo(() => visibleNotifications.filter((row) => !row?.isRead), [visibleNotifications]);
   // If a refresh removes the last notification of the selected team, fall back to All.
   useEffect(() => {
     if (selectedSourceTeam && Array.isArray(notificationDataSource) && !sourceTeamCards.some((c) => c.team === selectedSourceTeam)) {
@@ -386,14 +417,58 @@ const TCTUserNotificationList = () => {
     clearErrors(["tutorId", "statusId"]);
   };
 
+  // Ids with a mark-as-read request in flight (prevents double clicks / double requests).
+  const [markingReadIds, setMarkingReadIds] = useState([]);
+  const [isMarkingAllRead, setIsMarkingAllRead] = useState(false);
+
+  // Rows the server confirmed as read: flag them locally right away, then reload from the API.
+  const applyReadStatus = (ids) => {
+    setNotificationDataSource((current) =>
+      Array.isArray(current) ? current.map((row) => (ids.includes(row.id) ? { ...row, isRead: true } : row)) : current
+    );
+  };
+  const reloadNotifications = () =>
+    fetchNotifications(userId)
+      .then((data) => setNotificationDataSource(data))
+      .catch(() => {});
+  // After a failed request, some rows may still have been saved. fetchNotifications caches results
+  // for 1.5s, so wait that out before reloading so the counts come from the database.
+  const reloadNotificationsAfterFailure = () => setTimeout(reloadNotifications, 1600);
+
   const onMarkAsReadHandler = (notifiDetailsId) => {
-    MarkAsRead(notifiDetailsId, userId).then((response) => {
-      if (response.succeeded) {
-        fetchNotifications(userId).then((data) => {
-          setNotificationDataSource(data);
-        });
-      }
-    });
+    if (!notifiDetailsId || markingReadIds.includes(notifiDetailsId)) return;
+    setMarkingReadIds((ids) => [...ids, notifiDetailsId]);
+    MarkAsRead(notifiDetailsId, userId)
+      .then((response) => {
+        if (response?.succeeded) {
+          applyReadStatus([notifiDetailsId]);
+          reloadNotifications();
+        } else {
+          toast.error(response?.message || "Unable to mark the notification as read.");
+        }
+      })
+      // The axios interceptor already shows the error message.
+      .catch(() => reloadNotificationsAfterFailure())
+      .finally(() => setMarkingReadIds((ids) => ids.filter((id) => id !== notifiDetailsId)));
+  };
+
+  const onMarkAllAsReadHandler = () => {
+    const unreadIds = visibleUnreadNotifications.map((row) => row.id);
+    if (unreadIds.length === 0 || isMarkingAllRead) return;
+    setIsMarkingAllRead(true);
+    MarkAllAsRead(visibleUnreadNotifications, userId)
+      .then((responses) => {
+        const failed = (responses || []).filter((response) => response?.succeeded === false);
+        if (failed.length > 0) {
+          toast.error("Some notifications could not be marked as read.");
+          reloadNotificationsAfterFailure();
+          return;
+        }
+        applyReadStatus(unreadIds);
+        reloadNotifications();
+      })
+      .catch(() => reloadNotificationsAfterFailure())
+      .finally(() => setIsMarkingAllRead(false));
   };
 
   const openNotification = (row) => {
@@ -861,7 +936,7 @@ const TCTUserNotificationList = () => {
       cell: (row) => (
         <div
           onClick={() => {
-            onMarkAsReadHandler(row?.id);
+            if (!row?.isRead) onMarkAsReadHandler(row?.id);
           }}
           className={row.isRead ? "n_read" : "n_unread"}
         >
@@ -885,10 +960,29 @@ const TCTUserNotificationList = () => {
     },
     {
       name: "Action",
-      minWidth: "100px",
-      maxWidth: "100px",
+      // Wider on the Notifications page to fit the "Mark as Read" button beside the existing actions.
+      minWidth: isStyledNotificationPage ? "210px" : "100px",
+      maxWidth: isStyledNotificationPage ? "210px" : "100px",
       selector: (row) => row.id,
-      cell: (row) => <div onClick={() => openNotification(row)}>{renderActionButton(row)}</div>,
+      cell: (row) =>
+        isStyledNotificationPage ? (
+          <div className={`tct-notif-actions${row.isRead ? "" : " is-unread"}`}>
+            <div onClick={() => openNotification(row)}>{renderActionButton(row)}</div>
+            {!row.isRead && (
+              <button
+                type="button"
+                className="btn btn-xs btn-outline-success tct-notif-markread"
+                disabled={markingReadIds.includes(row.id)}
+                aria-busy={markingReadIds.includes(row.id)}
+                onClick={() => onMarkAsReadHandler(row.id)}
+              >
+                Mark as Read
+              </button>
+            )}
+          </div>
+        ) : (
+          <div onClick={() => openNotification(row)}>{renderActionButton(row)}</div>
+        ),
     },
   ];
 
@@ -1126,6 +1220,22 @@ const TCTUserNotificationList = () => {
               <BlockHeadContent>
                 <BlockTitle tag="h5">Notifications</BlockTitle>
               </BlockHeadContent>
+              {isStyledNotificationPage && notificationDataSource && (
+                <BlockHeadContent>
+                  <Button
+                    type="button"
+                    color="primary"
+                    outline
+                    className="tct-notif-markall"
+                    disabled={visibleUnreadNotifications.length === 0 || isMarkingAllRead}
+                    aria-disabled={visibleUnreadNotifications.length === 0 || isMarkingAllRead}
+                    onClick={onMarkAllAsReadHandler}
+                  >
+                    {isMarkingAllRead ? <Spinner size="sm" /> : <Icon name="check-circle" />}
+                    <span>Mark All as Read</span>
+                  </Button>
+                </BlockHeadContent>
+              )}
             </BlockBetween>
           </BlockHead>
 
@@ -1145,7 +1255,7 @@ const TCTUserNotificationList = () => {
             )}
             {isStyledNotificationPage && notificationDataSource && sourceTeamCards.length > 0 && (
               <div className="tct-notif-teams" role="group" aria-label="Filter notifications by source team">
-                {[{ team: null, count: uniqueNotifications.length }, ...sourceTeamCards].map(({ team, count }) => {
+                {[{ team: null, count: uniqueNotifications.length, unread: totalUnread }, ...sourceTeamCards].map(({ team, unread }) => {
                   const look = SOURCE_TEAM_LOOK[team ?? "all"] || { icon: "bell", accent: "#854fff", bg: "#f1ecff" };
                   const active = selectedSourceTeam === team;
                   return (
@@ -1164,7 +1274,7 @@ const TCTUserNotificationList = () => {
                         </span>
                         <span className="tct-notif-team-sub">{team ? "Notifications" : "Every team"}</span>
                       </span>
-                      <span className="tct-notif-team-count">{count}</span>
+                      <span className="tct-notif-team-count">{unread}</span>
                     </button>
                   );
                 })}
@@ -1866,7 +1976,18 @@ const TCTUserNotificationList = () => {
                               NoteText: "",
                             };
                             setIsApproving(true);
-                            updateStatus(inputData).then(() => {
+                            updateStatus(inputData).then((response) => {
+                              // Not saved (e.g. a payment change awaits Super Admin): keep the dialog open.
+                              if (response?.succeeded === false) {
+                                setIsApproving(false);
+                                toast.error(response.message || "Tutor assignment could not be approved.", {
+                                  position: "top-right",
+                                  autoClose: true,
+                                  hideProgressBar: true,
+                                  closeOnClick: true,
+                                });
+                                return;
+                              }
                               setShowSalesDetails(false);
                               setIsApproving(false);
                               fetchNotifications(userId).then((data) => {
@@ -1924,7 +2045,18 @@ const TCTUserNotificationList = () => {
                               NoteText: "",
                             };
                             setIsRejecting(true);
-                            updateStatus(inputData).then(() => {
+                            updateStatus(inputData).then((response) => {
+                              // Not saved (e.g. a payment change awaits Super Admin): keep the dialog open.
+                              if (response?.succeeded === false) {
+                                setIsRejecting(false);
+                                toast.error(response.message || "Tutor assignment could not be rejected.", {
+                                  position: "top-right",
+                                  autoClose: true,
+                                  hideProgressBar: true,
+                                  closeOnClick: true,
+                                });
+                                return;
+                              }
                               setShowSalesDetails(false);
                               setIsRejecting(false);
                               fetchNotifications(userId).then((data) => {

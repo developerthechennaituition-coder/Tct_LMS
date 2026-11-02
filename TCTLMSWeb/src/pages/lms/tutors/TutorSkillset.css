@@ -1,0 +1,76 @@
+/* Low / High payment columns of the Skill Sets table (read-only payment range). */
+
+/* Single-line, colour-coded headers */
+.tct-skpay-head {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+.tct-skpay-head::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex: 0 0 7px;
+}
+.tct-skpay-head-low { color: #0f9d76; }
+.tct-skpay-head-low::before { background: #1ee0ac; }
+.tct-skpay-head-high { color: #d33a2c; }
+.tct-skpay-head-high::before { background: #e85347; }
+
+/* Amount pill */
+.tct-skpay {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 72px;
+  justify-content: flex-end;
+  padding: 5px 10px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  white-space: nowrap;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+.tct-skpay .icon { font-size: 12px; }
+.tct-skpay-symbol { margin-right: 1px; font-weight: 500; opacity: 0.75; }
+
+/* Low payment: green */
+.tct-skpay-low { color: #0f9d76; background: #e8faf4; border-color: #c4f2e3; }
+/* High payment: red */
+.tct-skpay-high { color: #d33a2c; background: #fdeeed; border-color: #f8d3cf; }
+
+/* No eligible assignments: a plain muted dash, no coloured box */
+.tct-skpay-empty { justify-content: center; font-weight: 500; cursor: default; }
+.tct-skpay-low.tct-skpay-empty,
+.tct-skpay-high.tct-skpay-empty { color: #b7c2d0; background: transparent; border-color: transparent; }
+
+/* ---- Skill Sets table layout (scoped to .tct-sk-table, i.e. this table only) ---- */
+.tct-sk-table .rdt_Table { border: 1px solid #e5e9f2; border-radius: 10px; overflow: hidden; }
+.tct-sk-table .rdt_TableHeadRow { min-height: 46px; background: #f5f6fa; border-bottom: 1px solid #e5e9f2; }
+.tct-sk-table .rdt_TableCol {
+  font-size: 12px !important; font-weight: 600 !important; letter-spacing: 0.04em;
+  text-transform: uppercase; color: #8094ae !important;
+}
+/* The global theme spreads label and sort arrows to opposite edges of each column (space-between);
+   keep the arrows right next to their label instead. */
+/* width: auto lets the centred payment headers centre label + arrows together. */
+.tct-sk-table .rdt_TableCol_Sortable { justify-content: flex-start !important; gap: 6px; width: auto; }
+.tct-sk-table .__rdt_custom_sort_icon__ { font-size: 11px; color: #b7c2d0; }
+.tct-sk-table .rdt_TableCol_Sortable:hover .__rdt_custom_sort_icon__ { color: #854fff; }
+.tct-sk-table .rdt_TableRow { min-height: 54px; border-bottom-color: #eef0f5 !important; transition: background-color 0.12s ease; }
+.tct-sk-table .rdt_TableRow:hover { background: #faf7ff; }
+.tct-sk-table .tct-sk-board { color: #364a63; font-weight: 500; }
+.tct-sk-table .tct-sk-subject { color: #364a63; font-weight: 600; }
+
+/* Actions: compact icon buttons, aligned right */
+.tct-sk-table .nk-tb-actions { gap: 2px; justify-content: flex-end; }
+.tct-sk-table .nk-tb-actions .btn-trigger.btn-icon { width: 32px; height: 32px; border-radius: 8px; color: #6e82a5; }
+.tct-sk-table .nk-tb-actions .btn-trigger.btn-icon:before { display: none; }
+.tct-sk-table .nk-tb-actions .btn-trigger.btn-icon:hover { background: #f5f1ff; color: #854fff; }
+.tct-sk-table .nk-tb-actions li:last-child .btn-trigger.btn-icon:hover { background: #fdeeed; color: #e85347; }

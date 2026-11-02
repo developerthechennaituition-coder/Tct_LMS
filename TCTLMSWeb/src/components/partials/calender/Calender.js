@@ -66,6 +66,8 @@ import {
 import { getEnrolledCoursesByUser } from "../../../apiservices/StudentEnrollmentService";
 import { scheduleEvent } from "../../../apiservices/UserService";
 import moment from "moment";
+import { ClassTutorTimeLabel, UserTimeZoneLabels } from "../../../pages/lms/common/UserTimeZoneLabel";
+import { classTimeLabelText, loadUserTimeZone, resolveClassUserIds, useClassUserIds } from "../../../library/userTimeZones";
 import { GetSalesDetails } from "../../../apiservices/NofiticationService";
 import { FollowUpStatus, GetClassNoteLabel } from "../../../utils/Utils";
 import PaymentPlanModal from "../../../pages/lms/students/PaymentPlanModal";
@@ -73,6 +75,20 @@ import { toast } from "react-toastify";
 
 // Class statuses that let the tutor move this occurrence's scheduled Start/End Time.
 const isScheduledTimeEditStatus = (code) => ExtraClassStatusCodes.includes(Number(code));
+
+// Class pickers: " | Tutor: <class time in the tutor's timezone> · Student: <…>" for each class
+// (display only; the class times themselves are unchanged).
+const classTimeZoneTexts = (classes) =>
+  Promise.all(
+    classes.map((c) =>
+      resolveClassUserIds(c)
+        .then((ids) => Promise.all([loadUserTimeZone(ids.tutorUserId), loadUserTimeZone(ids.studentUserId)]))
+        .then(
+          ([tutor, student]) =>
+            ` | Tutor: ${classTimeLabelText(tutor, c.start ?? null, c.end)} · Student: ${classTimeLabelText(student, c.start ?? null, c.end)}`,
+        ),
+    ),
+  );
 
 const EventTooltip = (props) => {
   const event = props.eventData;
@@ -100,6 +116,9 @@ const EventTooltip = (props) => {
               </p>
             </div>
           </div>
+        </Col>
+        <Col sm="12">
+          <ClassTutorTimeLabel classEvent={event} />
         </Col>
         {["operation", "operations", "coordinator"].includes(props?.guestType?.toLowerCase()) ? (
           <>
@@ -331,6 +350,8 @@ const CalenderApp = ({ events, onDelete, onEdit, scheduleType, onMonthChange, in
   const [statusTypeId, setStatusTypeId] = useState("");
   const [mockEvents, updateEvents] = useState(events);
   const [event, updateEvent] = useState({});
+  // Display only: the User ids for the selected class's timezone labels (event itself is not changed).
+  const classLabelIds = useClassUserIds(event);
   const [theme, settheme] = useState();
   const [edit, updateEditModal] = useState(false);
   const defaultGuid = "00000000-0000-0000-0000-000000000000";
@@ -676,13 +697,14 @@ const [selectedCalendarDate, setSelectedCalendarDate] = useState(null);
 
     let selected = dayClasses[0];
     if (dayClasses.length > 1) {
+      const zones = await classTimeZoneTexts(dayClasses);
       const { value } = await Swal.fire({
         title: `Select class - ${moment(date).format("DD-MMM-YYYY")}`,
         input: "select",
         inputOptions: Object.fromEntries(
-          dayClasses.map((c) => [
+          dayClasses.map((c, index) => [
             c.scheduleDetailsId,
-            `${moment(c.start).format("hh:mm A")} - ${moment(c.end).format("hh:mm A")} | ${c.subjectName} - ${c.studentName}`,
+            `${moment(c.start).format("hh:mm A")} - ${moment(c.end).format("hh:mm A")} | ${c.subjectName} - ${c.studentName}${zones[index]}`,
           ]),
         ),
         showCancelButton: true,
@@ -706,16 +728,17 @@ const [selectedCalendarDate, setSelectedCalendarDate] = useState(null);
     }
 
     const NEW_CLASS = "__new__";
+    const zones = await classTimeZoneTexts(dayClasses);
     const { value } = await Swal.fire({
       title: `Classes on ${moment(date).format("DD-MMM-YYYY")}`,
       input: "select",
       inputOptions: {
         ...Object.fromEntries(
-          dayClasses.map((c) => [
+          dayClasses.map((c, index) => [
             c.scheduleDetailsId,
             `${moment(c.start).format("hh:mm A")} - ${moment(c.end).format("hh:mm A")} | ${c.scheduleType} | ${c.subjectName} - ${
               scheduleType === "student" ? c.tutorName : c.studentName
-            }`,
+            }${zones[index]}`,
           ]),
         ),
         [NEW_CLASS]: "+ Add a new class on this date",
@@ -1437,6 +1460,18 @@ const [selectedCalendarDate, setSelectedCalendarDate] = useState(null);
                   {event && moment(isNewClass ? formData.endTime : event?.end).format("hh:mm")}
                 </p>
               </Col>
+              {!isNewClass && (
+                <Col sm="12" className="mb-2">
+                  <UserTimeZoneLabels
+                    tutorUserId={classLabelIds.tutorUserId}
+                    studentUserId={classLabelIds.studentUserId}
+                    tutorPending={classLabelIds.tutorPending}
+                    calendarGuestType={event?.calendarGuestType}
+                    start={event?.start}
+                    end={event?.end}
+                  />
+                </Col>
+              )}
             </Row>
             {/* Student calendar: the agreed or Operations cross-checked attendance for this class. */}
             {readOnly && event?.attendanceLabel && (
@@ -1902,6 +1937,10 @@ const [selectedCalendarDate, setSelectedCalendarDate] = useState(null);
             guestType={scheduleType}
             salesDetails={salesDetails}
             scheduleDetailsId={event.scheduleDetailsId}
+            tutorUserId={classLabelIds.tutorUserId}
+            studentUserId={classLabelIds.studentUserId}
+            classStart={event.start}
+            classEnd={event.end}
             type={FollowUpStatus.NeedToSchedule}
             modalOpen={statusModal}
             modalStateChange={(resp) => {
@@ -1928,6 +1967,10 @@ const [selectedCalendarDate, setSelectedCalendarDate] = useState(null);
             guestType={scheduleType}
             salesDetails={salesDetails}
             scheduleDetailsId={event.scheduleDetailsId}
+            tutorUserId={classLabelIds.tutorUserId}
+            studentUserId={classLabelIds.studentUserId}
+            classStart={event.start}
+            classEnd={event.end}
             eventStatusCode={eventStatusCode}
             type={FollowUpStatus.NeedToSchedule}
             modalOpen={scheduleDemoModal}

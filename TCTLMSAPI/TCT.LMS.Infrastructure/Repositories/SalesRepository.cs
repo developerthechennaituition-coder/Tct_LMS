@@ -1377,6 +1377,18 @@ public class SalesRepository : GenericRepository<Sales>, ISalesRepository
             }
             else
             {
+                // Coordinator Admin approve / reject waits while a payment change awaits the Super Admin
+                // decision: nothing is saved (status, payment, allocation, skill rate or the request).
+                var hasPendingSuperAdminRequest = await _dbContext.TutorPaymentApproval.AnyAsync(
+                    TCT.LMS.Application.Services.TutorPaymentApprovalRules.IsPendingSuperAdminRequest(existingSalesDetails.Id, _tutor.Id));
+                if (TCT.LMS.Application.Services.TutorPaymentApprovalRules.BlocksCoordinatorAdminDecision(input.Status, hasPendingSuperAdminRequest))
+                {
+                    await _dbContext.Entry(existingSalesDetails).ReloadAsync();
+                    response.Succeeded = false;
+                    response.Message = TCT.LMS.Application.Services.TutorPaymentApprovalRules.PendingSuperAdminPaymentMessage;
+                    return response;
+                }
+
                 var allocation = await _dbContext.TutorStudentAllocations
                     .Where(t => t.TutorId == _tutor.Id && t.StudentId == _sales.StudentId && t.SalesDetailsId == input.SaleseDetailsId)
                     .OrderByDescending(s => s.CreatedDate).FirstOrDefaultAsync();

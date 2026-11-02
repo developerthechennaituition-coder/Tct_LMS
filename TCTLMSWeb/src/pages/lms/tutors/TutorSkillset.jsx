@@ -21,6 +21,7 @@ import { getLookups } from "../../../apiservices/LookupsService";
 import { useLocation, Link } from "react-router-dom";
 import SkillsetForm from "./SkillsetForm";
 import Swal from "sweetalert2";
+import "./TutorSkillset.css";
 
 const TutorSkillset = (props) => {
   const formRef = useRef(null);
@@ -118,27 +119,41 @@ const TutorSkillset = (props) => {
   const onFormCancel = () => {
     setAddSkillsetModal(false);
   };
-  const updateTutorPayment = async (amount, row, inputElement) => {
-    if (Number(amount) === Number(row.tutorPayment)) return;
+  // Request Rate Change (row action): raises the existing Super Admin rate-change request;
+  // the stored skill rate changes only when Super Admin approves it.
+  const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+  const updateTutorPayment = async (row) => {
+    const currentAmount = Number(row.tutorPayment) > 0 ? escapeHtml(row.tutorPayment) : "Not set";
     const prompt = await Swal.fire({
       title: "Request tutor rate change",
-      html: `<div class="text-start mb-2"><b>Current amount:</b> ${row.tutorPayment}<br/><b>Proposed amount:</b> ${amount}</div>`,
-      input: "textarea",
-      inputLabel: "Reason for change (required)",
-      inputPlaceholder: "Enter the reason for this payment change",
+      html:
+        `<div class="text-start mb-2"><b>Skill:</b> ${escapeHtml(row.boardName)} · ${escapeHtml(row.gradeName)} · ${escapeHtml(row.subjectName)}` +
+        `<br/><b>Current amount:</b> ${currentAmount}</div>` +
+        `<input id="tct-rate-amount" type="number" min="1" step="0.01" class="swal2-input" placeholder="Proposed amount" aria-label="Proposed amount">` +
+        `<textarea id="tct-rate-reason" class="swal2-textarea" placeholder="Enter the reason for this payment change" aria-label="Reason for change (required)"></textarea>`,
       showCancelButton: true,
       confirmButtonText: "Submit for approval",
-      inputValidator: (value) => !value?.trim() && "Reason is required.",
+      focusConfirm: false,
+      preConfirm: () => {
+        const amount = Number(document.getElementById("tct-rate-amount")?.value);
+        const reason = document.getElementById("tct-rate-reason")?.value?.trim();
+        if (!(amount > 0)) {
+          Swal.showValidationMessage("Enter a proposed amount greater than 0.");
+          return false;
+        }
+        if (!reason) {
+          Swal.showValidationMessage("Reason is required.");
+          return false;
+        }
+        return { amount, reason };
+      },
     });
-    if (!prompt.isConfirmed) {
-      inputElement.value = row.tutorPayment;
-      return;
-    }
+    if (!prompt.isConfirmed) return;
     const inputData = {
       UserId: createdBy,
-      Payment: amount,
+      Payment: prompt.value.amount,
       Id: row.id,
-      Reason: prompt.value.trim(),
+      Reason: prompt.value.reason,
     };
     UpdateTutorPayment(inputData)
       .then((response) => {
@@ -152,12 +167,10 @@ const TutorSkillset = (props) => {
           progress: false,
           closeButton: <CloseButton />,
         });
-        inputElement.value = row.tutorPayment;
         loadTutorSkillsets();
       })
       .catch((error) => {
-        inputElement.value = row.tutorPayment;
-        toast.error("Unable to update the payment.", {
+        toast.error(error?.response?.data?.message || "Unable to update the payment.", {
           position: "top-right",
           autoClose: true,
           hideProgressBar: true,
@@ -169,20 +182,48 @@ const TutorSkillset = (props) => {
         });
       });
   };
+  // Low / High payment are read-only; no eligible assignment shows "—" rather than 0.
+  const paymentFormat = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 2 });
+  const renderPaymentRange = (value, type) => {
+    if (!(Number(value) > 0)) {
+      return (
+        <span
+          className={`tct-skpay tct-skpay-${type} tct-skpay-empty`}
+          title="No approved, active assignments for this board, grade and subject"
+        >
+          —
+        </span>
+      );
+    }
+    const parts = paymentFormat.formatToParts(value);
+    const symbol = parts.filter((p) => p.type === "currency").map((p) => p.value).join("");
+    const amount = parts.filter((p) => p.type !== "currency" && p.type !== "literal").map((p) => p.value).join("");
+    return (
+      <span className={`tct-skpay tct-skpay-${type}`} title={`${type === "low" ? "Lowest" : "Highest"} assigned payment: ${paymentFormat.format(value)}`}>
+        <Icon name={type === "low" ? "arrow-down" : "arrow-up"} aria-hidden="true" />
+        <span>
+          <span className="tct-skpay-symbol">{symbol}</span>
+          {amount}
+        </span>
+      </span>
+    );
+  };
   const dtColumns = [
+    // Payment and Actions columns are fixed to their content; Board, Grade and Subject share the
+    // remaining width, so spare space is spread evenly instead of opening one large gap.
     {
       name: "Board",
-      minWidth: "150px",
-      maxWidth: "150px",
+      grow: 1,
+      minWidth: "100px",
       selector: (row) => row.boardName,
       sortable: true,
-      cell: (row) => <span>{row.boardName}</span>,
+      cell: (row) => <span className="tct-sk-board">{row.boardName}</span>,
     },
     {
       name: "Grade",
       selector: (row) => row.gradeName,
-      minWidth: "50px",
-      maxWidth: "100px",
+      grow: 1,
+      minWidth: "100px",
       cell: (row) => <span className="tb-amount">{row.gradeName}</span>,
       sortable: true,
     },
@@ -191,42 +232,34 @@ const TutorSkillset = (props) => {
       selector: (row) => row.subjectName,
       sortable: true,
       hide: "sm",
-      cell: (row) => <span>{row.subjectName}</span>,
+      grow: 1.5,
+      minWidth: "140px",
+      cell: (row) => <span className="tct-sk-subject">{row.subjectName}</span>,
     },
     {
-      name: "Payment",
-      selector: (row) => row.tutorPayment,
+      name: <span className="tct-skpay-head tct-skpay-head-low">Low Payment</span>,
+      selector: (row) => row.lowPayment ?? -1,
       sortable: true,
-      hide: "sm",
-      cell: (row) => (
-        <span>
-          <input
-            className="form-control"
-            
-            key={row.id}
-            name="tutorPayment"
-            onBlur={(e) => {
-              if (e.target.value != "") {
-                updateTutorPayment(e.target.value, row, e.target);
-                // alert(e.target.value);
-              }
-            }}
-            defaultValue={row.tutorPayment}
-            // value={row.tutorPayment}
-            // onChange={(e) => {
-            //   // setFormData({ ...formData, firstName: e.target.value });
-            // }}
-            placeholder="Enter amount"
-            // ref={register({ required: "This field is required" })}
-          />
-        </span>
-      ),
+      center: true,
+      hide: "md",
+      width: "160px",
+      cell: (row) => renderPaymentRange(row.lowPayment, "low"),
     },
     {
-      name: "",
+      name: <span className="tct-skpay-head tct-skpay-head-high">High Payment</span>,
+      selector: (row) => row.highPayment ?? -1,
+      sortable: true,
+      center: true,
+      hide: "md",
+      width: "160px",
+      cell: (row) => renderPaymentRange(row.highPayment, "high"),
+    },
+    {
+      name: "Actions",
       sortable: false,
+      right: true,
       hide: "sm",
-      width: "150px",
+      width: "140px",
       cell: (row) => (
         // <span
         //   className={"icon ni ni-trash"}
@@ -237,6 +270,17 @@ const TutorSkillset = (props) => {
         <>
           <div className="nk-tb-action">
             <ul className="nk-tb-actions">
+              {/* Always available, including skills without a stored rate (new skills start with none). */}
+              <li aria-label="Request Rate Change" onClick={() => updateTutorPayment(row)}>
+                <TooltipComponent
+                  tag="a"
+                  containerClassName="btn btn-trigger btn-icon"
+                  id={"rateChange" + row?.id}
+                  icon="icon ni ni-sign-inr"
+                  direction="top"
+                  text="Request Rate Change"
+                />
+              </li>
               <li
                 onClick={() => {
                   setDataItem(row);
@@ -400,7 +444,7 @@ const TutorSkillset = (props) => {
 
         {tutorSkillSets &&
           (showRowsPerPage ? (
-            <div className="tct-sk-grid">
+            <div className="tct-sk-grid tct-sk-table">
               <RenderGrid dataSource={tutorSkillSets}></RenderGrid>
               {tutorSkillSets.length > 0 && (
                 <div className="tct-rpp">
@@ -433,9 +477,9 @@ const TutorSkillset = (props) => {
               )}
             </div>
           ) : (
-            <>
+            <div className="tct-sk-table">
               <RenderGrid dataSource={tutorSkillSets}></RenderGrid>
-            </>
+            </div>
           ))}
         <ToastContainer />
       </Block>

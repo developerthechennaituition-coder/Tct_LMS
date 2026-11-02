@@ -164,7 +164,8 @@ const money = value => new Intl.NumberFormat("en-IN", { style: "currency", curre
 const errorMessage = error => error?.response?.data?.message ||
   (typeof error?.response?.data === "string" ? error.response.data : error?.message) || "Unable to load payroll.";
 const PAGE_SIZE_OPTIONS = [5, 10, 15, 25];
-const STATUS_COLORS = { "Processed": "#1ee0ac", "Pending": "#f4bd0e", "No classes taken": "#8094ae" };
+const AWAITING_OPS = "Awaiting Operations Approval";
+const STATUS_COLORS = { "Processed": "#1ee0ac", "Pending": "#f4bd0e", [AWAITING_OPS]: "#09c2de", "No classes taken": "#8094ae" };
 
 export default function TCTTutorPayroll() {
   const [period, setPeriod] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1));
@@ -200,7 +201,7 @@ export default function TCTTutorPayroll() {
   }, [month, year]);
 
   const generate = async row => {
-    if (processingRef.current || row.isInvoiceGenerated || !row.noOfDaysPresent || row.approved !== row.noOfDaysPresent) return;
+    if (processingRef.current || row.isInvoiceGenerated || !row.noOfDaysPresent || !row.approved || row.approved !== row.noOfDaysPresent) return;
     const requestedPeriod = currentPeriod.current;
     processingRef.current = true; setProcessing(row.tutorId);
     try {
@@ -235,7 +236,8 @@ export default function TCTTutorPayroll() {
       ? <div>{(row.invoiceNumbers?.length ? row.invoiceNumbers : [row.invoiceNumber]).filter(Boolean).map(number =>
           <Link key={number} to={`${process.env.PUBLIC_URL}/lms/tutors/tutor-invoice-details?invNumber=${encodeURIComponent(number)}&from=payroll`}>View Payslip {number}<br /></Link>)}</div>
       : !row.noOfDaysPresent ? <span>No completed classes</span>
-      : row.approved !== row.noOfDaysPresent ? <span>Waiting for Operations approval</span>
+      // No payable (Operations-approved) class yet, or some completed classes still unapproved: no payslip.
+      : !row.approved || row.approved !== row.noOfDaysPresent ? <span>Waiting for Operations approval</span>
       : <Button size="sm" color="primary" disabled={Boolean(processing)} onClick={() => generate(row)}>
           {processing === row.tutorId ? "Processing…" : "Generate Payslip"}
         </Button> }
@@ -283,9 +285,9 @@ export default function TCTTutorPayroll() {
                 </UncontrolledDropdown>
               </div>
               <div className="tct-pr-year">
-                <Input type="select" aria-label="Payroll status" value={status} style={{ width: "230px" }}
+                <Input type="select" aria-label="Payroll status" value={status} style={{ width: "280px" }}
                   onChange={event => setStatus(event.target.value)}>
-                  {["All", "No classes taken", "Pending", "Processed"].map(value =>
+                  {["All", "No classes taken", AWAITING_OPS, "Pending", "Processed"].map(value =>
                     <option key={value} value={value}>{value} ({value === "All" ? rows.length : rows.filter(row => row.payrollStatus === value).length})</option>)}
                 </Input>
               </div>

@@ -11,6 +11,7 @@ import { Block, BlockHead, BlockHeadContent, BlockTitle, PreviewAltCard } from "
 import Content from "../../../layout/content/Content";
 import Head from "../../../layout/head/Head";
 import OpsScheduleCalendar from "./OpsScheduleCalendar";
+import { ClassPeopleTimeLines, IndiaTimeEntryNote, PersonTimeZoneLabel } from "../common/UserTimeZoneLabel";
 import {
   addWeeklyDayChange,
   decideScheduleChangeRequest,
@@ -229,13 +230,23 @@ const TCTScheduleCalendar = () => {
         timeText: `${moment(e.start).format("h:mm A")} - ${moment(e.end).format("h:mm A")}`,
         color: kind.color,
         textColor: busy ? "#526484" : "#fff",
+        // Display only: this enrolment's classes show the time in the tutor's and the student's timezone
+        // (busy slots belong to other enrolments, whose people are not known here).
+        people: busy || !enrolment
+          ? null
+          : [
+              { label: "Tutor", kind: "tutor", personId: enrolment.tutorId },
+              { label: "Student", kind: "student", personId: enrolment.studentId },
+            ],
+        classStart: e.start,
+        classEnd: e.end,
       },
     };
   });
 
   // Our own event box: the site theme paints every calendar event purple, which hid the legend colours.
   const renderEvent = (arg) => {
-    const { timeText, color, textColor } = arg.event.extendedProps;
+    const { timeText, color, textColor, people, classStart, classEnd } = arg.event.extendedProps;
     return (
       <div
         title={`${timeText} · ${arg.event.title}`}
@@ -243,6 +254,7 @@ const TCTScheduleCalendar = () => {
       >
         <div style={{ fontWeight: 600, whiteSpace: "nowrap" }}>{timeText}</div>
         <div style={{ whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden" }}>{arg.event.title}</div>
+        {people && <ClassPeopleTimeLines people={people} start={classStart} end={classEnd} />}
       </div>
     );
   };
@@ -344,6 +356,12 @@ const TCTScheduleCalendar = () => {
                   </option>
                 ))}
               </Input>
+              {enrolment &&
+                (canEdit || role === "Tutor" ? (
+                  <PersonTimeZoneLabel className="mt-1" label="Student timezone" kind="student" personId={enrolment.studentId} />
+                ) : (
+                  <PersonTimeZoneLabel className="mt-1" label="Tutor timezone" kind="tutor" personId={enrolment.tutorId} />
+                ))}
             </Col>
             {enrolment && (
               <Col md="3" className="d-flex align-items-end">
@@ -406,6 +424,7 @@ const TCTScheduleCalendar = () => {
                   </FormGroup>
                 </Col>
               </Row>
+              <IndiaTimeEntryNote className="mt-2" />
               <div className="d-flex justify-content-between align-items-center flex-wrap mt-3" style={{ gap: 10 }}>
                 <small className="text-soft">
                   {Number(form.weeks) === 0

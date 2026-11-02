@@ -1,7 +1,7 @@
 import React, { useCallback, useState, useEffect, useMemo } from "react";
 import { DropdownToggle, DropdownMenu, UncontrolledDropdown } from "reactstrap";
 import Icon from "../../../../components/icon/Icon";
-import { fetchNotifications, MarkAsRead, MarkAllAsRead } from "../../../../apiservices/NofiticationService";
+import { fetchNotifications, MarkAsRead } from "../../../../apiservices/NofiticationService";
 import { Link, useHistory } from "react-router-dom";
 import NotificationMessage from "../../../../components/NotificationMessage";
 import { notificationLinkPath } from "../../../../utils/Utils";
@@ -86,16 +86,9 @@ const TCTNotification = () => {
     };
   }, [fetchData]);
 
+  // Opening the bell only shows the notifications; a notification is marked read when it is opened.
   const handleBellClick = () => {
-    setDropdownOpen((prev) => {
-      if (!prev) {
-        const userId = localStorage.getItem("userId");
-        MarkAllAsRead(notifications, userId)
-          .then(() => setNotifications((current) => current.map((item) => ({ ...item, isRead: true }))))
-          .catch(() => fetchData());
-      }
-      return !prev;
-    });
+    setDropdownOpen((prev) => !prev);
   };
 
   const handleNotificationOpen = async (item) => {

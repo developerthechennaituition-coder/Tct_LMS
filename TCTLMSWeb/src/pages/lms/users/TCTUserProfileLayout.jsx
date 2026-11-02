@@ -147,7 +147,9 @@ const studentProfileStyle = `
               align-self: flex-start;
               border-left: 0;
               width: 320px;
-              padding: 20px 20px 20px 0;
+              /* Top: tab bar (57px) + tab content padding (20px), so the card starts level with the tab
+                 content below the tab underline instead of the underline running into its side. */
+              padding: 77px 20px 20px 0;
               background: transparent;
             }
           }
@@ -343,6 +345,8 @@ const TCTUserProfileLayout = () => {
       setProfileName(response.data.fullName);
       if (response.data.fileData != null && response.data.fileData != "") {
         setImageUrl(`data:image/jpeg;base64, ${response.data.fileData}`);
+      } else {
+        setImageUrl(""); // no photo for this user: don't keep a previously viewed user's photo
       }
       setEmailAddress(response.data.email);
       setDesignation(response.data.designationName);
@@ -619,7 +623,17 @@ const TCTUserProfileLayout = () => {
               <Sidebar toggleState={sideBar}>
                 <div className="card-inner">
                   <div className="user-card user-card-s2 mt-5 mt-xxl-0">
-                    <UserAvatar className="lg" theme="primary" text={findUpper(formData?.fullName)} />
+                    {/* Uploaded profile photo, filling the circle; initials when there is none or it fails to load. */}
+                    <UserAvatar className="lg" theme="primary" text={imageUrl ? undefined : findUpper(formData?.fullName)}>
+                      {imageUrl && (
+                        <img
+                          src={imageUrl}
+                          alt={formData?.fullName || "Profile photo"}
+                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                          onError={() => setImageUrl("")}
+                        />
+                      )}
+                    </UserAvatar>
                     <div className="user-info">
                       <div className="badge badge-outline-light badge-pill ucap">{formData?.role}</div>
                       <h5>{formData?.fullName}</h5>

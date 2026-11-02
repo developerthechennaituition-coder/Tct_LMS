@@ -67,6 +67,10 @@ public class TutorCourseDetailsDto
     public string? Mode { get; set; }
     public decimal? TutorPayment { get; set; }
     public int? StudentCount { get; set; } 
+    // Lowest / highest approved payment across the tutor's eligible current assignments
+    // for this board, grade and subject (read-only; null when there are none).
+    public decimal? LowPayment { get; set; }
+    public decimal? HighPayment { get; set; }
 }
 
 public class TutorSkillsetDto

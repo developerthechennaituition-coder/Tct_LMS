@@ -25,6 +25,7 @@ import { getTCTUserById } from "../../../apiservices/UserService";
 import { getTutorById } from "../../../apiservices/TutorService";
 import TutorSkillset from "../tutors/TutorSkillset";
 import UserAvailability from "./UserAvailability";
+import TimeZoneModal, { formatUtcOffset } from "./TimeZoneModal";
 import countryList from "react-select-country-list";
 import "./TCTUserDetailsRegular.css";
 
@@ -66,6 +67,15 @@ const TCTUserDetailsPage = ({ match }) => {
   const history = useHistory();
   const [activeTab, setActiveTab] = useState("1");
   const [loadError, setLoadError] = useState("");
+  // Time zone of this tutor. The API takes the tutor's User.Id (?userId=), not the Tutor.Id (?id=).
+  // Same role rule as the server (UserTimeZoneController): Super Admin (1) / Coordinator Admin (5) manage
+  // tutors' time zones, and a tutor manages their own; Coordinators (6) do not. The server still enforces it.
+  const tutorUserId = searchParams.get("userId");
+  const [timeZoneId, setTimeZoneId] = useState(null);
+  const [timeZoneModal, setTimeZoneModal] = useState(false);
+  const viewerRoleId = localStorage.getItem("roleId");
+  const canSetTimeZone = !!tutorUserId && (viewerRoleId === "1" || viewerRoleId === "5"
+    || tutorUserId.toLowerCase() === localStorage.getItem("userId")?.toLowerCase());
 
   // grabs the id of the url and loads the corresponding data
   useEffect(() => {
@@ -102,6 +112,7 @@ const TCTUserDetailsPage = ({ match }) => {
         setPhone(user.phone ?? "");
         setEmailAddress(user.email ?? "");
         setDesignation(user.designationName ?? "");
+        setTimeZoneId(user.timeZoneId || null);
       })
       .catch(() => setLoadError("User details could not be loaded. Please try again."));
   };
@@ -260,6 +271,21 @@ const TCTUserDetailsPage = ({ match }) => {
                             <InfoItem label="Mobile Number" value={formData?.phone} />
                             <InfoItem label="Alternate Number" value={formData?.alternatePhone} />
                             <InfoItem label="Email Address" value={formData?.email} wide />
+                            {canSetTimeZone && (
+                              <div className="tct-ud-item">
+                                <span className="tct-ud-label">Time zone</span>
+                                <span className={`tct-ud-value${timeZoneId ? "" : " is-empty"}`}>
+                                  {timeZoneId
+                                    ? `${timeZoneId}${formatUtcOffset(timeZoneId) ? ` (${formatUtcOffset(timeZoneId)} now)` : ""}`
+                                    : "Not set"}
+                                </span>
+                                <span>
+                                  <button type="button" className="btn btn-sm btn-outline-primary mt-1" onClick={() => setTimeZoneModal(true)}>
+                                    {timeZoneId ? "Change" : "Set time zone"}
+                                  </button>
+                                </span>
+                              </div>
+                            )}
                           </div>
                         </section>
                         <section className="tct-ud-section">
@@ -373,6 +399,19 @@ const TCTUserDetailsPage = ({ match }) => {
                     </div>
                   </ModalBody>
                 </Modal>
+
+                {timeZoneModal && (
+                  <TimeZoneModal
+                    isOpen={timeZoneModal}
+                    userId={tutorUserId}
+                    currentTimeZoneId={timeZoneId}
+                    onClose={() => setTimeZoneModal(false)}
+                    onSaved={(savedTimeZoneId) => {
+                      setTimeZoneModal(false);
+                      setTimeZoneId(savedTimeZoneId || null);
+                    }}
+                  />
+                )}
 
                 <Sidebar toggleState={sideBar}>
                   <div className="tct-ud-side">

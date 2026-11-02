@@ -15,6 +15,7 @@ import {
   getScheduleCalendarTutors,
   modifyScheduleChangeRequest,
 } from "../../../apiservices/ScheduleService";
+import { ClassPeopleTimeLines, IndiaTimeEntryNote, PersonTimeZoneLabel } from "../common/UserTimeZoneLabel";
 
 const DAYS = [
   { value: 1, label: "Mon" },
@@ -188,7 +189,18 @@ const OpsScheduleCalendar = ({ preselect, onRequestModified }) => {
     return list;
   }, [editOpen, range, form]);
 
-  const toCalendarEvents = (events) => {
+  // Display only: whose timezone each class shows. side: "tutor" / "student" calendar. That person always; the other
+  // person only for classes of an enrolment the selected tutor and student share (otherwise not known here).
+  const TUTOR_PERSON = { label: "Tutor", kind: "tutor", personId: tutorId };
+  const STUDENT_PERSON = { label: "Student", kind: "student", personId: studentId };
+  const classPeople = (side, salesDetailsId) => {
+    const isShared = shared.some((s) => sameId(s.salesDetailsId, salesDetailsId));
+    if (side === "tutor") return isShared ? [TUTOR_PERSON, STUDENT_PERSON] : [TUTOR_PERSON];
+    if (side === "student") return isShared ? [TUTOR_PERSON, STUDENT_PERSON] : [STUDENT_PERSON];
+    return null;
+  };
+
+  const toCalendarEvents = (events, side) => {
     const existing = events.map((e) => {
       const kind = KINDS[e.kind] || KINDS.OneTime;
       return {
@@ -198,7 +210,13 @@ const OpsScheduleCalendar = ({ preselect, onRequestModified }) => {
         end: e.end,
         backgroundColor: kind.color,
         borderColor: kind.color,
-        extendedProps: { color: kind.color, timeText: `${moment(e.start).format("h:mm A")} - ${moment(e.end).format("h:mm A")}` },
+        extendedProps: {
+          color: kind.color,
+          timeText: `${moment(e.start).format("h:mm A")} - ${moment(e.end).format("h:mm A")}`,
+          people: classPeople(side, e.salesDetailsId),
+          classStart: e.start,
+          classEnd: e.end,
+        },
       };
     });
     const added = proposed.map((p, i) => {
@@ -211,7 +229,14 @@ const OpsScheduleCalendar = ({ preselect, onRequestModified }) => {
         end: p.end.toDate(),
         backgroundColor: kind.color,
         borderColor: kind.color,
-        extendedProps: { color: kind.color, timeText: `${p.start.format("h:mm A")} - ${p.end.format("h:mm A")}` },
+        extendedProps: {
+          color: kind.color,
+          timeText: `${p.start.format("h:mm A")} - ${p.end.format("h:mm A")}`,
+          // The new classes are for the shared subject; the entered times are India time, passed without an offset.
+          people: side ? [TUTOR_PERSON, STUDENT_PERSON] : null,
+          classStart: p.start.format("YYYY-MM-DDTHH:mm:ss"),
+          classEnd: p.end.format("YYYY-MM-DDTHH:mm:ss"),
+        },
       };
     });
     return [...existing, ...added];
@@ -219,7 +244,7 @@ const OpsScheduleCalendar = ({ preselect, onRequestModified }) => {
 
   // Own event box: the site theme paints every calendar event purple.
   const renderEvent = (arg) => {
-    const { timeText, color } = arg.event.extendedProps;
+    const { timeText, color, people, classStart, classEnd } = arg.event.extendedProps;
     return (
       <div
         title={`${timeText} · ${arg.event.title}`}
@@ -227,6 +252,7 @@ const OpsScheduleCalendar = ({ preselect, onRequestModified }) => {
       >
         <div style={{ fontWeight: 600, whiteSpace: "nowrap" }}>{timeText}</div>
         <div style={{ whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden" }}>{arg.event.title}</div>
+        {people && <ClassPeopleTimeLines people={people} start={classStart} end={classEnd} />}
       </div>
     );
   };
@@ -241,7 +267,7 @@ const OpsScheduleCalendar = ({ preselect, onRequestModified }) => {
       allDaySlot={false}
       scrollTime="07:00:00"
       height={560}
-      events={toCalendarEvents(events)}
+      events={toCalendarEvents(events, master ? "tutor" : "student")}
       eventDisplay="block"
       eventContent={renderEvent}
       dayMaxEvents={3}
@@ -334,6 +360,7 @@ const OpsScheduleCalendar = ({ preselect, onRequestModified }) => {
               </option>
             ))}
           </Input>
+          {tutorId && <PersonTimeZoneLabel className="mt-1" label="Tutor timezone" kind="tutor" personId={tutorId} />}
           <div className="mt-2 border rounded p-1">
             {!tutorId && <div className="text-soft small p-1">Select a tutor to see all of the tutor's classes.</div>}
             {calendar(tutorCalendar, tutorEvents, true)}
@@ -349,6 +376,7 @@ const OpsScheduleCalendar = ({ preselect, onRequestModified }) => {
               </option>
             ))}
           </Input>
+          {studentId && <PersonTimeZoneLabel className="mt-1" label="Student timezone" kind="student" personId={studentId} />}
           <div className="mt-2 border rounded p-1">
             {!studentId && <div className="text-soft small p-1">Select a student to see all of the student's classes.</div>}
             {calendar(studentCalendar, studentEvents, false)}
@@ -441,6 +469,7 @@ const OpsScheduleCalendar = ({ preselect, onRequestModified }) => {
               </FormGroup>
             </Col>
           </Row>
+          <IndiaTimeEntryNote className="mt-2" />
           <div className="d-flex justify-content-between align-items-center flex-wrap mt-3" style={{ gap: 10 }}>
             <small className="text-soft">
               The new classes show on both calendars: green when that person is free, red when they already have a class.

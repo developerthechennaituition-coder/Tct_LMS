@@ -25,6 +25,10 @@
     Status = 'Class Completed' (Operations' record) + Ops-approved. Requires the view from
     TCT.LMS.API/DBScript/AttendanceCrossCheckBilling_19_October_2026.sql.
 
+    29-Oct-2026: Schedule.TutorId holds the Tutor.Id, or the tutor's User.Id on older rows. Classes are now
+    matched on either (@TutorId, @TutorUserId), so the tutor's classes on older schedules are no longer left
+    out. Each class row is matched once; the invoice is still saved under @TutorId (Tutor.Id). Pay is unchanged.
+
     Idempotent via CREATE OR ALTER — safe to re-run.
 */
 CREATE OR ALTER PROCEDURE [dbo].[usp_GenerateTutorInvoice]
@@ -44,6 +48,9 @@ BEGIN
 
     DECLARE @CancelledStatusId UNIQUEIDENTIFIER;
 
+    -- The tutor's User.Id: older schedules store it in Schedule.TutorId instead of Tutor.Id.
+    DECLARE @TutorUserId UNIQUEIDENTIFIER = (SELECT UserId FROM Tutor WHERE Id = @TutorId);
+
     -- Get TypeCode Id for Cancelled (20021) only - used for cancelled count
     SELECT @CancelledStatusId = TC.Id
     FROM Type_Code TC
@@ -58,7 +65,7 @@ BEGIN
         SELECT 1
         FROM Schedule SCH
         INNER JOIN ScheduleDetails SCD ON SCH.ScheduleId = SCD.ScheduleId
-        WHERE SCH.TutorId = @TutorId
+        WHERE SCH.TutorId IN (@TutorId, @TutorUserId)
           AND SCD.Date >= @MonthStartDate
           AND SCD.Date < @MonthEndDate
           AND EXISTS (SELECT 1 FROM dbo.vw_ClassAttendanceBilling B WHERE B.ScheduleDetailsId = SCD.ScheduleDetailsId AND B.IsTutorPayable = 1)
@@ -82,14 +89,14 @@ BEGIN
             FROM Schedule SCH2
             INNER JOIN ScheduleDetails SCD2 ON SCH2.ScheduleId = SCD2.ScheduleId
             INNER JOIN SalesDetails SAD ON SAD.Id = SCH2.SalesDetailsId
-            WHERE SCH2.TutorId = @TutorId
+            WHERE SCH2.TutorId IN (@TutorId, @TutorUserId)
               AND SCD2.Date >= @MonthStartDate
               AND SCD2.Date < @MonthEndDate
               AND EXISTS (SELECT 1 FROM dbo.vw_ClassAttendanceBilling B WHERE B.ScheduleDetailsId = SCD2.ScheduleDetailsId AND B.IsTutorPayable = 1)
         )
     FROM Schedule SCH
     INNER JOIN ScheduleDetails SCD ON SCH.ScheduleId = SCD.ScheduleId
-    WHERE SCH.TutorId = @TutorId
+    WHERE SCH.TutorId IN (@TutorId, @TutorUserId)
       AND SCD.Date >= @MonthStartDate
       AND SCD.Date < @MonthEndDate
       AND EXISTS (SELECT 1 FROM dbo.vw_ClassAttendanceBilling B WHERE B.ScheduleDetailsId = SCD.ScheduleDetailsId AND B.IsTutorPayable = 1);
@@ -160,7 +167,7 @@ BEGIN
     INNER JOIN Sales SAS ON SAS.Id = SAD.SalesId
     INNER JOIN Student STD ON STD.Id = SAS.StudentId
     INNER JOIN [User] USR ON USR.Id = STD.UserId
-    WHERE SCH.TutorId = @TutorId
+    WHERE SCH.TutorId IN (@TutorId, @TutorUserId)
       AND SCD.Date >= @MonthStartDate
       AND SCD.Date < @MonthEndDate
       AND EXISTS (SELECT 1 FROM dbo.vw_ClassAttendanceBilling B WHERE B.ScheduleDetailsId = SCD.ScheduleDetailsId AND B.IsTutorPayable = 1);

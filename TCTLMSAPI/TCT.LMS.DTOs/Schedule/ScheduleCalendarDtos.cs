@@ -39,6 +39,8 @@ public class ScheduleCalendarEnrolmentDto
     // e.g. "Mon 07:00 PM, Wed 07:00 PM" from the latest weekly schedule; empty when there is none.
     public string WeeklyPattern { get; set; } = "";
     public bool HasWeeklySchedule { get; set; }
+    // SalesDetails.TutorId as stored (the Tutor.Id, or the tutor's User.Id on older rows); used to show the tutor's timezone.
+    public Guid? TutorId { get; set; }
 }
 
 public class ScheduleCalendarEventDto

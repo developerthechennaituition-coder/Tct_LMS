@@ -39,6 +39,7 @@ import {
 } from "../../../apiservices/UserService";
 import UserAvailableSlotsProgressBar from "./UserAvailableSlotsProgressBar";
 import TutorAvailabilityModal from "./TutorAvailabilityModal";
+import { UserTimeZoneLabels } from "./UserTimeZoneLabel";
 
 // The enrollment's Preferred Demo Date ("YYYY-MM-DD...") as DD-MM-YYYY, read without a time-zone shift.
 const formatPreferredDemoDate = (value) => {
@@ -621,6 +622,10 @@ const ScheduleDemo = (props) => {
                         </div>
                       </div>
                     </FormGroup>
+                    {/* Opened from the class calendar: the class's tutor and student timezones (display only). */}
+                    {props.source === "Calender" && (
+                      <UserTimeZoneLabels className="mb-2" tutorUserId={props.tutorUserId} studentUserId={props.studentUserId} start={props.classStart} end={props.classEnd} />
+                    )}
                     {!isClassRescheduleFlow && (
                       <FormGroup>
                         <label className="form-label">Preferred Demo Date</label>

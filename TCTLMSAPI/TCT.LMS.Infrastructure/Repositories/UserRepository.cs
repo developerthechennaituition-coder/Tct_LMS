@@ -70,6 +70,7 @@ public class UserRepository : GenericRepository<User>, IUserRepository
                 LastLogin = result.LastLogin,
                 ManagerId = result.ManagerId,
                 Location = result.Location,
+                TimeZoneId = result.TimeZoneId,
             };
             if (address != null)
             {
@@ -505,11 +506,37 @@ public class UserRepository : GenericRepository<User>, IUserRepository
             throw;
         }
     }
+    // Updates profile fields only; a null (or omitted) value keeps the stored one. Email, password, status,
+    // privilege flags, TimeZoneId, login/chat state and audit fields have their own flows and are never changed here.
     public async Task<User> UpdateUser(User user)
     {
-        _dbContext.User.Update(user);
+        var existing = await _dbContext.User.FirstOrDefaultAsync(u => u.Id == user.Id)
+            ?? throw new KeyNotFoundException($"User {user.Id} not found.");
+
+        var firstName = user.FirstName ?? existing.FirstName;
+        var lastName = user.LastName ?? existing.LastName;
+        // A changed first or last name rebuilds FullName from the stored names (as AddTCTUser does).
+        var nameChanged = firstName != existing.FirstName || lastName != existing.LastName;
+        existing.FirstName = firstName;
+        existing.LastName = lastName;
+        existing.FullName = nameChanged ? $"{firstName} {lastName}".Trim() : user.FullName ?? existing.FullName;
+        existing.Phone = user.Phone ?? existing.Phone;
+        existing.AlternatePhone = user.AlternatePhone ?? existing.AlternatePhone;
+        existing.DOB = user.DOB ?? existing.DOB;
+        existing.Gender = user.Gender ?? existing.Gender;
+        existing.DesignationId = user.DesignationId ?? existing.DesignationId;
+        existing.ManagerId = user.ManagerId ?? existing.ManagerId;
+        existing.JoiningDate = user.JoiningDate ?? existing.JoiningDate;
+        existing.LastWorkingDate = user.LastWorkingDate ?? existing.LastWorkingDate;
+        existing.Location = user.Location ?? existing.Location;
+        existing.Nickname = user.Nickname ?? existing.Nickname;
+        existing.Theme = user.Theme ?? existing.Theme;
+        existing.ChatTheme = user.ChatTheme ?? existing.ChatTheme;
+        existing.ModifiedBy = user.ModifiedBy ?? existing.ModifiedBy;
+        existing.ModifiedDate = DateTime.UtcNow;
+
         await _dbContext.SaveChangesAsync();
-        return user;
+        return existing;
     }
     public async Task<User> UpdateConfirmEmail(string email)
     {
