@@ -9,7 +9,16 @@ public sealed record DemoStatusOptions(IReadOnlyList<DemoStatusOption> Statuses,
 
 public sealed record UpdateDemoStatusRequest(Guid SalesDetailsId, int StatusCode, DateTime? ReminderDate, Guid? DropoutReasonId);
 
-public sealed record CreateUserTaskRequest(Guid AssignedToUserId, string? Title, string? Description, DateTime? DueDate, string? Priority);
+/// <param name="DueTime">Optional deadline time of day, "HH:mm" (same clock as DueDate). Omitted by older clients.</param>
+/// <param name="TimeZoneOffsetMinutes">The browser's Date.getTimezoneOffset() (UTC − local, minutes), used to check the deadline is not in the past.</param>
+public sealed record CreateUserTaskRequest(Guid AssignedToUserId, string? Title, string? Description, DateTime? DueDate, string? Priority,
+    string? DueTime = null, int? TimeZoneOffsetMinutes = null);
+
+/// <summary>Verify (comment optional) or request changes (comment required).</summary>
+public sealed record ReviewUserTaskRequest(string? Comment);
+
+/// <summary>A proof file's content, after the caller's access was checked.</summary>
+public sealed record TaskAttachmentContent(string FileName, string ContentType, byte[] Data);
 
 /// <summary>Result of a My Calendar task action: Ok, or a client error (400/403/404/409) with a message.</summary>
 public sealed record MyCalendarResult<T>(bool Succeeded, int StatusCode, string? Message, T? Data)
@@ -37,6 +46,21 @@ public interface IMyCalendarService
     Task<MyCalendarResult<UserTaskDto>> CreateTaskAsync(Guid callerUserId, CreateUserTaskRequest request, CancellationToken token);
 
     Task<MyCalendarResult<UserTaskDto>> CompleteTaskAsync(Guid callerUserId, Guid taskId, CancellationToken token);
+
+    // ─── Task verification workflow ───
+    /// <summary>Tasks awaiting the caller's verification (administrators: every task awaiting verification, except their own).</summary>
+    Task<IReadOnlyList<UserTaskDto>> GetPendingVerificationTasksAsync(Guid callerUserId, IReadOnlyCollection<string> callerRoles, CancellationToken token);
+
+    Task<MyCalendarResult<UserTaskDto>> StartTaskAsync(Guid callerUserId, Guid taskId, CancellationToken token);
+
+    Task<MyCalendarResult<UserTaskDto>> SubmitForVerificationAsync(Guid callerUserId, Guid taskId, string? notes,
+        IReadOnlyList<TaskVerificationFile> files, CancellationToken token);
+
+    Task<MyCalendarResult<UserTaskDto>> ReviewTaskAsync(Guid callerUserId, IReadOnlyCollection<string> callerRoles, Guid taskId,
+        bool approve, string? comment, CancellationToken token);
+
+    Task<MyCalendarResult<TaskAttachmentContent>> GetTaskAttachmentAsync(Guid callerUserId, IReadOnlyCollection<string> callerRoles,
+        Guid attachmentId, CancellationToken token);
 
     // ─── Demo status workflow ───
     Task<DemoStatusOptions> GetDemoStatusOptionsAsync(CancellationToken token);

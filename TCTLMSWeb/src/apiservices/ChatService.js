@@ -62,6 +62,11 @@ export const DeleteMessage = (messageId, senderId, receiverId) => {
   return axios.post("/Chat/DeleteMessage", { messageId, senderId, receiverId });
 };
 
+// "Delete for me": hides the message for the logged-in user only (identified from the access token).
+export const DeleteMessageForMe = (messageId) => {
+  return axios.post("/Chat/DeleteMessageForMe", { messageId });
+};
+
 export const DeleteGroup = (groupId, userId) => {
   return axios.put(`/Chat/DeleteGroup?groupId=${groupId}&userId=${userId}`);
 };

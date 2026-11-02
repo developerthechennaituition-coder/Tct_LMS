@@ -7,6 +7,7 @@ import Toggle from "./Toggle";
 import EcommerceMenu from "../menu/EcommerceMenu";
 import { GetMenuByUser } from "../../apiservices/AuthenticateService";
 import { normalizeChatMenu } from "../../library/workflowDisplay";
+import TaskCountBadge from "./TaskCountBadge";
 
 const removeStudentOnlyRestrictedItems = (items) => {
   if (!Array.isArray(items)) return items;
@@ -139,6 +140,22 @@ const Sidebar = ({ fixed, theme, className, sidebarToggle, mobileView, ...props 
         if (!hasMyCalendar) {
           finalMenuData = [...finalMenuData, { text: "My Calendar", link: myCalendarLink, icon: "calendar-booking", subMenu: [] }];
         }
+
+        // Tasks: opens the Tasks page (the My Calendar Tasks panel on its own), right after My Calendar (in the same
+        // list), with the live "Assigned to me" count as its badge.
+        const tasksLink = "/lms/tasks";
+        const tasksItem = { text: "Tasks", link: tasksLink, icon: "task", badge: <TaskCountBadge />, subMenu: [] };
+        const insertAfterMyCalendar = (items) => {
+          if (items.some((item) => item?.link === tasksLink)) return items;
+          const index = items.findIndex((item) => item?.link === myCalendarLink);
+          if (index >= 0) return [...items.slice(0, index + 1), tasksItem, ...items.slice(index + 1)];
+          return items.map((item) =>
+            Array.isArray(item?.subMenu) && item.subMenu.some((sub) => sub?.link === myCalendarLink)
+              ? { ...item, subMenu: insertAfterMyCalendar(item.subMenu) }
+              : item
+          );
+        };
+        finalMenuData = insertAfterMyCalendar(finalMenuData);
       }
 
       // Reports parent (present only when the API returned at least one permitted report) opens the Reports landing page.

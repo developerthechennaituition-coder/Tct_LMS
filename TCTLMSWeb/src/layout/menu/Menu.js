@@ -3,6 +3,7 @@ import menu from "./MenuData";
 import { NavLink, Link } from "react-router-dom";
 import Icon from "../../components/icon/Icon";
 import classNames from "classnames";
+import { isCurrentMenuLink } from "../../library/menuActiveLink";
 
 const MenuHeading = ({ heading }) => {
   return (
@@ -12,7 +13,7 @@ const MenuHeading = ({ heading }) => {
   );
 };
 
-const MenuItem = ({ icon, link, text, sub, subPanel, panel, newTab, mobileView, sidebarToggle, badge, ...props }) => {
+const MenuItem = ({ icon, link, text, sub, subPanel, panel, newTab, mobileView, sidebarToggle, badge, siblingLinks, ...props }) => {
   // A parent with its own page (non-empty link; only Reports today): the link opens the page and the
   // arrow button expands/collapses. Parents without a link keep the original click-to-expand behavior.
   const hasOwnPage = !!sub && !!link;
@@ -140,7 +141,9 @@ const MenuItem = ({ icon, link, text, sub, subPanel, panel, newTab, mobileView, 
   const menuItemClass = classNames({
     "nk-menu-item": true,
     "has-sub": sub,
-    "active current-page": !hasOwnPage && currentUrl === process.env.PUBLIC_URL + link,
+    // Exact path as before; a link with a query (Tasks) also needs its query values (see menuActiveLink).
+    "active current-page":
+      !hasOwnPage && isCurrentMenuLink(link, siblingLinks, currentUrl, window.location.search, process.env.PUBLIC_URL || ""),
     "current-menu": hasOwnPage && (currentUrl || "").startsWith(process.env.PUBLIC_URL + link),
   });
   return (
@@ -171,7 +174,8 @@ const MenuItem = ({ icon, link, text, sub, subPanel, panel, newTab, mobileView, 
             </span>
           ) : null}
           <span className="nk-menu-text">{text}</span>
-          {badge && <span className="nk-menu-badge">{badge}</span>}
+          {/* A component badge (Tasks count) renders its own nk-menu-badge, and nothing when empty. */}
+          {React.isValidElement(badge) ? badge : badge && <span className="nk-menu-badge">{badge}</span>}
           {hasOwnPage && (
             <button
               type="button"
@@ -267,6 +271,7 @@ const MenuSub = ({ icon, link, text, sub, sidebarToggle, mobileView, ...props })
           key={item.text}
           newTab={item.newTab}
           badge={item.badge}
+          siblingLinks={sub.map((s) => s.link)}
           sidebarToggle={sidebarToggle}
           mobileView={mobileView}
         />
@@ -315,6 +320,7 @@ const Menu = ({ sidebarToggle, mobileView, menuData }) => {
             text={item.text}
             sub={item.subMenu.length > 0 ? item.subMenu : null}
             badge={item.badge}
+            siblingLinks={data.map((d) => d.link)}
             panel={item.panel}
             subPanel={item.subPanel}
             sidebarToggle={sidebarToggle}

@@ -88,6 +88,71 @@ public sealed class MyCalendarController : ControllerBase
         return FromResult(await _service.CompleteTaskAsync(CallerId, taskId, token));
     }
 
+    // ─── Task verification workflow (permissions are enforced by the service and repository) ───
+
+    /// <summary>Tasks awaiting the caller's verification (administrators: all, except their own).</summary>
+    [HttpGet("tasks/pending-verification")]
+    public async Task<IActionResult> PendingVerificationTasks(CancellationToken token)
+    {
+        if (Reject() is { } rejected) return rejected;
+        return Ok(new { success = true, data = await _service.GetPendingVerificationTasksAsync(CallerId, CallerRoles, token) });
+    }
+
+    [HttpPut("tasks/{taskId:guid}/start")]
+    public async Task<IActionResult> StartTask(Guid taskId, CancellationToken token)
+    {
+        if (Reject() is { } rejected) return rejected;
+        return FromResult(await _service.StartTaskAsync(CallerId, taskId, token));
+    }
+
+    /// <summary>Submit (or resubmit) a completed task for verification: optional notes and up to 5 proof files (multipart/form-data).</summary>
+    [HttpPost("tasks/{taskId:guid}/submit-verification")]
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> SubmitForVerification(Guid taskId, [FromForm] string? notes, [FromForm] List<IFormFile>? files, CancellationToken token)
+    {
+        if (Reject() is { } rejected) return rejected;
+        var uploads = (files ?? new List<IFormFile>()).Where(f => f != null).ToList();
+        var streams = new List<Stream>();
+        try
+        {
+            var proof = uploads.Select(f =>
+            {
+                var stream = f.OpenReadStream();
+                streams.Add(stream);
+                return new TCT.LMS.Application.Interfaces.Repositories.TaskVerificationFile(Path.GetFileName(f.FileName), f.Length, stream);
+            }).ToList();
+            return FromResult(await _service.SubmitForVerificationAsync(CallerId, taskId, notes, proof, token));
+        }
+        finally
+        {
+            foreach (var stream in streams) stream.Dispose();
+        }
+    }
+
+    [HttpPut("tasks/{taskId:guid}/verify")]
+    public async Task<IActionResult> VerifyTask(Guid taskId, [FromBody] ReviewUserTaskRequest? request, CancellationToken token)
+    {
+        if (Reject() is { } rejected) return rejected;
+        return FromResult(await _service.ReviewTaskAsync(CallerId, CallerRoles, taskId, approve: true, request?.Comment, token));
+    }
+
+    [HttpPut("tasks/{taskId:guid}/request-changes")]
+    public async Task<IActionResult> RequestTaskChanges(Guid taskId, [FromBody] ReviewUserTaskRequest? request, CancellationToken token)
+    {
+        if (Reject() is { } rejected) return rejected;
+        return FromResult(await _service.ReviewTaskAsync(CallerId, CallerRoles, taskId, approve: false, request?.Comment, token));
+    }
+
+    /// <summary>Download a proof file (assignee, assigner or administrator only).</summary>
+    [HttpGet("tasks/attachments/{attachmentId:guid}")]
+    public async Task<IActionResult> TaskAttachment(Guid attachmentId, CancellationToken token)
+    {
+        if (Reject() is { } rejected) return rejected;
+        var result = await _service.GetTaskAttachmentAsync(CallerId, CallerRoles, attachmentId, token);
+        if (!result.Succeeded) return StatusCode(result.StatusCode, new { success = false, message = result.Message });
+        return File(result.Data!.Data, result.Data.ContentType, result.Data.FileName);
+    }
+
     // ─── Demo status workflow ───
 
     /// <summary>The 12 demo statuses (label, code, id, required fields) and the dropout reasons.</summary>

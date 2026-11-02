@@ -102,7 +102,51 @@ public sealed class UserTaskDto
     public DateTime CreatedDate { get; set; }
     public DateTime? CompletedDate { get; set; }
     public string? CompletedByName { get; set; }
+
+    // ─── Deadline time and verification workflow (all optional for older tasks) ───
+    /// <summary>Time of day of the deadline, same clock as <see cref="DueDate"/>; null = date-only.</summary>
+    public TimeSpan? DueTime { get; set; }
+    /// <summary>
+    /// Effective workflow status: Assigned / InProgress / Completed / PendingVerification / ChangesRequested / Verified
+    /// (UserTaskWorkflowStatus), worked out from Status and the stored WorkflowStatus.
+    /// </summary>
+    public string VerificationStatus { get; set; } = string.Empty;
+    /// <summary>Stored dbo.UserTask.WorkflowStatus (null for tasks that never entered the workflow).</summary>
+    public string? WorkflowStatus { get; set; }
+    /// <summary>True when the signed-in user is the assignee and may submit / resubmit it (set by the service).</summary>
+    public bool CanSubmitForVerification { get; set; }
+    /// <summary>True when the signed-in user may verify it or request changes (set by the service).</summary>
+    public bool CanVerify { get; set; }
+    public IReadOnlyList<UserTaskVerificationHistoryDto> VerificationHistory { get; set; } = Array.Empty<UserTaskVerificationHistoryDto>();
 }
+
+/// <summary>One verification workflow action, newest first in <see cref="UserTaskDto.VerificationHistory"/>.</summary>
+public sealed class UserTaskVerificationHistoryDto
+{
+    public Guid Id { get; set; }
+    public Guid UserTaskId { get; set; }
+    public string Action { get; set; } = string.Empty;
+    public string PreviousStatus { get; set; } = string.Empty;
+    public string NewStatus { get; set; } = string.Empty;
+    public string? Comments { get; set; }
+    public Guid PerformedByUserId { get; set; }
+    public string? PerformedByName { get; set; }
+    public DateTime PerformedDate { get; set; }
+    public IReadOnlyList<UserTaskAttachmentDto> Attachments { get; set; } = Array.Empty<UserTaskAttachmentDto>();
+}
+
+/// <summary>A proof file attached to a submission (dbo.DocumentStorage row).</summary>
+public sealed record UserTaskAttachmentDto(Guid Id, string FileName, string? ContentType, string? FileSize);
+
+/// <summary>A stored proof file and the task it belongs to (for the permission check before download).</summary>
+public sealed record UserTaskAttachmentFile(Guid UserTaskId, string FileName, string? ContentType, string FilePath);
+
+/// <summary>An uploaded proof file, already validated by the service.</summary>
+public sealed record TaskVerificationFile(string FileName, long Length, Stream Content);
+
+/// <summary>A deadline reminder due for a task's assignee (Milestone: a UserTaskDeadline value).</summary>
+public sealed record TaskReminderCandidate(Guid TaskId, string Title, Guid AssignedToUserId, Guid AssignedByUserId,
+    DateTime DueDate, TimeSpan? DueTime, string Milestone);
 
 public enum CompleteTaskOutcome
 {
@@ -110,6 +154,20 @@ public enum CompleteTaskOutcome
     NotFound,
     NotAssignee,
     AlreadyCompleted,
+}
+
+public enum TaskWorkflowOutcome
+{
+    Done,
+    NotFound,
+    /// <summary>Start / submit: the caller is not the assignee.</summary>
+    NotAssignee,
+    /// <summary>Verify / request changes: the caller is neither the assigner nor an administrator, or is the assignee.</summary>
+    NotVerifier,
+    /// <summary>Self-assigned tasks have no separate verifier, so they do not use the workflow.</summary>
+    SelfAssigned,
+    /// <summary>The task is not in a status that allows the action (also a repeated / concurrent submission).</summary>
+    InvalidState,
 }
 
 public interface IMyCalendarRepository
@@ -131,7 +189,7 @@ public interface IMyCalendarRepository
 
     /// <summary>Saves the task and (unless self-assigned) the assignee's notification in one transaction.</summary>
     Task<Guid> CreateTaskAsync(Guid assignedByUserId, Guid assignedToUserId, string title, string description,
-        DateTime dueDate, string? priority, CancellationToken token);
+        DateTime dueDate, TimeSpan? dueTime, string? priority, CancellationToken token);
 
     /// <summary>
     /// Marks the task Completed only when <paramref name="callerUserId"/> is its assignee and it is still Pending
@@ -139,6 +197,43 @@ public interface IMyCalendarRepository
     /// in the same transaction.
     /// </summary>
     Task<CompleteTaskOutcome> CompleteTaskAsync(Guid taskId, Guid callerUserId, CancellationToken token);
+
+    // ─── Task verification workflow ───
+
+    /// <summary>Tasks awaiting verification: those assigned by <paramref name="assignedByUserId"/>, or every one when null (administrators).</summary>
+    Task<IReadOnlyList<UserTaskDto>> GetPendingVerificationTasksAsync(Guid? assignedByUserId, CancellationToken token);
+
+    /// <summary>Assigned → In Progress, by the assignee only (conditional update + history row).</summary>
+    Task<TaskWorkflowOutcome> StartTaskAsync(Guid taskId, Guid callerUserId, CancellationToken token);
+
+    /// <summary>
+    /// Assigned / In Progress (completes the task) / Completed / Changes Requested → Pending Verification, by the
+    /// assignee only, never for a self-assigned task. Stores the proof files, the history row (with the notes) and the
+    /// assigner's notification in one transaction; on failure nothing is saved and the new files are removed.
+    /// </summary>
+    Task<TaskWorkflowOutcome> SubmitForVerificationAsync(Guid taskId, Guid callerUserId, string? notes,
+        IReadOnlyList<TaskVerificationFile> files, CancellationToken token);
+
+    /// <summary>
+    /// Pending Verification → Verified (<paramref name="approve"/>) or Changes Requested, by the assigner or an
+    /// administrator, never the assignee. Conditional update, history row and the assignee's notification in one transaction.
+    /// </summary>
+    Task<TaskWorkflowOutcome> ReviewTaskAsync(Guid taskId, Guid callerUserId, bool callerIsAdmin, bool approve,
+        string? comment, CancellationToken token);
+
+    Task<UserTaskAttachmentFile?> GetTaskAttachmentAsync(Guid attachmentId, CancellationToken token);
+
+    /// <summary>
+    /// Deadline reminders due at <paramref name="now"/> (TCT local time) that have not been sent yet: active tasks still
+    /// Pending (not completed, not submitted for verification), one milestone per task, for the assignee.
+    /// </summary>
+    Task<IReadOnlyList<TaskReminderCandidate>> GetDueTaskRemindersAsync(DateTime now, CancellationToken token);
+
+    /// <summary>
+    /// Sends one reminder notification and records it, in one transaction. False when it was already sent (also by a
+    /// concurrent run) or the task has been completed / submitted / removed since it was listed.
+    /// </summary>
+    Task<bool> SendTaskReminderAsync(TaskReminderCandidate reminder, CancellationToken token);
 
     // ─── Demo status workflow ───
 

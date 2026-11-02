@@ -99,6 +99,7 @@ builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddSignalR();
 builder.Services.AddHostedService<ClassReminderService>();
+builder.Services.AddHostedService<TaskDeadlineReminderService>();
 
 var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() ?? [];
 builder.Services.AddCors(options =>

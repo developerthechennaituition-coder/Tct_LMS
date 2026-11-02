@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useHistory, useLocation } from "react-router-dom";
+import { Redirect, useHistory, useLocation } from "react-router-dom";
 import Select from "react-select";
 import moment from "moment";
 import { toast, ToastContainer } from "react-toastify";
@@ -19,19 +19,44 @@ import {
   getMyTasks,
   createUserTask,
   completeUserTask,
+  startUserTask,
+  getPendingVerificationTasks,
+  submitTaskForVerification,
+  verifyUserTask,
+  requestUserTaskChanges,
+  downloadTaskAttachment,
   myCalendarErrorMessage,
 } from "../../../apiservices/MyCalendarService";
 import { dDayFilterOptions, demoDayMarkerDate, demoFollowUpCategory, LONG_FOLLOW_UP, SHORT_FOLLOW_UP } from "../../../library/demoFollowUp";
-import { criticalTaskOffset, groupCriticalTasks, selectMyTaskDemos } from "../../../library/myCalendarTasks";
+import {
+  criticalTaskOffset,
+  groupCriticalTasks,
+  selectMyTaskDemos,
+  formatTaskDeadline,
+  isDeadlineBeforeNow,
+  verificationLabel,
+  latestReview,
+  latestSubmission,
+  validateProofFiles,
+  PROOF_ACCEPT,
+  VERIFICATION_ACTION_LABELS,
+  taskDeadlineState,
+  deadlineDetail,
+  DEADLINE_LABELS,
+  openAssignedTaskCount,
+  publishTaskCount,
+} from "../../../library/myCalendarTasks";
 import { showsClassEvents, toClassEvent, visibleClassEvents } from "../../../library/myCalendarClasses";
 import { UserTimeZoneText } from "../common/UserTimeZoneLabel";
 import "./MyCalendar.css";
 
 // Roles without My Calendar (the server enforces the same rule).
 const EXCLUDED_ROLES = ["tutor", "student"];
+// The Tasks page (route/Index.js; sidebar → Tasks).
+const TASKS_PATH = `${process.env.PUBLIC_URL}/lms/tasks`;
 const PRIORITIES = ["Low", "Medium", "High"];
 const roleLabel = (role) => String(role || "").replace(/([a-z])([A-Z])/g, "$1 $2");
-const emptyTaskForm = { assignee: null, title: "", description: "", dueDate: "", priority: "" };
+const emptyTaskForm = { assignee: null, title: "", description: "", dueDate: "", dueTime: "", priority: "" };
 
 // ─── Demo calendar ──────────────────────────────────────────────────────────────
 const ALL_STATUSES = "";
@@ -541,27 +566,100 @@ const DemoCalendar = () => {
 };
 
 // ─── Tasks ──────────────────────────────────────────────────────────────────────
-const statusBadge = (task) => {
+// Incomplete tasks show their deadline state (Due Soon D-7…D-1, Critical — Due Today, Overdue) in place of "Pending";
+// it is calculated from the due date / time (taskDeadlineState) and never changes the task's status.
+const DEADLINE_BADGE_CLASS = { dueSoon: "is-due-soon", dueToday: "is-critical", overdue: "is-overdue" };
+const statusBadge = (task, deadline) => {
   if (task.status === "Completed") return <span className="mc-badge is-done">Completed</span>;
-  const overdue = moment(task.dueDate).isBefore(moment(), "day");
-  return <span className={`mc-badge ${overdue ? "is-overdue" : "is-pending"}`}>{overdue ? "Overdue" : "Pending"}</span>;
+  if (deadline) return <span className={`mc-badge ${DEADLINE_BADGE_CLASS[deadline.state]}`}>{DEADLINE_LABELS[deadline.state]}</span>;
+  return <span className="mc-badge is-pending">Pending</span>;
 };
 
-const TaskCard = ({ task, mode, onComplete, completing }) => {
-  const [nextStatus, setNextStatus] = useState(task.status);
+// Verification workflow badge, next to the existing status badge (Assigned / Completed need none).
+const VERIFICATION_BADGE_CLASS = {
+  InProgress: "is-progress",
+  PendingVerification: "is-verifying",
+  ChangesRequested: "is-overdue",
+  Verified: "is-done",
+};
+const verificationBadge = (task) =>
+  VERIFICATION_BADGE_CLASS[task.verificationStatus] ? (
+    <span className={`mc-badge ${VERIFICATION_BADGE_CLASS[task.verificationStatus]}`}>{verificationLabel(task.verificationStatus)}</span>
+  ) : null;
+
+const AttachmentLinks = ({ attachments }) =>
+  attachments?.length ? (
+    <ul className="mc-vh-files">
+      {attachments.map((file) => (
+        <li key={file.id}>
+          <button type="button" className="btn btn-link btn-sm p-0"
+            onClick={() => downloadTaskAttachment(file).catch((error) => toast.error(error.message))}>
+            <Icon name="clip" /> {file.fileName}
+          </button>
+        </li>
+      ))}
+    </ul>
+  ) : null;
+
+// Verification history, newest first: action, status change, who, when, comments and files.
+const VerificationHistory = ({ history }) => (
+  <ol className="mc-vh">
+    {history.map((h) => (
+      <li key={h.id}>
+        <div className="mc-vh-head">
+          <strong>{VERIFICATION_ACTION_LABELS[h.action] || h.action}</strong>
+          <span className="mc-vh-when">
+            {h.performedByName || "—"} · {moment.utc(h.performedDate).local().format("DD-MMM-YYYY hh:mm A")}
+          </span>
+        </div>
+        <div className="mc-vh-status">{verificationLabel(h.previousStatus)} → {verificationLabel(h.newStatus)}</div>
+        {h.comments && <p className="mc-vh-comment">{h.comments}</p>}
+        <AttachmentLinks attachments={h.attachments} />
+      </li>
+    ))}
+  </ol>
+);
+
+const TaskCard = ({ task, mode, onComplete, completing, onStart, onOpenSubmit, onOpenReview, now }) => {
+  const [nextStatus, setNextStatus] = useState(task.verificationStatus === "InProgress" ? "InProgress" : task.status);
+  const deadline = taskDeadlineState(task, now);
+  const [showHistory, setShowHistory] = useState(false);
   const canComplete = mode === "mine" && task.status !== "Completed";
+  // "In Progress" is offered only while the task has not been started (Assigned).
+  const canStart = canComplete && task.verificationStatus === "Assigned" && Boolean(onStart);
+  const review = latestReview(task);
+  const history = task.verificationHistory || [];
+  // Tasks from someone else are completed through the completion form (notes + files), which submits them for
+  // verification; self-assigned tasks keep the direct completion.
+  const completesWithVerification = task.canSubmitForVerification && Boolean(onOpenSubmit);
+  const updateStatus = () =>
+    nextStatus === "InProgress" ? onStart(task) : completesWithVerification ? onOpenSubmit(task) : onComplete(task);
+  // Separate Submit button: tasks completed before the workflow, and resubmission after Changes Requested.
+  const showSubmitButton = completesWithVerification && (task.verificationStatus === "Completed" || task.verificationStatus === "ChangesRequested");
+  const canUpdate = nextStatus === "Completed" || (nextStatus === "InProgress" && canStart);
   return (
     <div className="mc-task">
       <div className="mc-task-head">
         <h6 className="mc-task-title">{task.title}</h6>
-        {statusBadge(task)}
+        <span className="mc-demo-badges">
+          {verificationBadge(task)}
+          {statusBadge(task, deadline)}
+        </span>
       </div>
       <p className="mc-task-desc">{task.description}</p>
       <div className="mc-task-meta">
-        <span><Icon name="calendar" /> Due {moment(task.dueDate).format("DD-MMM-YYYY")}</span>
+        <span><Icon name="calendar" /> Due {formatTaskDeadline(task)}</span>
+        {deadline && (
+          <span className={`mc-deadline is-${deadline.state}`}><Icon name="clock" /> {deadlineDetail(deadline)}</span>
+        )}
         {task.priority && <span className={`mc-priority is-${task.priority.toLowerCase()}`}>{task.priority} priority</span>}
         {mode === "mine" ? (
           <span><Icon name="user" /> From {task.assignedByName || "—"}</span>
+        ) : mode === "verification" ? (
+          <>
+            <span><Icon name="user" /> To {task.assignedToName || "—"}</span>
+            <span><Icon name="user" /> By {task.assignedByName || "—"}</span>
+          </>
         ) : (
           <span><Icon name="user" /> To {task.assignedToName || "—"}</span>
         )}
@@ -569,6 +667,15 @@ const TaskCard = ({ task, mode, onComplete, completing }) => {
           <span><Icon name="check-circle" /> Completed {moment.utc(task.completedDate).local().format("DD-MMM-YYYY")}</span>
         )}
       </div>
+      {review?.comments && (task.verificationStatus === "ChangesRequested" || task.verificationStatus === "Verified") && (
+        <p className={`mc-verify-note ${task.verificationStatus === "ChangesRequested" ? "is-changes" : "is-verified"}`}>
+          <Icon name={task.verificationStatus === "ChangesRequested" ? "alert-circle" : "check-circle"} />{" "}
+          <span>
+            <strong>{task.verificationStatus === "ChangesRequested" ? "Changes requested" : "Verified"} by {review.performedByName || "—"}:</strong>{" "}
+            {review.comments}
+          </span>
+        </p>
+      )}
       {canComplete && (
         <div className="mc-task-actions">
           <label className="sr-only" htmlFor={`task-status-${task.id}`}>Status</label>
@@ -580,20 +687,201 @@ const TaskCard = ({ task, mode, onComplete, completing }) => {
             disabled={completing}
           >
             <option value="Pending">Pending</option>
+            {(canStart || task.verificationStatus === "InProgress") && <option value="InProgress">In Progress</option>}
             <option value="Completed">Completed</option>
           </select>
           <button
             type="button"
             className="btn btn-primary"
-            disabled={nextStatus !== "Completed" || completing}
-            onClick={() => onComplete(task)}
+            disabled={!canUpdate || completing}
+            onClick={updateStatus}
           >
             {completing ? <Spinner size="sm" /> : <Icon name="check" />}
             <span>Update status</span>
           </button>
         </div>
       )}
+      {showSubmitButton || (task.canVerify && onOpenReview) || history.length > 0 ? (
+        <div className="mc-task-actions">
+          {showSubmitButton && (
+            <button type="button" className="btn btn-primary" onClick={() => onOpenSubmit(task)}>
+              <Icon name="send" /> <span>{task.verificationStatus === "ChangesRequested" ? "Resubmit for verification" : "Submit for verification"}</span>
+            </button>
+          )}
+          {task.canVerify && onOpenReview && (
+            <button type="button" className="btn btn-primary" onClick={() => onOpenReview(task)}>
+              <Icon name="shield-check" /> <span>Review &amp; verify</span>
+            </button>
+          )}
+          {history.length > 0 && (
+            <button type="button" className="btn btn-light" onClick={() => setShowHistory((v) => !v)} aria-expanded={showHistory}>
+              <Icon name="history" /> <span>{showHistory ? "Hide history" : `History (${history.length})`}</span>
+            </button>
+          )}
+        </div>
+      ) : null}
+      {showHistory && history.length > 0 && <VerificationHistory history={history} />}
     </div>
+  );
+};
+
+// Employee: completion notes and optional proof files. Completing an Assigned / In Progress task submits it for
+// verification in the same step; also used to submit an older completed task and to resubmit after Changes Requested.
+const SubmitVerificationModal = ({ task, onClose, onSubmitted }) => {
+  const [notes, setNotes] = useState("");
+  const [files, setFiles] = useState([]);
+  const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
+  const review = latestReview(task);
+  const resubmitting = task.verificationStatus === "ChangesRequested";
+  const completing = task.verificationStatus === "Assigned" || task.verificationStatus === "InProgress";
+  const title = completing ? "Complete task" : resubmitting ? "Resubmit for verification" : "Submit for verification";
+  // Files of the previous submission stay in the history; new files are added with this submission.
+  const previousFiles = resubmitting ? latestSubmission(task)?.attachments || [] : [];
+
+  const submit = () => {
+    const fileError = validateProofFiles(files);
+    if (notes.trim().length > 2000) return setError("Completion notes must be 2000 characters or fewer.");
+    if (fileError) return setError(fileError);
+    setError("");
+    setSaving(true);
+    submitTaskForVerification(task.id, notes.trim(), files)
+      .then((response) => {
+        toast.success(response?.message || "Task submitted for verification.");
+        onSubmitted();
+      })
+      .catch((err) => toast.error(myCalendarErrorMessage(err, "Unable to submit the task. Please try again.")))
+      .finally(() => setSaving(false));
+  };
+
+  return (
+    <Modal isOpen toggle={saving ? undefined : onClose} className="modal-dialog-centered mc-status-modal" size="md">
+      <div className="mc-sm-head">
+        <span className="mc-sm-icon" aria-hidden="true"><Icon name="send" /></span>
+        <div className="mc-sm-head-text">
+          <h5 className="mc-sm-title">{title}</h5>
+          <p className="mc-sm-sub">{task.title} · Due {formatTaskDeadline(task)}</p>
+        </div>
+        <button type="button" className="mc-sm-close" aria-label="Close" onClick={onClose} disabled={saving}><Icon name="cross" /></button>
+      </div>
+      <ModalBody>
+        {task.verificationStatus === "ChangesRequested" && review?.comments && (
+          <p className="mc-verify-note is-changes">
+            <Icon name="alert-circle" /> <span><strong>Changes requested by {review.performedByName || "—"}:</strong> {review.comments}</span>
+          </p>
+        )}
+        <div className="mc-sm-form">
+          <div className="mc-field">
+            <label className="form-label" htmlFor="mc-sv-notes">Completion notes</label>
+            <textarea id="mc-sv-notes" className="form-control mc-textarea" rows={4} maxLength={2000} value={notes}
+              onChange={(e) => setNotes(e.target.value)} disabled={saving} placeholder="What was done? Anything the reviewer should check?" />
+          </div>
+          <div className="mc-field">
+            <label className="form-label" htmlFor="mc-sv-files">Supporting files (optional)</label>
+            <input id="mc-sv-files" type="file" className="form-control mc-file" multiple accept={PROOF_ACCEPT}
+              onChange={(e) => setFiles(Array.from(e.target.files || []))} disabled={saving} />
+            <span className="mc-hint">Up to 5 files (PDF, Word, Excel, JPG, PNG, TXT), 10 MB each.</span>
+          </div>
+          {previousFiles.length > 0 && (
+            <div className="mc-field">
+              <span className="form-label">Previously submitted files</span>
+              <AttachmentLinks attachments={previousFiles} />
+              <span className="mc-hint">They stay in the verification history. Attach the corrected or additional files above.</span>
+            </div>
+          )}
+          {completing && <span className="mc-hint">The task will be marked completed and sent to {task.assignedByName || "the assigner"} for verification.</span>}
+          {error && <span className="mc-error" role="alert">{error}</span>}
+        </div>
+      </ModalBody>
+      <ModalFooter>
+        <button type="button" className="btn btn-light" onClick={onClose} disabled={saving}>Cancel</button>
+        <button type="button" className="btn btn-primary" onClick={submit} disabled={saving}>
+          {saving ? <Spinner size="sm" /> : <Icon name="send" />}{" "}
+          <span>{saving ? "Submitting…" : completing ? "Complete & submit for verification" : "Submit"}</span>
+        </button>
+      </ModalFooter>
+    </Modal>
+  );
+};
+
+// Assigner / administrator: task details, completion notes, files and history; Verify, or Request changes (comment required).
+const ReviewTaskModal = ({ task, onClose, onReviewed }) => {
+  const [comment, setComment] = useState("");
+  const [error, setError] = useState("");
+  const [saving, setSaving] = useState("");
+  const submission = latestSubmission(task);
+
+  const act = (approve) => {
+    if (!approve && !comment.trim()) return setError("Please describe the changes needed.");
+    if (comment.trim().length > 2000) return setError("The comment must be 2000 characters or fewer.");
+    setError("");
+    setSaving(approve ? "verify" : "changes");
+    (approve ? verifyUserTask(task.id, comment.trim()) : requestUserTaskChanges(task.id, comment.trim()))
+      .then((response) => {
+        toast.success(response?.message || (approve ? "Task verified." : "Changes requested."));
+        onReviewed();
+      })
+      .catch((err) => toast.error(myCalendarErrorMessage(err, "Unable to update the task. Please try again.")))
+      .finally(() => setSaving(""));
+  };
+
+  return (
+    <Modal isOpen toggle={saving ? undefined : onClose} className="modal-dialog-centered mc-status-modal mc-review-modal" size="lg">
+      <div className="mc-sm-head">
+        <span className="mc-sm-icon" aria-hidden="true"><Icon name="shield-check" /></span>
+        <div className="mc-sm-head-text">
+          <h5 className="mc-sm-title">{task.title}</h5>
+          <p className="mc-sm-sub">Review &amp; verify</p>
+        </div>
+        <button type="button" className="mc-sm-close" aria-label="Close" onClick={onClose} disabled={Boolean(saving)}><Icon name="cross" /></button>
+      </div>
+      <ModalBody>
+        <dl className="mc-sm-details">
+          <dt>Assigned to</dt>
+          <dd>{task.assignedToName || "—"}</dd>
+          <dt>Assigned by</dt>
+          <dd>{task.assignedByName || "—"}</dd>
+          <dt>Deadline</dt>
+          <dd>{formatTaskDeadline(task)}</dd>
+          <dt>Priority</dt>
+          <dd>{task.priority || "Not set"}</dd>
+          <dt>Description</dt>
+          <dd className="mc-review-desc mc-sm-wide">{task.description}</dd>
+          <dt>Status</dt>
+          <dd className="mc-sm-wide"><span className="mc-status-pill">{verificationLabel(task.verificationStatus)}</span></dd>
+          <dt>Completion notes</dt>
+          <dd className="mc-review-desc mc-sm-wide">{submission?.comments || "—"}</dd>
+          <dt>Files</dt>
+          <dd className="mc-sm-wide">{submission?.attachments?.length ? <AttachmentLinks attachments={submission.attachments} /> : "—"}</dd>
+        </dl>
+        {task.verificationHistory?.length > 0 && (
+          <>
+            <h6 className="mc-vh-title" id="mc-rv-history">Verification history ({task.verificationHistory.length})</h6>
+            {/* Scrolls on its own when there are many entries; focusable so it can be scrolled from the keyboard. */}
+            <div className="mc-vh-scroll" tabIndex={0} role="region" aria-labelledby="mc-rv-history">
+              <VerificationHistory history={task.verificationHistory} />
+            </div>
+          </>
+        )}
+        <div className="mc-sm-form">
+          <div className="mc-field">
+            <label className="form-label" htmlFor="mc-rv-comment">Comment <span className="mc-hint">(required to request changes)</span></label>
+            <textarea id="mc-rv-comment" className="form-control mc-textarea" rows={3} maxLength={2000} value={comment}
+              onChange={(e) => { setComment(e.target.value); setError(""); }} disabled={Boolean(saving)} />
+          </div>
+          {error && <span className="mc-error" role="alert">{error}</span>}
+        </div>
+      </ModalBody>
+      <ModalFooter>
+        <button type="button" className="btn btn-light" onClick={onClose} disabled={Boolean(saving)}>Close</button>
+        <button type="button" className="btn btn-outline-danger" onClick={() => act(false)} disabled={Boolean(saving)}>
+          {saving === "changes" ? <Spinner size="sm" /> : <Icon name="undo" />} <span>Request changes</span>
+        </button>
+        <button type="button" className="btn btn-success" onClick={() => act(true)} disabled={Boolean(saving)}>
+          {saving === "verify" ? <Spinner size="sm" /> : <Icon name="check-circle" />} <span>Verify</span>
+        </button>
+      </ModalFooter>
+    </Modal>
   );
 };
 
@@ -662,7 +950,7 @@ const MyTaskDemoList = ({ items, state, load }) => {
 // Critical: the user's own incomplete tasks due from tomorrow onward (D+1 … D+N), grouped by due
 // date. Uses the tasks already loaded by the Tasks panel and the existing TaskCard (same fields and
 // "Update status" action as Assigned to me).
-const CriticalTaskList = ({ tasks, tasksState, loadTasks, completeTask, completingId }) => {
+const CriticalTaskList = ({ tasks, tasksState, loadTasks, completeTask, completingId, ...actions }) => {
   if (tasksState.loading && tasks.length === 0) return <div className="mc-state" role="status"><Spinner size="sm" color="primary" /> Loading tasks…</div>;
   if (tasksState.error) {
     return (
@@ -685,7 +973,7 @@ const CriticalTaskList = ({ tasks, tasksState, loadTasks, completeTask, completi
             {g.offset === 1 ? "Due Tomorrow" : `Due in ${g.offset} Days`} — {moment(g.dueDate, "YYYY-MM-DD").format("DD-MMM-YYYY")}
           </h6>
           {g.tasks.map((task) => (
-            <TaskCard key={task.id} task={task} mode="mine" onComplete={completeTask} completing={completingId === task.id} />
+            <TaskCard key={task.id} task={task} mode="mine" onComplete={completeTask} completing={completingId === task.id} {...actions} />
           ))}
         </section>
       ))}
@@ -704,7 +992,21 @@ const TaskPanel = () => {
   const [reviewing, setReviewing] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [completingId, setCompletingId] = useState(null);
-  const [listTab, setListTab] = useState("mine");
+  // A notification link may open a list directly (?tab=tasks&list=verification / mine / given).
+  const location = useLocation();
+  const [listTab, setListTab] = useState(() => {
+    const requested = new URLSearchParams(location.search).get("list");
+    return ["mine", "given", "verification"].includes(requested) ? requested : "mine";
+  });
+  const requestedList = new URLSearchParams(location.search).get("list");
+  useEffect(() => {
+    if (["mine", "given", "verification"].includes(requestedList)) setListTab(requestedList);
+  }, [requestedList]);
+  // Tasks awaiting the user's verification (administrators: every one, except their own), from the server.
+  const [pendingVerification, setPendingVerification] = useState([]);
+  const [pendingState, setPendingState] = useState({ loading: true, error: "" });
+  const [submitTarget, setSubmitTarget] = useState(null);
+  const [reviewTarget, setReviewTarget] = useState(null);
   // My Task and Critical open full width; Back returns to the tab that was open before them.
   const [tabBeforeCritical, setTabBeforeCritical] = useState("mine");
   const myTaskDemos = useMyTaskDemos();
@@ -722,6 +1024,14 @@ const TaskPanel = () => {
         setTasksState({ loading: false, error: "" });
       })
       .catch((error) => setTasksState({ loading: false, error: myCalendarErrorMessage(error, "Unable to load tasks. Please try again.") }));
+    // Loaded separately: a failure here must not hide the user's own tasks.
+    setPendingState((s) => ({ ...s, loading: true, error: "" }));
+    getPendingVerificationTasks()
+      .then((response) => {
+        setPendingVerification(Array.isArray(response?.data) ? response.data : []);
+        setPendingState({ loading: false, error: "" });
+      })
+      .catch((error) => setPendingState({ loading: false, error: myCalendarErrorMessage(error, "Unable to load tasks awaiting verification.") }));
   }, []);
 
   useEffect(() => {
@@ -748,7 +1058,11 @@ const TaskPanel = () => {
 
   const myTasks = tasks.filter((t) => String(t.assignedToUserId).toLowerCase() === String(userId).toLowerCase());
   const givenTasks = tasks.filter((t) => String(t.assignedByUserId).toLowerCase() === String(userId).toLowerCase());
-  const myPendingCount = myTasks.filter((t) => t.status !== "Completed").length;
+  const myPendingCount = openAssignedTaskCount(tasks, userId);
+  // The sidebar Tasks badge shows the same count; every task change here reloads the tasks, so it follows at once.
+  useEffect(() => {
+    if (!tasksState.loading && !tasksState.error) publishTaskCount(myPendingCount);
+  }, [myPendingCount, tasksState]);
   // Critical: my incomplete tasks due from tomorrow onward; recalculated whenever the task list reloads.
   const criticalTasks = myTasks
     .map((t) => ({ ...t, criticalOffset: criticalTaskOffset(t) }))
@@ -764,6 +1078,9 @@ const TaskPanel = () => {
     else if (form.description.trim().length > 2000) errors.description = "Use 2000 characters or fewer.";
     if (!form.dueDate) errors.dueDate = "Due date is required.";
     else if (form.dueDate < today) errors.dueDate = "Due date cannot be in the past.";
+    if (form.dueTime && !moment(form.dueTime, "HH:mm", true).isValid()) errors.dueTime = "Enter a valid time.";
+    else if (!errors.dueDate && isDeadlineBeforeNow(form.dueDate, form.dueTime))
+      errors.dueTime = "The deadline cannot be earlier than the current date and time.";
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -776,6 +1093,9 @@ const TaskPanel = () => {
       description: form.description.trim(),
       dueDate: `${form.dueDate}T00:00:00`,
       priority: form.priority || null,
+      // Optional deadline time; the offset (at the deadline, so DST is right) lets the server check it is not in the past.
+      dueTime: form.dueTime || null,
+      timeZoneOffsetMinutes: form.dueTime ? new Date(`${form.dueDate}T${form.dueTime}:00`).getTimezoneOffset() : null,
     })
       .then((response) => {
         toast.success(response?.message || "Task assigned successfully.");
@@ -803,12 +1123,39 @@ const TaskPanel = () => {
       .finally(() => setCompletingId(null));
   };
 
+  // Assigned → In Progress (assignee only; checked by the server).
+  const startTask = (task) => {
+    setCompletingId(task.id);
+    startUserTask(task.id)
+      .then((response) => {
+        toast.success(response?.message || "Task marked as in progress.");
+        loadTasks();
+      })
+      .catch((error) => {
+        toast.error(myCalendarErrorMessage(error, "Unable to update the task. Please try again."));
+        loadTasks();
+      })
+      .finally(() => setCompletingId(null));
+  };
+
+  // Deadline badges are recalculated from this clock, so an open page moves into Due Today / Overdue by itself.
+  const [now, setNow] = useState(() => moment());
+  useEffect(() => {
+    const timer = setInterval(() => setNow(moment()), 30000);
+    return () => clearInterval(timer);
+  }, []);
+  useEffect(() => setNow(moment()), [tasks, pendingVerification]);
+
+  const workflowActions = { onStart: startTask, onOpenSubmit: setSubmitTarget, onOpenReview: setReviewTarget, now };
+
   const setField = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
     if (formErrors[field]) setFormErrors((prev) => ({ ...prev, [field]: undefined }));
   };
 
-  const listed = listTab === "mine" ? myTasks : givenTasks;
+  const listed = listTab === "mine" ? myTasks : listTab === "verification" ? pendingVerification : givenTasks;
+  // Pending Verification is offered to users who assign tasks, or who have tasks awaiting their verification.
+  const showVerificationTab = givenTasks.length > 0 || pendingVerification.length > 0 || listTab === "verification";
 
   return (
     <div className={`mc-tasks${isExpandedTab ? " is-critical" : ""}`}>
@@ -875,6 +1222,14 @@ const TaskPanel = () => {
                 {formErrors.dueDate && <span className="mc-error">{formErrors.dueDate}</span>}
               </div>
               <div className="mc-field">
+                <label className="form-label" htmlFor="mc-due-time">Due time</label>
+                <input id="mc-due-time" type="time" className="form-control" value={form.dueTime}
+                  onChange={(e) => setField("dueTime", e.target.value)} />
+                {formErrors.dueTime && <span className="mc-error">{formErrors.dueTime}</span>}
+              </div>
+            </div>
+            <div className="mc-field-row">
+              <div className="mc-field">
                 <label className="form-label" htmlFor="mc-priority">Priority</label>
                 <select id="mc-priority" className="form-control" value={form.priority}
                   onChange={(e) => setField("priority", e.target.value)}>
@@ -898,8 +1253,8 @@ const TaskPanel = () => {
               <dd>{form.title.trim()}</dd>
               <dt>Description</dt>
               <dd className="mc-review-desc">{form.description.trim()}</dd>
-              <dt>Due date</dt>
-              <dd>{moment(form.dueDate).format("DD-MMM-YYYY")}</dd>
+              <dt>Deadline</dt>
+              <dd>{formatTaskDeadline({ dueDate: form.dueDate, dueTime: form.dueTime })}</dd>
               <dt>Priority</dt>
               <dd>{form.priority || "Not set"}</dd>
             </dl>
@@ -931,6 +1286,17 @@ const TaskPanel = () => {
           <button type="button" role="tab" aria-selected={listTab === "given"} className={listTab === "given" ? "is-active" : ""} onClick={() => setListTab("given")}>
             Assigned by me <span className="mc-count is-muted">{givenTasks.length}</span>
           </button>
+          {showVerificationTab && (
+            <button type="button" role="tab" aria-selected={listTab === "verification"} className={listTab === "verification" ? "is-active" : ""}
+              onClick={() => setListTab("verification")}>
+              Pending Verification{" "}
+              {pendingVerification.length > 0 && (
+                <span className="mc-count" title="Tasks submitted for your verification" aria-label={`${pendingVerification.length} tasks awaiting verification`}>
+                  {pendingVerification.length}
+                </span>
+              )}
+            </button>
+          )}
           <button type="button" role="tab" aria-selected={listTab === "mytask"} className={listTab === "mytask" ? "is-active" : ""}
             onClick={() => openExpandedTab("mytask")}>
             My Task{" "}
@@ -956,10 +1322,19 @@ const TaskPanel = () => {
           <MyTaskDemoList items={myTaskDemos.items} state={myTaskDemos.state} load={myTaskDemos.load} />
         ) : listTab === "critical" ? (
           <CriticalTaskList tasks={criticalTasks} tasksState={tasksState} loadTasks={loadTasks}
-            completeTask={completeTask} completingId={completingId} />
-        ) : tasksState.loading && tasks.length === 0 ? (
+            completeTask={completeTask} completingId={completingId} {...workflowActions} />
+        ) : listTab === "verification" && pendingState.loading && pendingVerification.length === 0 ? (
           <div className="mc-state" role="status"><Spinner size="sm" color="primary" /> Loading tasks…</div>
-        ) : tasksState.error ? (
+        ) : listTab === "verification" && pendingState.error ? (
+          <div className="mc-state is-error" role="alert">
+            <Icon name="alert-circle" /> {pendingState.error}
+            <button type="button" className="btn btn-sm btn-light" onClick={loadTasks}>Retry</button>
+          </div>
+        ) : listTab === "verification" && pendingVerification.length === 0 ? (
+          <div className="mc-state"><Icon name="check-round-cut" /> No tasks are awaiting your verification.</div>
+        ) : tasksState.loading && tasks.length === 0 && listTab !== "verification" ? (
+          <div className="mc-state" role="status"><Spinner size="sm" color="primary" /> Loading tasks…</div>
+        ) : tasksState.error && listTab !== "verification" ? (
           <div className="mc-state is-error" role="alert">
             <Icon name="alert-circle" /> {tasksState.error}
             <button type="button" className="btn btn-sm btn-light" onClick={loadTasks}>Retry</button>
@@ -978,11 +1353,32 @@ const TaskPanel = () => {
                 mode={listTab}
                 onComplete={completeTask}
                 completing={completingId === task.id}
+                {...workflowActions}
               />
             ))}
           </div>
         )}
       </section>
+      {submitTarget && (
+        <SubmitVerificationModal
+          task={submitTarget}
+          onClose={() => setSubmitTarget(null)}
+          onSubmitted={() => {
+            setSubmitTarget(null);
+            loadTasks();
+          }}
+        />
+      )}
+      {reviewTarget && (
+        <ReviewTaskModal
+          task={reviewTarget}
+          onClose={() => setReviewTarget(null)}
+          onReviewed={() => {
+            setReviewTarget(null);
+            loadTasks();
+          }}
+        />
+      )}
     </div>
   );
 };
@@ -992,11 +1388,18 @@ const MyCalendar = () => {
   const location = useLocation();
   const history = useHistory();
   const params = new URLSearchParams(location.search);
-  const tab = params.get("tab") === "tasks" ? "tasks" : "calendar";
   const role = localStorage.getItem("userRole")?.trim().toLowerCase();
   const allowed = role && !EXCLUDED_ROLES.includes(role);
 
-  const setTab = (next) => history.replace({ pathname: location.pathname, search: next === "tasks" ? "?tab=tasks" : "" });
+  // Tasks have their own page. Older links (notifications, bookmarks: ?tab=tasks&list=…) are redirected there with
+  // their other query values, replacing the history entry so Back skips the redirect.
+  if (params.get("tab") === "tasks") {
+    params.delete("tab");
+    const search = params.toString();
+    return <Redirect to={{ pathname: TASKS_PATH, search: search ? `?${search}` : "" }} />;
+  }
+  // Tasks are opened from the sidebar (Tasks → /lms/tasks); My Calendar shows the Demo Calendar only.
+  const showCalendar = () => history.replace({ pathname: location.pathname, search: "" });
 
   return (
     <React.Fragment>
@@ -1006,7 +1409,7 @@ const MyCalendar = () => {
           <div className="mc-head">
             <div>
               <h3 className="mc-title">My Calendar</h3>
-              <p className="mc-sub">Your demo classes and the tasks assigned to and by you.</p>
+              <p className="mc-sub">Your demo classes.</p>
             </div>
           </div>
           {!allowed ? (
@@ -1016,14 +1419,44 @@ const MyCalendar = () => {
           ) : (
             <Block>
               <div className="mc-tabs" role="tablist">
-                <button type="button" role="tab" aria-selected={tab === "calendar"} className={tab === "calendar" ? "is-active" : ""} onClick={() => setTab("calendar")}>
+                <button type="button" role="tab" aria-selected className="is-active" onClick={showCalendar}>
                   <Icon name="calendar-booking" /> <span>Demo Calendar</span>
                 </button>
-                <button type="button" role="tab" aria-selected={tab === "tasks"} className={tab === "tasks" ? "is-active" : ""} onClick={() => setTab("tasks")}>
-                  <Icon name="task" /> <span>Tasks</span>
-                </button>
               </div>
-              {tab === "calendar" ? <DemoCalendar /> : <TaskPanel />}
+              <DemoCalendar />
+            </Block>
+          )}
+        </div>
+        <ToastContainer />
+      </Content>
+    </React.Fragment>
+  );
+};
+
+// Tasks page (sidebar → Tasks, /lms/tasks): the same Tasks panel, APIs and state as My Calendar had, without the
+// calendar heading and tabs. ?list=mine / given / verification opens that list, as before.
+export const MyTasks = () => {
+  const role = localStorage.getItem("userRole")?.trim().toLowerCase();
+  const allowed = role && !EXCLUDED_ROLES.includes(role);
+
+  return (
+    <React.Fragment>
+      <Head title="Tasks" />
+      <Content>
+        <div className="my-calendar">
+          <div className="mc-head">
+            <div>
+              <h3 className="mc-title">Tasks</h3>
+              <p className="mc-sub">Tasks assigned to and by you.</p>
+            </div>
+          </div>
+          {!allowed ? (
+            <Block>
+              <div className="mc-state is-error"><Icon name="lock-alt" /> Tasks are not available for your role.</div>
+            </Block>
+          ) : (
+            <Block>
+              <TaskPanel />
             </Block>
           )}
         </div>

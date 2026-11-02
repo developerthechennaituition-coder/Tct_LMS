@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext, useRef } from "react";
-import { DropdownItem, DropdownMenu, DropdownToggle, UncontrolledDropdown } from "reactstrap";
+import { DropdownItem, DropdownMenu, DropdownToggle, UncontrolledDropdown, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 import SimpleBar from "simplebar-react";
 import { UserAvatar, Icon, Button } from "../../../components/Component";
 import { currentTime, findUpper, truncate } from "../../../utils/Utils";
@@ -7,7 +7,8 @@ import { ChatContext } from "./ChatContext";
 import classNames from "classnames";
 import ChatSideBar from "./ChatSideBar";
 import { MeChat, YouChat, MetaChat } from "./ChatPartials";
-import { PostMessage, GetMessages, DeleteMessage } from "../../../apiservices/ChatService";
+import { PostMessage, GetMessages, DeleteMessage, DeleteMessageForMe } from "../../../apiservices/ChatService";
+import { applyMessageDeletion, messageIdOf } from "../../../library/chatMessageDeletion";
 import UserAvatar1 from "../../../components/user/UserAvatar1";
 import { findUpper1, getColor, getImageUrl } from "../../../utils/Utils";
 import * as signalR from "@microsoft/signalr";
@@ -113,6 +114,8 @@ const ChatBody = ({ id, group, setGroup, mobileView, setMobileView, setSelectedI
   const [currentPreview, setCurrentPreview] = useState(0);
   const [messageText, setMessageText] = useState("");
   const [attachmentType, setAttachmentType] = useState("");
+  const [confirmDeleteMessage, setConfirmDeleteMessage] = useState(null);
+  const [isDeletingMessage, setIsDeletingMessage] = useState(false);
   const [imageViewer, setImageViewer] = useState({
     open: false,
     images: [],
@@ -256,6 +259,23 @@ const ChatBody = ({ id, group, setGroup, mobileView, setMobileView, setSelectedI
     connection.on("MessageDelivered", handleMessageDelivered);
     return () => {
       connection.off("MessageDelivered", handleMessageDelivered);
+    };
+  }, [connection]);
+
+  // "Delete for everyone" reaches every participant, "Delete for me" only this user's other tabs/devices.
+  // Message ids are unique, so a deletion for a chat that is not open is a no-op here.
+  useEffect(() => {
+    if (!connection) return;
+
+    const handleMessageDeleted = (data) => {
+      if (!data) return;
+      const scope = data.scope ?? data.Scope;
+      setUchat((prev) => applyMessageDeletion(prev, data.messageId ?? data.MessageId, scope));
+    };
+
+    connection.on("MessageDeleted", handleMessageDeleted);
+    return () => {
+      connection.off("MessageDeleted", handleMessageDeleted);
     };
   }, [connection]);
 
@@ -475,17 +495,36 @@ const ChatBody = ({ id, group, setGroup, mobileView, setMobileView, setSelectedI
     setShowAttachmentPreview(false);
     setInputText("");
   };
-  const onRemoveMessage = async (message) => {
-    const messageId = message?.messageId ?? message?.MessageId;
-    if (!Number.isInteger(Number(messageId)) || Number(messageId) <= 0) {
+  // "Delete for everyone" asks for confirmation first (see the modal below).
+  const onRemoveMessage = (message) => {
+    const messageId = messageIdOf(message);
+    if (!Number.isInteger(messageId) || messageId <= 0) {
       toast.error("Unable to delete this message because its ID is missing.");
       return;
     }
-    await DeleteMessage(Number(messageId), localStorage.userId, id)
-      .then((response) => {
-        GetMessages(localStorage.userId, id, group).then((response) => {
-          setUchat(response);
-        });
+    setConfirmDeleteMessage(message);
+  };
+  const confirmDeleteForEveryone = async () => {
+    const messageId = messageIdOf(confirmDeleteMessage);
+    if (isDeletingMessage) return;
+    setIsDeletingMessage(true);
+    await DeleteMessage(messageId, localStorage.userId, id)
+      .then(() => {
+        setUchat((prev) => applyMessageDeletion(prev, messageId, "everyone"));
+      })
+      .catch(() => {});
+    setIsDeletingMessage(false);
+    setConfirmDeleteMessage(null);
+  };
+  const onDeleteForMe = async (message) => {
+    const messageId = messageIdOf(message);
+    if (!Number.isInteger(messageId) || messageId <= 0) {
+      toast.error("Unable to delete this message because its ID is missing.");
+      return;
+    }
+    await DeleteMessageForMe(messageId)
+      .then(() => {
+        setUchat((prev) => applyMessageDeletion(prev, messageId, "me"));
       })
       .catch(() => {});
   };
@@ -613,6 +652,23 @@ const ChatBody = ({ id, group, setGroup, mobileView, setMobileView, setSelectedI
           }))
         }
       />
+      <Modal
+        isOpen={!!confirmDeleteMessage}
+        toggle={() => !isDeletingMessage && setConfirmDeleteMessage(null)}
+        size="sm"
+        centered
+      >
+        <ModalHeader toggle={() => !isDeletingMessage && setConfirmDeleteMessage(null)}>Delete message?</ModalHeader>
+        <ModalBody>This message will be deleted for everyone in this chat. This cannot be undone.</ModalBody>
+        <ModalFooter>
+          <Button color="light" disabled={isDeletingMessage} onClick={() => setConfirmDeleteMessage(null)}>
+            Cancel
+          </Button>
+          <Button color="danger" disabled={isDeletingMessage} onClick={confirmDeleteForEveryone}>
+            Delete for everyone
+          </Button>
+        </ModalFooter>
+      </Modal>
       {Uchat && (
         <>
           {Object.keys(Uchat).length > 0 && (
@@ -844,6 +900,7 @@ const ChatBody = ({ id, group, setGroup, mobileView, setMobileView, setSelectedI
                           item={item}
                           chat={Uchat}
                           onRemoveMessage={onRemoveMessage}
+                          onDeleteForMe={onDeleteForMe}
                           onOpenImageViewer={(images, index) => {
                             setImageViewer({
                               open: true,
@@ -875,6 +932,7 @@ const ChatBody = ({ id, group, setGroup, mobileView, setMobileView, setSelectedI
                           onRescheduleClass={onRescheduleClass}
                           onPostponeClass={onPostponeClass}
                           onCancelClass={onCancelClass}
+                          onDeleteForMe={onDeleteForMe}
                         />
                       );
                     }

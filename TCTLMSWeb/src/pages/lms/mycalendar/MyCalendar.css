@@ -190,3 +190,74 @@
   .mc-status-modal .mc-sm-details { grid-template-columns: minmax(0, 1fr); }
   .mc-status-modal .mc-field-row { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* ─── Task deadline time and verification workflow ─────────────────────── */
+.my-calendar .mc-badge.is-progress { color: #1f6fd1; background: #e6f0fd; }
+.my-calendar .mc-badge.is-verifying { color: #6a35e8; background: #f1ecff; }
+.my-calendar .mc-verify-note { display: flex; gap: 6px; align-items: flex-start; margin: 10px 0 0; padding: 8px 10px; border-radius: 10px; font-size: 13px; overflow-wrap: anywhere; white-space: pre-wrap; }
+.my-calendar .mc-verify-note.is-changes,
+.mc-status-modal .mc-verify-note.is-changes { color: #a5281e; background: #fdecea; }
+.my-calendar .mc-verify-note.is-verified { color: #0b7a5c; background: #e3f8f1; }
+.mc-status-modal .mc-verify-note { display: flex; gap: 6px; align-items: flex-start; margin: 0 0 12px; padding: 8px 10px; border-radius: 10px; font-size: 13px; overflow-wrap: anywhere; white-space: pre-wrap; }
+.my-calendar .mc-vh,
+.mc-status-modal .mc-vh { list-style: none; margin: 10px 0 0; padding: 0; border-left: 2px solid #ebe4ff; }
+.my-calendar .mc-vh li,
+.mc-status-modal .mc-vh li { position: relative; padding: 0 0 10px 14px; font-size: 13px; color: #364a63; }
+.my-calendar .mc-vh li::before,
+.mc-status-modal .mc-vh li::before { content: ""; position: absolute; left: -6px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: #854fff; }
+.mc-vh-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 10px; }
+.mc-vh-when, .mc-vh-status { font-size: 12px; color: #8094ae; }
+.mc-vh-comment { margin: 4px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.mc-vh-files { list-style: none; margin: 4px 0 0; padding: 0; }
+.mc-vh-files li { padding: 0; }
+.mc-vh-files li::before { display: none; }
+.mc-vh-title { margin: 16px 0 6px; font-size: 13px; font-weight: 700; color: #364a63; }
+.mc-status-modal .mc-sm-form { margin-top: 14px; }
+.mc-status-modal .form-control.mc-textarea { height: auto; }
+.mc-status-modal .form-control.mc-file { height: auto; padding: 6px 10px; }
+.mc-status-modal .mc-hint { margin-top: 4px; font-size: 12px; font-weight: 400; color: #8094ae; }
+.my-calendar .mc-task-actions + .mc-task-actions { margin-top: 0; }
+@media (max-width: 575.98px) {
+  .mc-status-modal .modal-footer { flex-wrap: wrap; }
+}
+
+/* Review & verify modal: header and footer stay in view, the body scrolls (review modal only). */
+.mc-review-modal .modal-content { display: flex; flex-direction: column; max-height: 88vh; max-height: 88dvh; }
+.mc-review-modal .mc-sm-head,
+.mc-review-modal .modal-footer { flex: 0 0 auto; }
+.mc-review-modal .mc-sm-head { padding: 14px 18px 12px; }
+.mc-review-modal .modal-body { flex: 1 1 auto; min-height: 0; padding: 14px 18px; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; }
+.mc-review-modal .mc-sm-details { margin-bottom: 12px; padding: 10px 12px; }
+.mc-review-modal .mc-vh-title { margin: 0 0 6px; }
+.mc-review-modal .mc-vh-scroll { max-height: min(260px, 34vh); overflow-x: hidden; overflow-y: auto; padding: 2px 4px 0 6px; border: 1px solid #eef0f5; border-radius: 10px; background: #fff; }
+.mc-review-modal .mc-vh-scroll:focus-visible { outline: 2px solid rgba(133, 79, 255, 0.45); outline-offset: 1px; }
+.mc-review-modal .mc-vh { margin: 6px 0 0; }
+.mc-review-modal .mc-vh li { padding: 0 0 8px 12px; line-height: 1.4; }
+.mc-review-modal .mc-vh li::before { top: 3px; }
+.mc-review-modal .mc-vh-status { margin-top: 1px; }
+.mc-review-modal .mc-vh-comment { margin-top: 2px; }
+.mc-review-modal .mc-vh-files { display: flex; flex-wrap: wrap; gap: 2px 12px; margin-top: 2px; }
+/* File links: their own height and wrapping, not the modal's 38px buttons, so long names do not overflow. */
+.mc-review-modal .mc-vh-files .btn { height: auto; gap: 4px; font-weight: 500; text-align: left; white-space: normal; overflow-wrap: anywhere; }
+.mc-review-modal .modal-footer { padding: 10px 18px; }
+@media (min-width: 768px) {
+  /* Short fields two per row; the long ones span the full width. */
+  .mc-review-modal .mc-sm-details { grid-template-columns: 110px minmax(0, 1fr) 110px minmax(0, 1fr); }
+  .mc-review-modal .mc-sm-details .mc-sm-wide { grid-column: span 3; }
+}
+@media (max-width: 575.98px) {
+  .mc-review-modal .modal-content { max-height: calc(100vh - 1rem); max-height: calc(100dvh - 1rem); }
+  .mc-review-modal .mc-sm-head { padding: 12px 14px 10px; }
+  .mc-review-modal .modal-body { padding: 12px 14px; }
+  .mc-review-modal .modal-footer { padding: 10px 14px; }
+  .mc-review-modal .modal-footer .btn { flex: 1 1 auto; justify-content: center; }
+  .mc-review-modal .mc-vh-scroll { max-height: 40vh; }
+}
+
+/* ─── Task deadline state (Due Soon / Critical — Due Today / Overdue) ──── */
+.my-calendar .mc-badge.is-due-soon { color: #b46d00; background: #fff4e0; box-shadow: inset 0 0 0 1px #f5c46b; }
+.my-calendar .mc-badge.is-critical { color: #fff; background: #d9534f; }
+.my-calendar .mc-deadline { font-weight: 600; }
+.my-calendar .mc-deadline.is-dueSoon { color: #b46d00; }
+.my-calendar .mc-deadline.is-dueToday,
+.my-calendar .mc-deadline.is-overdue { color: #c4382d; }

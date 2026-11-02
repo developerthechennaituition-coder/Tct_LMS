@@ -53,6 +53,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Conversation> Conversations { get; set; }
     public DbSet<MessageStatus> MessageStatus { get; set; }
     public DbSet<Message> Messages { get; set; }
+    public DbSet<MessageUserDeletion> MessageUserDeletions { get; set; }
     public DbSet<Group> Groups { get; set; }
     public DbSet<GroupMember> GroupMembers { get; set; }
     public DbSet<ChatLabel> ChatLabels { get; set; }
@@ -94,6 +95,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<TestSchedule> TestSchedule { get; set; }
     public DbSet<AnswerSheetSubmission> AnswerSheetSubmission { get; set; }
     public DbSet<UserTask> UserTask { get; set; }
+    public DbSet<UserTaskVerificationHistory> UserTaskVerificationHistory { get; set; }
+    public DbSet<UserTaskReminder> UserTaskReminder { get; set; }
     public DbSet<DemoStatusHistory> DemoStatusHistory { get; set; }
     public DbSet<AssignmentChangeRequest> AssignmentChangeRequest { get; set; }
 
@@ -130,6 +133,27 @@ modelBuilder.Entity<UserTask>(entity =>
             entity.Property(x => x.Description).HasMaxLength(2000).IsRequired();
             entity.Property(x => x.Priority).HasMaxLength(20);
             entity.Property(x => x.Status).HasMaxLength(20).IsRequired();
+            entity.Property(x => x.DueTime).HasColumnType("time(0)");
+            entity.Property(x => x.WorkflowStatus).HasMaxLength(30);
+        });
+
+        modelBuilder.Entity<UserTaskVerificationHistory>(entity =>
+        {
+            entity.ToTable("UserTaskVerificationHistory");
+            entity.HasKey(x => x.Id);
+            entity.Property(x => x.Action).HasMaxLength(30).IsRequired();
+            entity.Property(x => x.PreviousStatus).HasMaxLength(30).IsRequired();
+            entity.Property(x => x.NewStatus).HasMaxLength(30).IsRequired();
+            entity.Property(x => x.Comments).HasMaxLength(2000);
+        });
+
+        modelBuilder.Entity<UserTaskReminder>(entity =>
+        {
+            entity.ToTable("UserTaskReminder");
+            entity.HasKey(x => x.Id);
+            entity.Property(x => x.Milestone).HasMaxLength(20).IsRequired();
+            entity.HasIndex(x => new { x.UserTaskId, x.RecipientUserId, x.Milestone }).IsUnique()
+                .HasDatabaseName("UX_UserTaskReminder_Task_Recipient_Milestone");
         });
 
         modelBuilder.Entity<DemoStatusHistory>(entity =>
@@ -258,6 +282,13 @@ modelBuilder.Entity<UserTask>(entity =>
                 .WithMany(x => x.Members)
                 .HasForeignKey(x => x.LabelId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<MessageUserDeletion>(entity =>
+        {
+            entity.ToTable("MessageUserDeletion");
+            entity.HasKey(x => x.Id);
+            entity.HasIndex(x => new { x.MessageId, x.UserId }).IsUnique();
         });
     }
 }

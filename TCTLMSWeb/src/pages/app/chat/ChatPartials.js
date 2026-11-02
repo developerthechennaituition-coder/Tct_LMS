@@ -11,6 +11,46 @@ import ChatGroupMenu from "./ChatGroupMenu";
 import MessageAttachment from "./MessageAttachment ";
 import ImageViewer from "./ImageView";
 import moment from "moment";
+import { canDeleteForEveryone, DELETED_MESSAGE_PLACEHOLDER } from "../../../library/chatMessageDeletion";
+
+// Per-message actions. "Delete for everyone" only on the user's own messages that are not deleted yet;
+// the server enforces the same rule.
+const MessageActionMenu = ({ msg, isMine, onMessageInfo, onDeleteForMe, onDeleteForEveryone }) => {
+  const showInfo = onMessageInfo && msg?.isDeleted !== true;
+  const showDeleteForEveryone = onDeleteForEveryone && canDeleteForEveryone(isMine, msg);
+  if (!showInfo && !onDeleteForMe && !showDeleteForEveryone) return null;
+  return (
+    <UncontrolledDropdown className="message-menu">
+      <DropdownToggle tag="a" className="btn btn-icon btn-sm">
+        <Icon name="chevron-down" />
+      </DropdownToggle>
+
+      <DropdownMenu right>
+        {showInfo && (
+          <DropdownItem onClick={() => onMessageInfo(msg)}>
+            <Icon name="info-fill" />
+            <span className="ml-2">Message Info</span>
+          </DropdownItem>
+        )}
+
+        {onDeleteForMe && (
+          <DropdownItem onClick={() => onDeleteForMe(msg)}>
+            <Icon name="trash" />
+            <span className="ml-2">Delete for me</span>
+          </DropdownItem>
+        )}
+
+        {showDeleteForEveryone && (
+          <DropdownItem onClick={() => onDeleteForEveryone(msg)}>
+            <Icon name="trash-fill" />
+            <span className="ml-2">Delete for everyone</span>
+          </DropdownItem>
+        )}
+      </DropdownMenu>
+    </UncontrolledDropdown>
+  );
+};
+
 const getTick = (msg) => {
   if (msg.isRead) {
     return <span style={{ color: "#53bdeb" }}>✓✓</span>;
@@ -23,7 +63,7 @@ const getTick = (msg) => {
   return <span>✓</span>;
 };
 
-export const MeChat = ({ item, chat, onRemoveMessage, onOpenImageViewer, onMessageInfo }) => {
+export const MeChat = ({ item, chat, onRemoveMessage, onDeleteForMe, onOpenImageViewer, onMessageInfo }) => {
   const [hoverIndex, setHoverIndex] = useState(null);
   return (
     <>
@@ -39,29 +79,21 @@ export const MeChat = ({ item, chat, onRemoveMessage, onOpenImageViewer, onMessa
                   onMouseLeave={() => setHoverIndex(null)}
                 >
                   {msg?.isDeleted === true ? (
-                    <div className="chat-msg border bg-white text-muted">Message has been deleted</div>
+                    <div className="chat-msg border bg-white text-muted">
+                      {hoverIndex === idx && <MessageActionMenu msg={msg} isMine onDeleteForMe={onDeleteForMe} />}
+                      <i>{DELETED_MESSAGE_PLACEHOLDER}</i>
+                    </div>
                   ) : (
                     <React.Fragment>
                       <div className={`chat-msg bg-${chat.chatTheme}`}>
                         {hoverIndex === idx && (
-                          <UncontrolledDropdown className="message-menu">
-                            <DropdownToggle tag="a" className="btn btn-icon btn-sm">
-                              <Icon name="chevron-down" />
-                            </DropdownToggle>
-
-                            <DropdownMenu right>
-                              <DropdownItem onClick={() => onMessageInfo(msg)}>
-                                <Icon name="info-fill" />
-                                <span className="ml-2">Message Info</span>
-                              </DropdownItem>
-
-                              <DropdownItem onClick={() => onRemoveMessage(msg)}>
-                                <Icon name="trash-fill" />
-
-                                <span className="ml-2">Delete</span>
-                              </DropdownItem>
-                            </DropdownMenu>
-                          </UncontrolledDropdown>
+                          <MessageActionMenu
+                            msg={msg}
+                            isMine
+                            onMessageInfo={onMessageInfo}
+                            onDeleteForMe={onDeleteForMe}
+                            onDeleteForEveryone={onRemoveMessage}
+                          />
                         )}
                         <MessageAttachment msg={msg} onImageClick={onOpenImageViewer} />
                         {msg?.messageText && <div className="message-text">{msg.messageText}</div>}
@@ -82,7 +114,8 @@ export const MeChat = ({ item, chat, onRemoveMessage, onOpenImageViewer, onMessa
   );
 };
 
-export const YouChat = ({ item, chat, onOpenImageViewer, onCancelClass, onRescheduleClass, onPostponeClass }) => {
+export const YouChat = ({ item, chat, onOpenImageViewer, onCancelClass, onRescheduleClass, onPostponeClass, onDeleteForMe }) => {
+  const [hoverIndex, setHoverIndex] = useState(null);
   return (
     <div className="chat is-you">
       <div className="chat-avatar">
@@ -109,10 +142,16 @@ export const YouChat = ({ item, chat, onOpenImageViewer, onCancelClass, onResche
         <div className="chat-bubbles">
           {item.chat1.map((msg, idx) => {
             return (
-              <div className="chat-bubble" key={idx}>
+              <div
+                className="chat-bubble position-relative"
+                key={idx}
+                onMouseEnter={() => setHoverIndex(idx)}
+                onMouseLeave={() => setHoverIndex(null)}
+              >
                 <div className="chat-msg">
+                  {hoverIndex === idx && <MessageActionMenu msg={msg} isMine={false} onDeleteForMe={onDeleteForMe} />}
                   {msg.isDeleted ? (
-                    "Deleted"
+                    <i className="text-muted">{DELETED_MESSAGE_PLACEHOLDER}</i>
                   ) : (
                     <>
                       <MessageAttachment msg={msg} onImageClick={onOpenImageViewer} />

@@ -395,6 +395,11 @@ ClassStatusEditRequest: 100467,
 ClassStatusEditDecision: 100468,
 ScheduleChangeRequest: 100469,
 ScheduleChangeDecision: 100470,
+TaskVerificationSubmitted: 100471,
+TaskVerified: 100472,
+TaskChangesRequested: 100473,
+TaskDueReminder: 100474,
+TaskOverdue: 100475,
 });
 
 // Page a notification opens, or null when it has none:
