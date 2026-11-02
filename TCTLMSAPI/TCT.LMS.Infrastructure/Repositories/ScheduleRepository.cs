@@ -1688,7 +1688,8 @@ namespace TCT.LMS.Infrastructure.Repositories
             {
                 var start = new DateTime(yearInt, monthInt, 1);
                 var end = start.AddMonths(1);
-                // Schedule/TutorInvoice use Tutor.Id. The UI generation request requires Tutor.UserId.
+                // Schedule/TutorInvoice store Tutor.Id, or the tutor's User.Id on older rows; TutorPayrollSummary
+                // matches both. The UI generation request requires Tutor.UserId.
                 // Pay follows the Operations attendance cross-check (AttendanceBillingRule): the cross-check
                 // code (OperationScheduleStatus) picks the tutor's or Operations' attendance record.
                 var billingCodes = TCT.LMS.Application.Services.AttendanceBillingRule.CompletedStatusCodes
@@ -1748,7 +1749,7 @@ namespace TCT.LMS.Infrastructure.Repositories
                 var historicalTutorIds = rows.Select(r => r.TutorId).Concat(invoices.Select(i => i.TutorId)).Distinct().ToList();
                 var tutors = await (from tutor in _dbContext.Tutor.AsNoTracking()
                     join user in _dbContext.User on tutor.UserId equals user.Id
-                    where (tutor.IsActive && user.IsActive) || historicalTutorIds.Contains(tutor.Id)
+                    where (tutor.IsActive && user.IsActive) || historicalTutorIds.Contains(tutor.Id) || historicalTutorIds.Contains(tutor.UserId)
                     select new TCT.LMS.Application.Services.PayrollTutor(tutor.Id, tutor.UserId, user.FullName, user.UserCode)).ToListAsync();
                 return new Response<List<PayrollRequestDto>> {
                     Data = TCT.LMS.Application.Services.TutorPayrollSummary.Build(tutors, classes, invoices, monthInt, yearInt),
@@ -3915,8 +3916,9 @@ namespace TCT.LMS.Infrastructure.Repositories
             var tutorEntityId = tutor.Id;
 
             string monthName = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(request.InputMonth);
+            // Older pay slips may be stored under the tutor's User.Id.
             bool invoiceExists = await _dbContext.TutorInvoice.AnyAsync(ti =>
-                ti.TutorId == tutorEntityId &&
+                (ti.TutorId == tutorEntityId || ti.TutorId == tutor.UserId) &&
                 ti.Year == request.InputYear &&
                 ti.IsActive &&
                 (ti.Month == monthName ||
@@ -4483,11 +4485,12 @@ namespace TCT.LMS.Infrastructure.Repositories
                         ---------------------------------------------------
                         INNER JOIN [Schedule] AS SH
                             ON SD.Id = SH.SalesDetailsId
-                        INNER JOIN [Tutor] AS TT 
-                            ON SH.TutorId = TT.Id
-                        INNER JOIN [User] AS UT 
+                        -- Schedule.TutorId holds the Tutor.Id, or the tutor's User.Id on older rows.
+                        INNER JOIN [Tutor] AS TT
+                            ON SH.TutorId = TT.Id OR SH.TutorId = TT.UserId
+                        INNER JOIN [User] AS UT
                             ON TT.UserId = UT.Id
-                        LEFT JOIN [UserRole] AS RT 
+                        LEFT JOIN [UserRole] AS RT
                             ON UT.Id = RT.UserId
                         LEFT JOIN [Roles] AS TR 
                             ON RT.RoleId = TR.Id
@@ -4554,7 +4557,7 @@ namespace TCT.LMS.Infrastructure.Repositories
                             FROM TutorInvoice INV
                             INNER JOIN TutorInvoiceDetails ID ON ID.TutorInvoiceId = INV.Id
                             WHERE ID.ScheduleDetailsId = HS.ScheduleDetailsId AND ID.IsActive = 1
-                              AND INV.TutorId = SH.TutorId AND INV.IsActive = 1
+                              AND INV.TutorId IN (TT.Id, TT.UserId) AND INV.IsActive = 1
                               AND INV.Year = YEAR(HS.[Date])
                               AND (TRY_CONVERT(INT, INV.Month) = MONTH(HS.[Date]) OR INV.Month = DATENAME(month, HS.[Date]))
                             ORDER BY INV.Id DESC, ID.Id DESC
@@ -4564,7 +4567,7 @@ namespace TCT.LMS.Infrastructure.Repositories
                         AND HS.IsActive = 1 AND SH.IsActive = 1
                         AND (@OperationId is null or SA.[Ownership] = @OperationId)
                         AND (@StudentId IS NULL OR SA.StudentId = @StudentId)
-                        AND (@TutorId IS NULL OR SH.TutorId = @TutorId)
+                        AND (@TutorId IS NULL OR TT.Id = @TutorId OR TT.UserId = @TutorId)
                         AND (@fromDate IS NULL OR HS.[Date] >= CAST(@fromDate AS DATE))
                         AND (@OperationStatus is null or HS.OperationScheduleStatus = @OperationStatus)
                         AND (@toDate IS NULL OR HS.[Date] < DATEADD(DAY, 1, CAST(@toDate AS DATE)))";

@@ -410,6 +410,16 @@ public class StudentController : ControllerBase
             return BadRequest();
         }
 
+        // ModifiedBy comes from the caller's token, never from the request body (null keeps the stored value).
+        var callerId = User.Claims
+            .Where(claim => claim.Type.Equals("UserId", StringComparison.OrdinalIgnoreCase)
+                || claim.Type == System.Security.Claims.ClaimTypes.NameIdentifier
+                || claim.Type.EndsWith("/nameidentifier", StringComparison.OrdinalIgnoreCase)
+                || claim.Type.Equals("sub", StringComparison.OrdinalIgnoreCase))
+            .Select(claim => Guid.TryParse(claim.Value, out var value) ? value : Guid.Empty)
+            .FirstOrDefault(value => value != Guid.Empty);
+        user.ModifiedBy = callerId == Guid.Empty ? null : callerId;
+
         try
         {
             var updatedUser = await _userService.UpdateUser(user);

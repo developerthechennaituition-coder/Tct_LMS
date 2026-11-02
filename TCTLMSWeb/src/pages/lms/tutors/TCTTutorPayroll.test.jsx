@@ -12,7 +12,7 @@ jest.mock("../../../layout/content/Content", () => ({children}) => <div>{childre
 jest.mock("../../../layout/head/Head", () => () => null);
 jest.mock("../../../components/Component", () => {
   const Wrap = ({children}) => <div>{children}</div>;
-  return { Block: Wrap, BlockHead: Wrap, BlockTitle: Wrap,
+  return { Block: Wrap, BlockHead: Wrap, BlockTitle: Wrap, BlockBetween: Wrap, BlockHeadContent: Wrap, Icon: () => null,
     ReactDataTable: ({data, columns}) => <div>{data.map(row => <section key={row.tutorId}>
       {columns.map((column, index) => <div key={index}>{column.cell ? column.cell(row) : column.selector(row)}</div>)}
     </section>)}</div> };
@@ -59,6 +59,17 @@ test("year boundary navigation requests the correct new month and year", async (
   await waitFor(() => expect(gettutorpayroll).toHaveBeenCalledWith(month, year));
   for (let i = month; i <= 12; i++) fireEvent.click(screen.getByLabelText("Next month"));
   await waitFor(() => expect(gettutorpayroll).toHaveBeenLastCalledWith(1, year + 1));
+});
+test("awaiting operations approval shows its status and offers no payslip generation", async () => {
+  gettutorpayroll.mockResolvedValue({succeeded: true, data: [{...row(4, "Awaiting Operations Approval"), approved: 0}, row(5)]});
+  render(<TCTTutorPayroll />);
+  await screen.findByText("Tutor 4 (T4)");
+  expect(screen.getAllByRole("button", {name: "Generate Payslip"})).toHaveLength(1);
+  expect(screen.getByText("Waiting for Operations approval")).toBeTruthy();
+  fireEvent.change(screen.getByLabelText("Payroll status"), {target:{value:"Awaiting Operations Approval"}});
+  expect(screen.getByText("Tutor 4 (T4)")).toBeTruthy();
+  expect(screen.queryByText("Tutor 5 (T5)")).toBeNull();
+  expect(screen.queryByRole("button", {name: "Generate Payslip"})).toBeNull();
 });
 test("pending payroll sends selected tutor and period once", async () => {
   gettutorpayroll.mockResolvedValue({succeeded:true,data:[row(2)]});

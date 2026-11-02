@@ -30,6 +30,7 @@ import {
 import { toast } from "react-toastify";
 import UserAvailableSlotsProgressBar from "./UserAvailableSlotsProgressBar";
 import moment from "moment";
+import { UserTimeZoneLabels } from "./UserTimeZoneLabel";
 
 // ---------------------------------------------------------------------------
 // Helper: stable numeric sort index from the WeekDays array (Sun=0 … Sat=6).
@@ -1151,6 +1152,10 @@ const ClassStatusUpdate = (props) => {
                       </FormGroup>
                     </Col>
                   </Row>
+                  {/* Opened from the class calendar: the class's tutor and student timezones (display only). */}
+                  {props.source === "Calender" && (
+                    <UserTimeZoneLabels className="mb-2" tutorUserId={props.tutorUserId} studentUserId={props.studentUserId} start={props.classStart} end={props.classEnd} />
+                  )}
                 </Col>
               </Row>
 

@@ -466,8 +466,40 @@ namespace TCT.LMS.Infrastructure.Repositories
                                      }).ToListAsync();
                 tutorCourseDetailsDtos.Data = new List<TutorCourseDetailsDto>();
 
+                // Low / High payment per board, grade and subject, read from the tutor's current
+                // assignments (SalesDetails holds only the current tutor and the approved amount;
+                // a pending requested amount stays on TutorPaymentApproval until it is approved).
+                // Excluded: inactive rows, dropped (20005/20026/20031/20032), awaiting Coordinator
+                // Admin approval (20012), rejected (20014), and assignments still pending approval.
+                var tutorKeys = result1.Select(r => r.TutorId)
+                    .Concat(result1.Where(r => r.UserId.HasValue).Select(r => r.UserId!.Value))
+                    .Distinct().ToList();
+                var excludedStatusCodes = new[] { 20005, 20026, 20031, 20032,
+                    (int)FollowUpStatus.DemoPendingTutorAssignedNotApproved, (int)FollowUpStatus.Reject };
+                var paymentRanges = tutorKeys.Count == 0
+                    ? new Dictionary<(Guid?, Guid?, Guid), (decimal Low, decimal High)>()
+                    : (await (from sd in _dbContext.SalesDetails.AsNoTracking()
+                              join s in _dbContext.Sales.AsNoTracking() on sd.SalesId equals s.Id
+                              where sd.IsActive && s.IsActive && sd.TutorPayment > 0
+                                    && sd.TutorId != null && tutorKeys.Contains(sd.TutorId.Value)
+                                    && !_dbContext.Type_Code.Any(c => c.Id == sd.Status && excludedStatusCodes.Contains(c.TypeCodeValue))
+                                    && !_dbContext.TutorPaymentApproval.Any(p => p.SalesDetailsId == sd.Id && p.IsActive
+                                          && p.ApprovalStatus == (int)TutorPaymentStatus.Pending
+                                          && p.RequestType == (int)TutorPaymentRequestType.AssignmentWithPaymentChange)
+                              group sd.TutorPayment by new { s.BoardId, s.GradeId, sd.SubjectId } into g
+                              select new { g.Key.BoardId, g.Key.GradeId, g.Key.SubjectId, Low = g.Min(), High = g.Max() })
+                             .ToListAsync())
+                        .ToDictionary(r => (r.BoardId, r.GradeId, r.SubjectId), r => (r.Low, r.High));
+
                 foreach (var item in result1)
                 {
+                    if (item.SubjectId.HasValue &&
+                        paymentRanges.TryGetValue((item.BoardId, item.GradeId, item.SubjectId.Value), out var range))
+                    {
+                        item.LowPayment = range.Low;
+                        item.HighPayment = range.High;
+                    }
+
                     var salesQuery = from s in _dbContext.Sales
                                      join sd in _dbContext.SalesDetails on s.Id equals sd.SalesId
                                      where s.BoardId == item.BoardId

@@ -309,6 +309,8 @@ const TCTStudentProfileLayout = () => {
       setProfileName(response.data.fullName);
       if (response.data.fileData != null && response.data.fileData != "") {
         setImageUrl(`data:image/jpeg;base64, ${response.data.fileData}`);
+      } else {
+        setImageUrl(""); // no photo for this user: don't keep a previously viewed user's photo
       }
       setEmailAddress(isTutorView ? "" : response.data.email);
       setDesignation(response.data.designationName);
@@ -520,7 +522,17 @@ const TCTStudentProfileLayout = () => {
               <Sidebar toggleState={sideBar}>
                 <div className="card-inner">
                   <div className="user-card user-card-s2 mt-5 mt-xxl-0">
-                    <UserAvatar className="lg" theme="primary" text={findUpper(formData?.fullName)} />
+                    {/* Uploaded profile photo, filling the circle; initials when there is none or it fails to load. */}
+                    <UserAvatar className="lg" theme="primary" text={imageUrl ? undefined : findUpper(formData?.fullName)}>
+                      {imageUrl && (
+                        <img
+                          src={imageUrl}
+                          alt={formData?.fullName || "Profile photo"}
+                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                          onError={() => setImageUrl("")}
+                        />
+                      )}
+                    </UserAvatar>
                     <div className="user-info">
                       <div className="badge badge-outline-light badge-pill ucap">{formData?.role}</div>
                       <h5>{formData?.fullName}</h5>

@@ -245,6 +245,11 @@ const TCTScheduleCalender = (props) => {
             meetingLink: item.meetingLink,
             tutorUserId: item.tutorUserId,
             studentUserId: item.studentUserId,
+            // Display only (timezone labels): the class's tutor id (Tutor.Id or, on older rows, User.Id) and
+            // whose calendar this is, used when the API leaves tutorUserId / studentUserId empty.
+            tutorId: item.tutorId,
+            calendarOwnerUserId: userId,
+            calendarGuestType: guest,
             scheduleStatusName: item.scheduleStatusName,
             // When Operations opens a student's calendar, the API query runs in
             // student context. Use Operations' own status so Tutor/Student

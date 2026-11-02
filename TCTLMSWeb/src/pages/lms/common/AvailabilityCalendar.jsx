@@ -6,6 +6,7 @@ import bootstrapPlugin from "@fullcalendar/bootstrap";
 import { Spinner } from "reactstrap";
 import moment from "moment";
 import { getUserAvailableSlots } from "../../../apiservices/UserService";
+import UserTimeZoneLabel from "./UserTimeZoneLabel";
 
 // Week view of one person's free time: their saved availability (with dated exceptions) minus the
 // classes already booked for them, which are shown separately as "Booked".
@@ -69,6 +70,8 @@ const AvailabilityCalendar = ({ userId, name, roleLabel, initialDate, onSelectSl
         <h6 className="overline-title mb-0">{name ? `${name}'s available slots` : `The ${roleLabel}'s available slots`}</h6>
         {loading && <Spinner size="sm" />}
       </div>
+      {/* initialDate is the start of the class being re-scheduled: shown in this person's timezone. */}
+      <UserTimeZoneLabel label={roleLabel === "tutor" ? "Class time for the tutor" : roleLabel === "student" ? "Class time for the student" : "Class time"} userId={userId} start={initialDate ?? null} className="mb-1" />
       <small className="text-muted d-block mb-2">
         Green: free time. Grey: classes already booked.
         {onSelectSlot ? " Click a green slot to add it to the comments as the preferred re-schedule time." : ""}

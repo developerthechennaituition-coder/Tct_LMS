@@ -24,6 +24,7 @@ import {
 import { dDayFilterOptions, demoDayMarkerDate, demoFollowUpCategory, LONG_FOLLOW_UP, SHORT_FOLLOW_UP } from "../../../library/demoFollowUp";
 import { criticalTaskOffset, groupCriticalTasks, selectMyTaskDemos } from "../../../library/myCalendarTasks";
 import { showsClassEvents, toClassEvent, visibleClassEvents } from "../../../library/myCalendarClasses";
+import { UserTimeZoneText } from "../common/UserTimeZoneLabel";
 import "./MyCalendar.css";
 
 // Roles without My Calendar (the server enforces the same rule).
@@ -149,6 +150,10 @@ const DemoStatusModal = ({ item, options, onClose, onSaved }) => {
               )}
               <dt>Demo date</dt>
               <dd>{moment(item?.demoStart).format("DD-MMM-YYYY")}, {moment(item?.demoStart).format("hh:mm A")} – {moment(item?.demoEnd).format("hh:mm A")}</dd>
+              <dt>Tutor time</dt>
+              <dd><UserTimeZoneText userId={item?.tutorUserId} start={item?.demoStart ?? null} end={item?.demoEnd} /></dd>
+              <dt>Student time</dt>
+              <dd><UserTimeZoneText userId={item?.studentUserId} start={item?.demoStart ?? null} end={item?.demoEnd} /></dd>
               <dt>Class status</dt>
               <dd>{item?.scheduleStatusName || "—"}</dd>
             </>
@@ -645,6 +650,7 @@ const MyTaskDemoList = ({ items, state, load }) => {
           <div className="mc-task-meta">
             <span><Icon name="calendar" /> {moment(d.startTime).format("DD-MMM-YYYY")}, {moment(d.startTime).format("hh:mm A")} – {moment(d.endTime).format("hh:mm A")}</span>
             <span><Icon name="user" /> Tutor {d.tutorName || "NA"}</span>
+            <span><Icon name="globe" /> Tutor: <UserTimeZoneText userId={d.tutorUserId} start={d.startTime ?? null} end={d.endTime} /> · Student: <UserTimeZoneText userId={d.studentUserId} start={d.startTime ?? null} end={d.endTime} /></span>
             {d.enrollmentStatusName && <span><Icon name="info" /> {d.enrollmentStatusName}</span>}
           </div>
         </div>

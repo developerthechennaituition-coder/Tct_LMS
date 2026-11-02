@@ -49,6 +49,40 @@ public class TutorPayrollSummaryTests
             new[] { new PayrollInvoice(tutor.Id, "SAVED", "10", 2026, 375) }, 10, 2026));
         Assert.Equal("Processed", row.PayrollStatus);
     }
+    [Fact] public void CompletedButNoPayableClassesAwaitOperationsApproval()
+    {
+        var row = Assert.Single(TutorPayrollSummary.Build(new[] { tutor }, new[] { Class(approved: false), Class(approved: false) },
+            Array.Empty<PayrollInvoice>(), 10, 2026));
+        Assert.Equal(TutorPayrollSummary.AwaitingOperationsApproval, row.PayrollStatus);
+        Assert.Equal(2, row.NoOfDaysPresent); Assert.Equal(0, row.Approved); Assert.Equal(0m, row.TotalTutorPayment);
+    }
+    [Fact] public void PartlyApprovedClassesStayPending()
+    {
+        var row = Assert.Single(TutorPayrollSummary.Build(new[] { tutor }, new[] { Class(), Class(approved: false) },
+            Array.Empty<PayrollInvoice>(), 10, 2026));
+        Assert.Equal("Pending", row.PayrollStatus); Assert.Equal(1, row.Approved); Assert.Equal(250m, row.TotalTutorPayment);
+    }
+    [Fact] public void ClassesStoredUnderTheTutorsUserIdAreIncludedOnce()
+    {
+        var onUserKey = Class() with { TutorId = tutor.UserId };
+        var row = Assert.Single(TutorPayrollSummary.Build(new[] { tutor },
+            new[] { Class(rate: 300), onUserKey, onUserKey with { TutorId = tutor.Id } }, Array.Empty<PayrollInvoice>(), 10, 2026));
+        Assert.Equal(2, row.TotalNoOfClasses); Assert.Equal(2, row.Approved); Assert.Equal(550m, row.TotalTutorPayment);
+    }
+    [Fact] public void PayslipStoredUnderTheTutorsUserIdMarksTheMonthProcessed()
+    {
+        var row = Assert.Single(TutorPayrollSummary.Build(new[] { tutor }, new[] { Class() },
+            new[] { new PayrollInvoice(tutor.UserId, "SAVED", "10", 2026, 375) }, 10, 2026));
+        Assert.Equal("Processed", row.PayrollStatus); Assert.Equal(375m, row.TotalTutorPayment);
+    }
+    [Fact] public void OtherTutorsClassesAreNotMatched()
+    {
+        var other = new PayrollTutor(Guid.NewGuid(), Guid.NewGuid(), "Other", "T002");
+        var rows = TutorPayrollSummary.Build(new[] { tutor, other }, new[] { Class() with { TutorId = tutor.UserId } },
+            Array.Empty<PayrollInvoice>(), 10, 2026);
+        Assert.Equal(1, rows.Single(r => r.UserCode == "T001").TotalNoOfClasses);
+        Assert.Equal(0, rows.Single(r => r.UserCode == "T002").TotalNoOfClasses);
+    }
     [Theory] [InlineData("09",9)] [InlineData("9",9)] [InlineData("September",9)]
     public void RecognizesExistingMonthFormats(string value, int month) => Assert.True(TutorPayrollSummary.MatchesMonth(value, month));
 }

@@ -55,6 +55,8 @@ namespace TCT.LMS.DTOs.Address
         public bool IsDelivered { get; set; }
         public string? Name { get; set; }
         public string? GeneratedPassword { get; set; }
+        // Read-only here: AddTCTUser / CreateTCTUser ignore it; it is saved via POST api/User/{id}/timezone.
+        public string? TimeZoneId { get; set; }
     }
 }
 

@@ -43,5 +43,8 @@ public class User : BaseEntity
     public bool? IsDelivered { get; set; }
     public List<Address>? Addresses { get; set; }
     public DateTime? LastLoggedIn { get; set; }
+    // IANA timezone ID (e.g. "America/New_York"); NULL = not set. Saved only through the timezone endpoint.
+    [MaxLength(64)]
+    public string? TimeZoneId { get; set; }
 
 }

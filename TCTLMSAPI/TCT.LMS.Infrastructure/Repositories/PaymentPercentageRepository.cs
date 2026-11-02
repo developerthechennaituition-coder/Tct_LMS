@@ -20,8 +20,9 @@ namespace TCT.LMS.Infrastructure.Repositories
         public async Task<Domain.Entities.PaymentPercentageConfiguration> GetPaymentPercentageAsync(Guid boardId, Guid gradeId, Guid subjectId)
         {
 
-            var result = await _dbContext.PaymentPercentageConfiguration
-                .Where(x => x.Board == boardId && x.Grade == gradeId && x.Subject == subjectId).FirstOrDefaultAsync();
+            var result = await TCT.LMS.Application.Services.TutorPaymentApprovalRules
+                .CurrentConfiguration(_dbContext.PaymentPercentageConfiguration, boardId, gradeId, subjectId)
+                .FirstOrDefaultAsync();
             return result;
         }
     }

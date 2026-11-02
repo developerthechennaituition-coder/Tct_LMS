@@ -10,6 +10,8 @@ public record PayrollInvoice(Guid TutorId, string Number, string Month, int Year
 
 public static class TutorPayrollSummary
 {
+    public const string AwaitingOperationsApproval = "Awaiting Operations Approval";
+
     public static bool MatchesMonth(string value, int month) =>
         int.TryParse(value, out var numeric) ? numeric == month :
         string.Equals(value?.Trim(), CultureInfo.InvariantCulture.DateTimeFormat.GetMonthName(month), StringComparison.OrdinalIgnoreCase);
@@ -26,8 +28,10 @@ public static class TutorPayrollSummary
         var byTutor = classes.Where(c => c.Date.Month == month && c.Date.Year == year).ToLookup(c => c.TutorId);
         var byInvoice = invoices.Where(i => i.Year == year && MatchesMonth(i.Month, month)).ToLookup(i => i.TutorId);
         return tutors.Select(tutor => {
-            var rows = byTutor[tutor.Id].DistinctBy(c => c.Id).ToList();
-            var issued = byInvoice[tutor.Id].DistinctBy(i => i.Number).ToList();
+            // Schedule.TutorId / TutorInvoice.TutorId may hold the Tutor.Id or the tutor's User.Id; match both.
+            // A class or payslip found under both keys is counted once.
+            var rows = byTutor[tutor.Id].Concat(byTutor[tutor.UserId]).DistinctBy(c => c.Id).ToList();
+            var issued = byInvoice[tutor.Id].Concat(byInvoice[tutor.UserId]).DistinctBy(i => i.Number).ToList();
             var completed = rows.Count(c => c.Completed);
             var approved = rows.Count(c => c.Completed && c.Approved);
             return new PayrollRequestDto {
@@ -42,7 +46,9 @@ public static class TutorPayrollSummary
                 IsInvoiceGenerated = issued.Count > 0,
                 InvoiceNumber = issued.FirstOrDefault()?.Number,
                 InvoiceNumbers = issued.Select(i => i.Number).ToList(),
-                PayrollStatus = issued.Count > 0 ? "Processed" : completed == 0 ? "No classes taken" : "Pending"
+                // Completed classes but none payable yet: Operations have not cross-checked them, so no payslip can be generated.
+                PayrollStatus = issued.Count > 0 ? "Processed" : completed == 0 ? "No classes taken"
+                    : approved == 0 ? AwaitingOperationsApproval : "Pending"
             };
         }).OrderBy(r => r.TutorName).ToList();
     }

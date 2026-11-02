@@ -73,6 +73,7 @@ public partial class ScheduleRepository
                 Subject = subjects.TryGetValue(row.SubjectId, out var subject) ? subject ?? "" : "",
                 WeeklyPattern = pattern,
                 HasWeeklySchedule = weekly != null,
+                TutorId = row.TutorId,
             });
         }
         return result;
