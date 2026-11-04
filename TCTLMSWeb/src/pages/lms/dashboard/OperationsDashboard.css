@@ -33,28 +33,70 @@
 
 /* ── Summary cards ── */
 .tct-ops-dash .ops-stat {
-  position: relative; display: flex; flex-direction: row; align-items: flex-start; gap: 14px; height: 100%; min-height: 96px; margin: 0;
-  padding: 18px 18px 16px; background: #fff; border: 1px solid #e8ebf3; border-top: 3px solid var(--tone); border-radius: 14px;
-  box-shadow: 0 1px 2px rgba(31, 43, 58, 0.04), 0 2px 8px rgba(31, 43, 58, 0.03);
+  position: relative; display: flex; flex-direction: row; align-items: flex-start; gap: 16px; height: 100%; min-height: 112px; margin: 0;
+  padding: 20px 20px 18px; background: #fff; border: 1px solid #eceff5; border-top: 3px solid var(--tone); border-radius: 16px;
+  box-shadow: 0 1px 2px rgba(31, 43, 58, 0.04), 0 8px 24px rgba(31, 43, 58, 0.06);
   transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
 }
 .tct-ops-dash .ops-stat.is-clickable { cursor: pointer; }
 .tct-ops-dash .ops-stat.is-clickable:hover {
   transform: translateY(-2px); border-color: var(--tone);
-  box-shadow: 0 10px 22px var(--tone-shadow), 0 2px 6px rgba(31, 43, 58, 0.05);
+  box-shadow: 0 12px 28px var(--tone-shadow), 0 2px 6px rgba(31, 43, 58, 0.05);
 }
 .tct-ops-dash .ops-stat-icon {
-  flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px;
-  border-radius: 12px; font-size: 19px; color: var(--tone-ink); background: var(--tone-soft);
+  flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px;
+  border-radius: 14px; font-size: 22px; color: var(--tone-ink); background: var(--tone-soft);
 }
-.tct-ops-dash .ops-stat-body { flex: 1 1 auto; min-width: 0; }
-.tct-ops-dash .ops-stat-value { font-size: 1.6rem; font-weight: 700; line-height: 1.15; color: #1c2b46; font-variant-numeric: tabular-nums; }
-.tct-ops-dash .ops-stat-label { margin-top: 2px; font-size: 14px; font-weight: 600; color: #364a63; }
-.tct-ops-dash .ops-stat-label.is-strong { font-weight: 700; color: #1c2b46; }
-.tct-ops-dash .ops-stat-note { display: block; margin-top: 4px; font-size: 12.5px; line-height: 1.45; color: #8094ae; overflow-wrap: anywhere; }
+/* Body is a column so a breakdown sits at the bottom of the card when the row is taller than its content. */
+.tct-ops-dash .ops-stat-body { display: flex; flex-direction: column; align-self: stretch; flex: 1 1 auto; min-width: 0; }
+.tct-ops-dash .ops-stat-value { font-size: 2rem; font-weight: 700; line-height: 1.05; letter-spacing: -0.02em; color: #1c2b46; font-variant-numeric: tabular-nums; }
+.tct-ops-dash .ops-stat-label { margin-top: 6px; font-size: 16px; font-weight: 600; line-height: 1.3; color: #1c2b46; }
+.tct-ops-dash .ops-stat-label.is-strong { font-weight: 700; }
+.tct-ops-dash .ops-stat-note { display: block; margin-top: 6px; font-size: 13px; line-height: 1.45; color: #6b7a90; overflow-wrap: break-word; }
 .tct-ops-dash .ops-stat-cta { display: block; margin-top: 4px; font-size: 12.5px; font-weight: 600; color: var(--tone-ink); }
-.tct-ops-dash .ops-stat-arrow { flex-shrink: 0; align-self: center; font-size: 16px; color: #b7c2d0; transition: color 0.18s ease, transform 0.18s ease; }
+/* The arrow sits at the right, level with the title, instead of taking a column; text keeps clear of it. */
+.tct-ops-dash .ops-stat.is-clickable .ops-stat-value,
+.tct-ops-dash .ops-stat.is-clickable .ops-stat-label,
+.tct-ops-dash .ops-stat.is-clickable .ops-stat-note,
+.tct-ops-dash .ops-stat.is-clickable .ops-stat-cta { padding-right: 22px; }
+.tct-ops-dash .ops-stat-arrow { position: absolute; top: 66px; right: 16px; font-size: 16px; color: #8094ae; transition: color 0.18s ease, transform 0.18s ease; }
 .tct-ops-dash .ops-stat.is-clickable:hover .ops-stat-arrow { color: var(--tone-ink); transform: translateX(2px); }
+/* Tutor / student breakdown inside the Rescheduled and Cancelled cards (blue = tutor, purple = student):
+   one row of compact pills under a divider that spans the card (under the 48px icon + 16px gap).
+   Labels never wrap; on very narrow cards the second pill moves to the next line instead. */
+.tct-ops-dash .ops-stat-breakdown {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin: auto 0 0 -64px; padding: 12px 0 0; list-style: none; border-top: 1px solid #eef1f6;
+}
+.tct-ops-dash .ops-stat:has(.ops-stat-breakdown) .ops-stat-body > :nth-last-child(2) { margin-bottom: 12px; }
+.tct-ops-dash .ops-breakdown-item {
+  --who-ink: #2f6fd6; --who-soft: #eef4ff; --who-line: #dde8ff;
+  display: inline-flex; flex: 1 1 0; align-items: center; gap: 8px; min-width: max-content; margin: 0;
+  padding: 5px 6px 5px 10px; border: 1px solid var(--who-line); border-radius: 999px; background: var(--who-soft); white-space: nowrap;
+}
+.tct-ops-dash .ops-breakdown-item.is-student { --who-ink: #6a4fd8; --who-soft: #f5f1ff; --who-line: #e8e0ff; }
+/* Third item (slate = Operations). */
+.tct-ops-dash .ops-breakdown-item.is-operations { --who-ink: #526484; --who-soft: #f1f4f8; --who-line: #e2e8f0; }
+/* Three items: three equal tiles on one row, icon and count on top, a one-word label under them, so they stay aligned
+   in the narrow four-across Rescheduled card as well as the wider Cancelled card. */
+.tct-ops-dash .ops-stat-breakdown.is-compact { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.tct-ops-dash .ops-stat-breakdown.is-compact .ops-breakdown-item {
+  display: grid; grid-template-columns: auto 1fr; grid-template-areas: "icon count" "label label"; align-items: center;
+  column-gap: 6px; row-gap: 2px; min-width: 0; padding: 6px 8px; border-radius: 10px; white-space: normal;
+}
+.tct-ops-dash .ops-stat-breakdown.is-compact .ops-breakdown-icon { grid-area: icon; }
+.tct-ops-dash .ops-stat-breakdown.is-compact .ops-breakdown-count {
+  grid-area: count; justify-self: end; min-width: 0; height: auto; padding: 0; background: transparent; font-size: 16px; line-height: 1.2;
+}
+.tct-ops-dash .ops-stat-breakdown.is-compact .ops-breakdown-label {
+  grid-area: label; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; color: var(--who-ink);
+}
+.tct-ops-dash .ops-breakdown-icon { display: inline-flex; flex-shrink: 0; font-size: 15px; color: var(--who-ink); }
+.tct-ops-dash .ops-breakdown-label { flex: 1 1 auto; font-size: 13px; font-weight: 500; line-height: 1.2; color: #364a63; }
+.tct-ops-dash .ops-breakdown-count {
+  flex-shrink: 0; min-width: 26px; height: 24px; padding: 0 7px; border-radius: 999px; font-size: 13.5px; font-weight: 700; line-height: 24px;
+  text-align: center; color: var(--who-ink); background: #fff; font-variant-numeric: tabular-nums;
+}
 
 /* ── Panels (D-1, table, charts) ── */
 .tct-ops-dash .ops-split { display: grid; grid-template-columns: minmax(300px, 1fr) minmax(0, 2fr); gap: 16px; margin-bottom: 28px; }

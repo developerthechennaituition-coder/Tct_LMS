@@ -98,6 +98,11 @@ const tutorPayrollStyle = `
   .tct-pr-card .tct-pr-details > span { display: block; }
   /* Payment */
   .tct-pr-card .tct-pr-amount .tb-lead { font-size: 15px; font-weight: 700; color: #1c2b46; font-variant-numeric: tabular-nums; }
+  /* Cancelled classes to review (not deducted: not certain whether they were re-scheduled). */
+  .tct-pr-card .tct-pr-review { margin-top: 6px; padding: 6px 8px; border: 1px solid #f4d48a; border-radius: 8px; background: #fff8e6;
+    font-size: 12px; line-height: 1.4; color: #7a5600; white-space: normal; }
+  .tct-pr-card .tct-pr-review strong { display: block; font-size: 12.5px; color: #6b4a00; }
+  .tct-pr-card .tct-pr-review ul { margin: 4px 0 0; padding-left: 16px; }
   /* Status: same text and colour as before, shown as a pill */
   .tct-pr-card .rdt_TableCell .badge { padding: 0; border: 0; background: transparent; }
   .tct-pr-card .rdt_TableCell .badge > p {
@@ -231,7 +236,18 @@ export default function TCTTutorPayroll() {
       cell: row => <div className="user-info tct-pr-amount"><span className="tb-lead">{money(row.totalTutorPayment)}</span>
         <small className="d-block text-soft">{row.isInvoiceGenerated ? "Saved payslip total" : "Approved classes estimate"}</small></div> },
     { name: "Status", selector: row => row.payrollStatus,
-      cell: row => <div className="badge"><p style={{ color: STATUS_COLORS[row.payrollStatus] || "#526484" }}>{row.payrollStatus}</p></div> },
+      cell: row => <div>
+        <div className="badge"><p style={{ color: STATUS_COLORS[row.payrollStatus] || "#526484" }}>{row.payrollStatus}</p></div>
+        {/* Cancelled classes not deducted because it is not certain whether they were re-scheduled: for review. */}
+        {/* Staff view only: not on a tutor's own payroll (roleId 13). Independent of the tutor-view styling. */}
+        {localStorage.getItem("roleId") !== "13" && row.cancellationsToReview > 0 && (
+          <div className="tct-pr-review" role="note">
+            <strong>{row.cancellationsToReview} cancelled class{row.cancellationsToReview > 1 ? "es" : ""} to review</strong>
+            <span>Not deducted: it is not certain whether {row.cancellationsToReview > 1 ? "they were" : "it was"} re-scheduled.</span>
+            <ul>{(row.cancellationReviewNotes || []).map(note => <li key={note}>{note}</li>)}</ul>
+          </div>
+        )}
+      </div> },
     { name: "Action", cell: row => row.isInvoiceGenerated
       ? <div>{(row.invoiceNumbers?.length ? row.invoiceNumbers : [row.invoiceNumber]).filter(Boolean).map(number =>
           <Link key={number} to={`${process.env.PUBLIC_URL}/lms/tutors/tutor-invoice-details?invNumber=${encodeURIComponent(number)}&from=payroll`}>View Payslip {number}<br /></Link>)}</div>

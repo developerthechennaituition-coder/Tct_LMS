@@ -13,7 +13,8 @@ import Content from "../../../layout/content/Content";
 import Head from "../../../layout/head/Head";
 import LogoDark from "../../../images/TCTLoginPageLogo.png";
 import { Link, useLocation } from "react-router-dom";
-import { gettutorinvoicebyid } from "../../../apiservices/ScheduleService";
+import { gettutorinvoicebyid, openTutorPaySlipPdf } from "../../../apiservices/ScheduleService";
+import { toast } from "react-toastify";
 import { config } from "../../../library/config";
 
 const InvoiceDetails = ({ match }) => {
@@ -118,11 +119,11 @@ const InvoiceDetails = ({ match }) => {
           <Block>
             <div className="invoice">
               <div className="invoice-action">
-                <a href={`${config.API_URL}/Scheduler/GetTutorPaySlipPdf?invoiceNumber=${invNumber}`} target="_blank" rel="noreferrer">
-                  <Button size="lg" color="primary" outline className="btn-icon btn-white btn-dim">
-                    <Icon name="printer-fill"></Icon>
-                  </Button>
-                </a>
+                {/* Fetched with the login token: the payslip PDF is no longer served anonymously. */}
+                <Button size="lg" color="primary" outline className="btn-icon btn-white btn-dim" aria-label="Open payslip PDF"
+                  onClick={() => openTutorPaySlipPdf(invNumber).catch(() => toast.error("Unable to open the payslip."))}>
+                  <Icon name="printer-fill"></Icon>
+                </Button>
               </div>
               <div className="invoice-wrap">
                 <div className="invoice-brand text-center">

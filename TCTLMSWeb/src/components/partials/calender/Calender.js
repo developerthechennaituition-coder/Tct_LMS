@@ -56,6 +56,8 @@ import {
   updatescheduledetails,
   getTutorScheduleDetails,
   requestClassStatusEdit,
+  getTutorCancellationSummary,
+  requestMakeupClass,
 } from "../../../apiservices/ScheduleService";
 import {
   getCurrentTutorContext,
@@ -398,6 +400,51 @@ const [selectedCalendarDate, setSelectedCalendarDate] = useState(null);
   const canRequestStatusEdit =
     !readOnly && !isNewClass && isSelfAttendanceRole && event?.scheduleType === "Class" &&
     Boolean(event?.scheduleDetailsId) && !canEditAttendance;
+
+  // Tutor cancellation rules: the opened class, when it is a cancelled class still needing a make-up, and the
+  // make-up slot the tutor or student picks for it (Operations approve the request).
+  const [makeupInfo, setMakeupInfo] = useState(null);
+  const [makeupSlot, setMakeupSlot] = useState({ date: "", start: "", end: "" });
+  const [makeupSaving, setMakeupSaving] = useState(false);
+  useEffect(() => {
+    setMakeupInfo(null);
+    setMakeupSlot({ date: "", start: "", end: "" });
+    if (!tutorModalState || !isSelfAttendanceRole || event?.scheduleType !== "Class" || !event?.salesDetailsId || !event?.scheduleDetailsId)
+      return undefined;
+    let active = true;
+    getTutorCancellationSummary(event.salesDetailsId, moment(event.start).format("YYYY-MM-DD"))
+      .then((summary) => {
+        const id = String(event.scheduleDetailsId).toLowerCase();
+        const item = (summary?.pendingMakeups || []).find((p) => String(p.scheduleDetailsId).toLowerCase() === id);
+        if (active) setMakeupInfo(item || null);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [tutorModalState, event?.scheduleDetailsId]);
+
+  const submitMakeupRequest = async () => {
+    const { date, start, end } = makeupSlot;
+    if (!date || !start || !end || end <= start) {
+      toast.error("Choose the make-up date, a start time and a later end time.");
+      return;
+    }
+    setMakeupSaving(true);
+    try {
+      const result = await requestMakeupClass({
+        scheduleDetailsId: event.scheduleDetailsId,
+        start: `${date}T${start}:00`,
+        end: `${date}T${end}:00`,
+      });
+      toast.success(result?.message || "Make-up request sent to Operations.");
+      setMakeupInfo((current) => (current ? { ...current, makeupRequestStatus: "Pending" } : current));
+    } catch (requestError) {
+      toast.error(requestError?.response?.data?.message || "Unable to send the make-up request.");
+    } finally {
+      setMakeupSaving(false);
+    }
+  };
 
   const requestStatusEdit = async () => {
     const { value: reason, isConfirmed } = await Swal.fire({
@@ -1053,8 +1100,28 @@ const [selectedCalendarDate, setSelectedCalendarDate] = useState(null);
   };
 
   const cancelClassHandler = async () => {
-    var reulst = await checkCanCancelClass(event.salesDetailsId, 2025, 9);
-    const message = reulst.data;
+    let message;
+    if (userRole === "Tutor") {
+      // Tutor cancellation allowance for this course and the class's month (also enforced when saving).
+      let summary;
+      try {
+        summary = await getTutorCancellationSummary(event.salesDetailsId, moment(event.start).format("YYYY-MM-DD"), event.scheduleDetailsId);
+      } catch {
+        toast.error("Unable to check your cancellation allowance. Please try again.");
+        return;
+      }
+      if (!summary?.canCancel) {
+        Swal.fire({ title: "Cancellation not allowed", text: summary?.message, icon: "error", showCancelButton: true,
+          showConfirmButton: false, cancelButtonText: "Reschedule Class" }).then((result) => {
+          if (result.dismiss === Swal.DismissReason.cancel) setScheduleDemoModal(true);
+        });
+        return;
+      }
+      message = summary.message;
+    } else {
+      var reulst = await checkCanCancelClass(event.salesDetailsId, 2025, 9);
+      message = reulst.data;
+    }
     Swal.fire({
       title: "Confirm class cancellation",
       text: message,
@@ -1477,6 +1544,32 @@ const [selectedCalendarDate, setSelectedCalendarDate] = useState(null);
             {readOnly && event?.attendanceLabel && (
               <div className={`alert ${event.attendanceLabel.startsWith("Attendance not") ? "alert-light" : "alert-info"} py-2 mb-3`}>
                 <strong>Attendance:</strong> {event.attendanceLabel}
+              </div>
+            )}
+            {/* A cancelled class needs its own make-up class (Operations approve it). */}
+            {makeupInfo && (
+              <div className="alert alert-warning py-2 mb-3">
+                <strong>This cancelled class needs a make-up class</strong> by{" "}
+                {moment(makeupInfo.rescheduleBy).format("DD-MMM-YYYY")}.
+                {makeupInfo.category === "tutor" && " If it is not re-scheduled by then, part of this class's fee is deducted."}
+                {makeupInfo.makeupRequestStatus === "Pending" ? (
+                  <div className="mt-1">Make-up request sent; waiting for Operations' approval.</div>
+                ) : (
+                  <div className="d-flex flex-wrap align-items-end mt-2" style={{ gap: 8 }}>
+                    {makeupInfo.makeupRequestStatus === "Rejected" && (
+                      <div className="w-100">The last make-up request was rejected; please choose another time.</div>
+                    )}
+                    <input type="date" className="form-control form-control-sm" style={{ width: "auto" }} aria-label="Make-up date"
+                      value={makeupSlot.date} onChange={(e) => setMakeupSlot((s) => ({ ...s, date: e.target.value }))} />
+                    <input type="time" className="form-control form-control-sm" style={{ width: "auto" }} aria-label="Make-up start time"
+                      value={makeupSlot.start} onChange={(e) => setMakeupSlot((s) => ({ ...s, start: e.target.value }))} />
+                    <input type="time" className="form-control form-control-sm" style={{ width: "auto" }} aria-label="Make-up end time"
+                      value={makeupSlot.end} onChange={(e) => setMakeupSlot((s) => ({ ...s, end: e.target.value }))} />
+                    <Button type="button" size="sm" color="primary" disabled={makeupSaving} onClick={submitMakeupRequest}>
+                      {makeupSaving ? <Spinner size="sm" /> : "Request make-up"}
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
             {/* readOnly: every field below is shown but disabled */}

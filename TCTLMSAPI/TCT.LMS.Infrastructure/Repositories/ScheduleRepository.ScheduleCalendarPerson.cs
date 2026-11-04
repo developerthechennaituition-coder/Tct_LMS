@@ -95,6 +95,8 @@ public partial class ScheduleRepository
             return new() { Succeeded = false, Message = "A permanent re-schedule request can only be approved or rejected." };
         if (change.SalesDetailsId != request.SalesDetailsId)
             return new() { Succeeded = false, Message = "The subject of a request cannot be changed." };
+        if (request.RequestKind == CancelledClassMakeupKind && (change.Weeks != 1 || change.Days.Distinct().Count() != 1))
+            return new() { Succeeded = false, Message = "A make-up replaces one cancelled class: choose one day for 1 week." };
 
         // Validate the modified values first (no save), so a refused change leaves the request untouched.
         var check = await AddWeeklyDayChangeAsync(change, request.RequestedBy, dryRun: true);

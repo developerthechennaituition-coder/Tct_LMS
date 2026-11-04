@@ -129,7 +129,8 @@ namespace TCT.LMS.Infrastructure.Common
 
                             TwoColRow(table, "Net salary",       formattedTotal, header: true);
                             TwoColRow(table, "Paid amount",      formattedTotal);
-                            TwoColRow(table, "Total Deductions", "NA");
+                            TwoColRow(table, "Total Deductions",
+                d.TotalDeductions is > 0 ? d.TotalDeductions.Value.ToString("N2", ci) + " INR" : "NA");
                         });
 
                         col.Item().PaddingTop(12).LineHorizontal(0.75f).LineColor("#333333");

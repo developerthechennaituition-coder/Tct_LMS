@@ -400,6 +400,8 @@ TaskVerified: 100472,
 TaskChangesRequested: 100473,
 TaskDueReminder: 100474,
 TaskOverdue: 100475,
+TutorCancellationDeduction: 100476,
+TutorCancellationReview: 100477,
 });
 
 // Page a notification opens, or null when it has none:

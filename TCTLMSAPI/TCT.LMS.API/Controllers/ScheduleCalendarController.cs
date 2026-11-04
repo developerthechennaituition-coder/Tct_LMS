@@ -170,6 +170,52 @@ public class ScheduleCalendarController : ControllerBase
         return Ok(result);
     }
 
+    // Tutor cancellation allowance of the course for the month of classDate (used / remaining) and its cancelled
+    // classes still needing a make-up. scheduleDetailsId: the class about to be cancelled (left out of "used").
+    [HttpGet("cancellation-summary")]
+    public async Task<IActionResult> CancellationSummary([FromQuery] Guid salesDetailsId, [FromQuery] DateTime classDate,
+        [FromQuery] Guid? scheduleDetailsId)
+    {
+        if (!IsEditor)
+        {
+            if (CurrentUserId is not Guid userId) return Unauthorized();
+            if ((await OwnEnrolmentsAsync(userId)).All(e => e.SalesDetailsId != salesDetailsId)) return Forbid();
+        }
+        var summary = await _repository.GetTutorCancellationSummaryAsync(salesDetailsId, classDate.Date, scheduleDetailsId);
+        // The allowance covers all the tutor's students: a student sees only this course's classes needing a make-up.
+        if (User.IsInRole("Student"))
+        {
+            summary.Allowed = null;
+            summary.Used = summary.Remaining = summary.WeeklyClasses = summary.MonthlyClasses = 0;
+            summary.Message = "";
+        }
+        return Ok(summary);
+    }
+
+    // A tutor or student asks for the make-up class of one cancelled class; Operations approve it in Requests.
+    [HttpPost("make-up")]
+    [Authorize(Roles = "Tutor,Student")]
+    public async Task<IActionResult> RequestMakeup([FromBody] MakeupRequestDto input)
+    {
+        if (input == null || input.ScheduleDetailsId == Guid.Empty) return BadRequest(new { succeeded = false, message = "Choose the cancelled class." });
+        if (CurrentUserId is not Guid userId) return Unauthorized();
+        var salesDetailsId = await _repository.GetCancelledClassSalesDetailsIdAsync(input.ScheduleDetailsId);
+        if (salesDetailsId == null) return BadRequest(new { succeeded = false, message = "This class is not a cancelled class waiting for a make-up." });
+        if ((await OwnEnrolmentsAsync(userId)).All(e => e.SalesDetailsId != salesDetailsId.Value)) return Forbid();
+
+        var created = await _repository.CreateMakeupRequestAsync(input, userId, User.IsInRole("Tutor") ? "tutor" : "student");
+        if (!created.Succeeded) return BadRequest(created);
+        try
+        {
+            await _notificationService.AddScheduleChangeRequestNotifications(created.Request!, userId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Make-up request notification failed for ScheduleDetails {ScheduleDetailsId}", input.ScheduleDetailsId);
+        }
+        return Ok(new { succeeded = true, pendingApproval = true, message = created.Message, request = created.Request });
+    }
+
     // Operations: the student dropdown (independent of the tutor dropdown).
     [HttpGet("students")]
     [Authorize(Roles = EditorRoles)]

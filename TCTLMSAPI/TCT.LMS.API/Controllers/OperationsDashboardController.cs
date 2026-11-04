@@ -104,6 +104,13 @@ public sealed class OperationsDashboardController : ControllerBase
         => List(await Query(OperationsDashboardQuery.ExtraClasses, token,
             fromDate: fromDate, toDate: toDate, take: take));
 
+    // Rescheduled card: re-scheduled classes and linked make-ups in the range, with the Tutor / Student / Operations counts.
+    [HttpGet("classes/rescheduled-range")]
+    public async Task<IActionResult> RescheduledInRange([FromQuery] DateTime? fromDate,
+        [FromQuery] DateTime? toDate, [FromQuery] int take = 500, CancellationToken token = default)
+        => List(await Query(OperationsDashboardQuery.RescheduledInRange, token,
+            fromDate: fromDate, toDate: toDate, take: take));
+
     private Task<IReadOnlyList<IReadOnlyDictionary<string, object?>>> Query(
         OperationsDashboardQuery query,
         CancellationToken token,

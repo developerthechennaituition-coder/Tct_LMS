@@ -881,6 +881,13 @@ namespace TCT.LMS.Infrastructure.Repositories
                 }
                 if (scheduleDetails != null)
                 {
+                    // Same tutor cancellation allowance as UpdateScheduleStatus (tutor / student saves only).
+                    var cancellationBlock = await TutorCancellationTracker.TrackStatusChangeAsync(_dbContext, scheduleDetails,
+                        inputData.GuestType,
+                        inputData.GuestType == "student" ? scheduleDetails.StudentScheduleStatus : scheduleDetails.TutorScheduleStatus,
+                        inputData.EventStatus, inputData.UserId ?? Guid.Empty, DateHelper.TCTConvertTimeFromUtc(DateTime.UtcNow));
+                    if (cancellationBlock != null)
+                        return new Response<bool> { Succeeded = false, Data = false, Message = cancellationBlock };
                     scheduleDetails.ModifiedBy = inputData.UserId;
                     scheduleDetails.ModifiedDate = DateTime.Now;
                     scheduleDetails.IsActive = inputData.IsActive;
@@ -1054,6 +1061,12 @@ namespace TCT.LMS.Infrastructure.Repositories
                 : inputData.GuestType == "student"
                     ? scheduleDetails.StudentScheduleStatus
                     : null;
+            // Tutor cancellation allowance (TutorCancellationRules): checked here, inside this transaction, and the
+            // cancelled class tracked once; the tracking row is saved with the status below.
+            var cancellationBlock = await TutorCancellationTracker.TrackStatusChangeAsync(_dbContext, scheduleDetails,
+                inputData.GuestType, previousSubmitterStatus, inputData.EventStatus, inputData.UserId ?? Guid.Empty, currentIndiaTime);
+            if (cancellationBlock != null)
+                return new Response<bool> { Succeeded = false, Data = false, Message = cancellationBlock };
             try
             {
                 if (scheduleDetails != null)
@@ -1751,8 +1764,11 @@ namespace TCT.LMS.Infrastructure.Repositories
                     join user in _dbContext.User on tutor.UserId equals user.Id
                     where (tutor.IsActive && user.IsActive) || historicalTutorIds.Contains(tutor.Id) || historicalTutorIds.Contains(tutor.UserId)
                     select new TCT.LMS.Application.Services.PayrollTutor(tutor.Id, tutor.UserId, user.FullName, user.UserCode)).ToListAsync();
+                var payroll = TCT.LMS.Application.Services.TutorPayrollSummary.Build(tutors, classes, invoices, monthInt, yearInt);
+                // Tutor cancellations of the month left undeducted because it is not certain whether they were re-scheduled.
+                await AddCancellationReviewAsync(payroll, yearInt, monthInt);
                 return new Response<List<PayrollRequestDto>> {
-                    Data = TCT.LMS.Application.Services.TutorPayrollSummary.Build(tutors, classes, invoices, monthInt, yearInt),
+                    Data = payroll,
                     Succeeded = true, Message = "Payroll data retrieved successfully"
                 };
             }
@@ -2315,7 +2331,9 @@ namespace TCT.LMS.Infrastructure.Repositories
                     join sch in _dbContext.Schedule on shd.ScheduleId equals sch.ScheduleId
                     join sad in _dbContext.SalesDetails on sch.SalesDetailsId equals sad.Id
                     join sal in _dbContext.Sales on sad.SalesId equals sal.Id
-                    join tut in _dbContext.Tutor on sch.TutorId equals tut.Id
+                    // Schedule.TutorId holds the Tutor.Id, or the tutor's User.Id on older schedules: match both, so a
+                    // payslip lists every paid class (as usp_GenerateTutorInvoice pays them).
+                    from tut in _dbContext.Tutor.Where(t => t.Id == sch.TutorId || t.UserId == sch.TutorId)
                     join usr in _dbContext.User on tut.UserId equals usr.Id
                     join tcb in _dbContext.Type_Code on sal.BoardId equals tcb.Id
                     join tcs in _dbContext.Type_Code on sad.SubjectId equals tcs.Id
@@ -2382,6 +2400,10 @@ namespace TCT.LMS.Infrastructure.Repositories
                     (r.TutorSubjectPayment ?? 0m) > 0
                         ? (r.TutorSubjectPayment ?? 0m)
                         : (r.ParentSubjectPayment ?? 0m));
+                // Tutor cancellation deductions on this pay slip (TutorTotalPayment is already after them).
+                var invoiceId = await _dbContext.TutorInvoice.Where(i => i.InvoiceNumber == invoiceNumber)
+                    .Select(i => (long?)i.Id).FirstOrDefaultAsync();
+                var totalDeductions = invoiceId.HasValue ? await GetInvoiceCancellationDeductionsAsync(invoiceId.Value) : 0m;
 
                 // month name must be set after query (CultureInfo cannot run inside EF LINQ)
                 foreach (var row in rows)
@@ -2401,7 +2423,9 @@ namespace TCT.LMS.Infrastructure.Repositories
                         row.TctEmail = tct.Email;
                     }
 
-                    if (row.TotalTutorPayment == null || row.TotalTutorPayment == 0)
+                    row.TotalDeductions = totalDeductions;
+                    // A pay slip reduced to 0 by deductions keeps its 0.
+                    if ((row.TotalTutorPayment == null || row.TotalTutorPayment == 0) && totalDeductions == 0)
                         row.TotalTutorPayment = computedTotal;
                 }
 
@@ -3928,18 +3952,17 @@ namespace TCT.LMS.Infrastructure.Repositories
             if (invoiceExists)
                 throw new InvalidOperationException($"A pay slip for {monthName} {request.InputYear} has already been generated for this tutor.");
 
+            // The pay slip (usp_GenerateTutorInvoice, unchanged) and the month's tutor cancellation deductions
+            // (TutorCancellationRules) are saved in one transaction: both or neither. EF opens and closes the connection.
+            await using var transaction = await _dbContext.Database.BeginTransactionAsync();
             var connection = _dbContext.Database.GetDbConnection();
 
-            try
+            GenerateTutorInvoiceResponseDto? result = null;
+            using (var command = connection.CreateCommand())
             {
-                if (connection.State != ConnectionState.Open)
-                {
-                    await connection.OpenAsync();
-                }
-
-                using var command = connection.CreateCommand();
                 command.CommandText = "usp_GenerateTutorInvoice";
                 command.CommandType = CommandType.StoredProcedure;
+                command.Transaction = Microsoft.EntityFrameworkCore.Storage.DbContextTransactionExtensions.GetDbTransaction(transaction);
 
                 var parameters = new[]
                 {
@@ -3953,24 +3976,23 @@ namespace TCT.LMS.Infrastructure.Repositories
                 using var reader = await command.ExecuteReaderAsync();
                 if (await reader.ReadAsync())
                 {
-                    var result = new GenerateTutorInvoiceResponseDto
+                    result = new GenerateTutorInvoiceResponseDto
                     {
                         InvoiceId = reader.GetInt64(reader.GetOrdinal("InvoiceId")),
                         TotalPayment = reader.GetDecimal(reader.GetOrdinal("TotalPayment")),
                         InvoiceNumber = reader.GetString(reader.GetOrdinal("InvoiceNumber"))
                     };
-                    return result;
                 }
             }
-            finally
-            {
-                if (connection.State == ConnectionState.Open)
-                {
-                    await connection.CloseAsync();
-                }
-            }
+            if (result == null)
+                throw new Exception("No invoice generated. The procedure may have raised an error.");
 
-            throw new Exception("No invoice generated. The procedure may have raised an error.");
+            (result.TotalDeductions, result.UncertainCancellations) = await ApplyCancellationDeductionsAsync(tutor, result.InvoiceId!.Value,
+                request.InputYear, request.InputMonth);
+            if (result.TotalDeductions > 0)
+                result.TotalPayment = Math.Max(0m, (result.TotalPayment ?? 0m) - result.TotalDeductions.Value);
+            await transaction.CommitAsync();
+            return result;
         }
 
         public async Task<List<TutorEngagementDto>> GetTutorEngagmentInfo(Guid tutorId)

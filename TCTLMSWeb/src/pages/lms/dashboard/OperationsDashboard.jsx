@@ -60,7 +60,13 @@ const EmptyRow = ({ columns, text = "No records found." }) => (
 // Card accent per existing colour prop (presentation only; see OperationsDashboard.css .ops-tone-*).
 const STAT_TONE = { primary: "violet", warning: "amber", danger: "coral", info: "blue", success: "mint", purple: "indigo", gray: "slate", orange: "peach" };
 
-const StatCard = ({ icon, label, value, color, onClick, note, cta }) => {
+// Breakdown for the Rescheduled / Cancelled cards, counted from the rows already loaded for their popups.
+// Re-schedule status names are the ones the rescheduled-classes query filters on.
+const RESCHEDULE_STATUSES = ["Class Re-Scheduled", "Re-Schedule Demo"];
+const BREAKDOWN_ICON = { tutor: "user-check", student: "user", operations: "setting" };
+const countRows = (rows, test) => rows.filter(test).length;
+
+const StatCard = ({ icon, label, value, color, onClick, note, cta, breakdown }) => {
   const hasValue = value !== null && value !== undefined && value !== "";
   return (
     <Card
@@ -75,7 +81,25 @@ const StatCard = ({ icon, label, value, color, onClick, note, cta }) => {
         {hasValue && <div className="ops-stat-value">{value}</div>}
         <div className={hasValue ? "ops-stat-label" : "ops-stat-label is-strong"}>{label}</div>
         {note && <small className="ops-stat-note">{note}</small>}
-        {cta && <small className="ops-stat-cta">{cta}</small>}
+        {breakdown && (
+          // Three items (Tutor / Student / Operations): three equal compact tiles on one row (count over a short label).
+          <ul className={`ops-stat-breakdown${breakdown.length >= 3 ? " is-compact" : ""}`}>
+            {breakdown.map((item) => (
+              <li key={item.label} className={`ops-breakdown-item is-${item.who}`} title={item.label}>
+                <span className="ops-breakdown-icon" aria-hidden="true">
+                  <Icon name={BREAKDOWN_ICON[item.who]} />
+                </span>
+                <span className="ops-breakdown-label">
+                  {breakdown.length >= 3 && item.compact
+                    ? <><span aria-hidden="true">{item.compact}</span><span className="sr-only">{item.label}</span></>
+                    : item.short ? <><span aria-hidden="true">{item.short}</span><span className="sr-only">{item.label}</span></> : item.label}
+                </span>
+                <span className="ops-breakdown-count">{item.value}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+        {cta &&<small className="ops-stat-cta">{cta}</small>}
       </div>
       {onClick && <Icon name="chevron-right" className="ops-stat-arrow" />}
     </Card>
@@ -195,6 +219,28 @@ const OperationsDashboard = ({ adminMode = false }) => {
   const operationMismatch = dashboard?.operationMismatch || [];
   const tutorMismatch = dashboard?.tutorMismatch || [];
   const extraClasses = dashboard?.extraClasses || [];
+  // Rescheduled card for the selected date range: re-scheduled classes and linked make-ups (each original class once),
+  // with the server's window counts (exact even when the rows are capped). If that call failed (null), the card keeps
+  // its earlier numbers for the "to" date.
+  const rescheduledInRange = dashboard?.rescheduledInRange;
+  const inRange = Array.isArray(rescheduledInRange);
+  const rangeCount = (name) => number(read(rescheduledInRange?.[0], name));
+  const rescheduledBreakdown = inRange
+    ? [
+        { label: "Rescheduled by Tutor", short: "By Tutor", compact: "Tutor", who: "tutor", value: rangeCount("tutorRescheduled") },
+        { label: "Rescheduled by Student", short: "By Student", compact: "Student", who: "student", value: rangeCount("studentRescheduled") },
+        { label: "Rescheduled by Operations", short: "By Operations", compact: "Operations", who: "operations", value: rangeCount("operationsRescheduled") },
+      ]
+    : [
+        { label: "Rescheduled by Tutor", short: "By Tutor", who: "tutor", value: countRows(rescheduled, (item) => RESCHEDULE_STATUSES.includes(read(item, "tutorStatus"))) },
+        { label: "Rescheduled by Student", short: "By Student", who: "student", value: countRows(rescheduled, (item) => RESCHEDULE_STATUSES.includes(read(item, "studentStatus"))) },
+      ];
+  const cancelledBreakdown = [
+    { label: "Cancelled by Tutor", short: "By Tutor", compact: "Tutor", who: "tutor", value: countRows(cancellations, (item) => read(item, "isTutorCancelled")) },
+    { label: "Cancelled by Student", short: "By Student", compact: "Student", who: "student", value: countRows(cancellations, (item) => read(item, "isStudentCancelled")) },
+    // One category per class (server), so the three add up to the card's total.
+    { label: "Cancelled by Operations", short: "By Operations", compact: "Operations", who: "operations", value: countRows(cancellations, (item) => read(item, "isOperationsCancelled")) },
+  ];
   const courseChart = enrollment.map((item) => ({
     course: read(item, "courseName") || "Unknown",
     students: number(read(item, "enrolledStudents")),
@@ -431,7 +477,10 @@ const OperationsDashboard = ({ adminMode = false }) => {
                 <td>{read(item, "tutorName") || "—"}</td>
                 <td>{read(item, "subjectName") || "—"}</td>
                 <td>
-                  <Badge color="danger">{read(item, "isTutorCancelled") ? "Tutor" : "Student"}</Badge>
+                  <Badge color="danger">
+                    {read(item, "isTutorCancelled") ? "Tutor" : read(item, "isStudentCancelled") ? "Student"
+                      : read(item, "isOperationsCancelled") ? "Operations" : "—"}
+                  </Badge>
                 </td>
                 <td>{read(item, "tutorComment") || read(item, "studentComment") || "—"}</td>
               </tr>
@@ -557,10 +606,11 @@ const OperationsDashboard = ({ adminMode = false }) => {
                 <StatCard
                   icon="repeat"
                   label="Rescheduled"
-                  note={`For ${displayDate(toDate)}`}
-                  value={number(read(summary, "todayRescheduledClasses"))}
+                  note={inRange ? `${displayDate(fromDate)} – ${displayDate(toDate)}` : `For ${displayDate(toDate)}`}
+                  value={inRange ? rangeCount("totalRescheduled") : number(read(summary, "todayRescheduledClasses"))}
                   color="warning"
-                  onClick={() => openModal("Rescheduled classes", "rescheduled", rescheduled)}
+                  breakdown={rescheduledBreakdown}
+                  onClick={() => openModal("Rescheduled classes", "rescheduled", inRange ? rescheduledInRange : rescheduled)}
                 />
               </div>
               <div>
@@ -620,6 +670,7 @@ const OperationsDashboard = ({ adminMode = false }) => {
                   value={cancellations.length}
                   color="danger"
                   note={`${displayDate(fromDate)} – ${displayDate(toDate)}`}
+                  breakdown={cancelledBreakdown}
                   onClick={() => openModal("Cancelled classes", "cancel", cancellations)}
                 />
               </div>

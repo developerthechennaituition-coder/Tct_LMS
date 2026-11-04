@@ -30,6 +30,8 @@ public interface INotificationService
     Task AddClassCompletionThresholdNotification(MonthlyClassCompletionDto completion, decimal thresholdPercent, Guid scheduleDetailsId, Guid actingUserId);
     Task AddRescheduleRequestNotifications(Guid salesDetailsId, Guid scheduleDetailsId, Guid requestedByUserId, string guestType, string? noteText,
         string? rescheduleType = null);
+    Task AddTutorCancellationDeductionNotification(Guid tutorUserId, Guid salesDetailsId, Guid scheduleDetailsId, string message, Guid createdBy);
+    Task AddCancellationReviewNotifications(IReadOnlyList<TCT.LMS.DTOs.Schedule.CancellationReviewItemDto> items, string? invoiceNumber, Guid createdBy);
     Task AddPermanentRescheduleIssueNotifications(Guid salesDetailsId, Guid scheduleDetailsId, Guid requestedByUserId, string requesterType,
         DateTime newStart, DateTime newEnd, string reason);
     Task AddScheduleChangeNotifications(Guid salesDetailsId, Guid changedByUserId, string changedByRole, string changeText);

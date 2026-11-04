@@ -82,6 +82,22 @@ export const gettutorpayroll = (month, year) => {
   return axios.get(`/Scheduler/gettutorpayroll?month=${month}&year=${year}`);
 };
 
+// The tutor's payslip PDF, fetched with the signed-in user's token (the API no longer serves it anonymously) and
+// opened in a new tab. The tab is opened first, so pop-up blockers allow it.
+export const openTutorPaySlipPdf = async (invoiceNumber) => {
+  const tab = window.open("", "_blank");
+  try {
+    const pdf = await axios.get(`/Scheduler/GetTutorPaySlipPdf?invoiceNumber=${encodeURIComponent(invoiceNumber)}`, { responseType: "blob" });
+    const url = URL.createObjectURL(new Blob([pdf], { type: "application/pdf" }));
+    if (tab) tab.location.href = url;
+    else window.open(url, "_blank");
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  } catch (error) {
+    if (tab) tab.close();
+    throw error;
+  }
+};
+
 export const gettutorinvoicebyid = (invoiceNumber) => {
   return axios.get(`/Scheduler/gettutorinvoicebyid?invoiceNumber=${invoiceNumber}`);
 };
@@ -280,6 +296,12 @@ export const getScheduleCalendarPersonEvents = ({ tutorId, studentId }, from, to
   axios.get(`/schedule-calendar/person-events?${tutorId ? `tutorId=${tutorId}` : `studentId=${studentId}`}&from=${from}&to=${to}`);
 export const modifyScheduleChangeRequest = (requestId, input) =>
   axios.post(`/schedule-calendar/requests/${requestId}/modify`, input);
+// Tutor cancellation allowance for the class's month (used / remaining, classes still needing a make-up),
+// and the make-up class request for one cancelled class (Operations approve it in Requests).
+export const getTutorCancellationSummary = (salesDetailsId, classDate, scheduleDetailsId) =>
+  axios.get(`/schedule-calendar/cancellation-summary?salesDetailsId=${salesDetailsId}&classDate=${classDate}` +
+    (scheduleDetailsId ? `&scheduleDetailsId=${scheduleDetailsId}` : ""));
+export const requestMakeupClass = (input) => axios.post(`/schedule-calendar/make-up`, input);
 
 // Class status edit requests: a tutor/student asks Operations to unlock a class status they already saved.
 export const requestClassStatusEdit = (scheduleDetailsId, reason) => {

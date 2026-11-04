@@ -208,6 +208,12 @@ TaskDueReminder = 100474,
 [Description("Task Overdue")]
 TaskOverdue = 100475,
 
+[Description("Cancelled Class Fee Deduction")]
+TutorCancellationDeduction = 100476,
+
+[Description("Cancelled Class Review")]
+TutorCancellationReview = 100477,
+
 }
 
 public enum FollowUpStatus

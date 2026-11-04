@@ -72,6 +72,16 @@ namespace TCT.LMS.Application.Interfaces.Repositories
         Task<List<ScheduleCalendarStudentDto>> GetScheduleCalendarStudentsAsync();
         Task<List<ScheduleCalendarPersonEventDto>> GetScheduleCalendarPersonEventsAsync(Guid? tutorId, Guid? studentId, DateTime fromDate, DateTime toDate);
         Task<ScheduleChangeRequestResultDto> ModifyAndApproveScheduleChangeRequestAsync(Guid id, WeeklyDayChangeRequestDto change, Guid decidedBy, string? comment);
+    // Tutor cancellation allowance and make-ups (TutorCancellationRules).
+    Task<TutorCancellationSummaryDto> GetTutorCancellationSummaryAsync(Guid salesDetailsId, DateTime classDate, Guid? excludeScheduleDetailsId);
+    Task<Guid?> GetCancelledClassSalesDetailsIdAsync(Guid scheduleDetailsId);
+    Task<ScheduleChangeRequestResultDto> CreateMakeupRequestAsync(MakeupRequestDto input, Guid userId, string requesterType);
+    Task<bool> LinkRescheduledClassAsync(Guid cancelledScheduleDetailsId, Guid newScheduleDetailsId, Guid actorUserId);
+    Task<List<CancellationReviewItemDto>> GetCancellationReviewAsync(int year, int month, IReadOnlyCollection<Guid>? tutorKeys = null);
+    Task<decimal> GetInvoiceCancellationDeductionsAsync(long invoiceId);
+    Task<List<CancellationDeductionNoticeDto>> GetUnnotifiedCancellationDeductionsAsync(long invoiceId);
+    Task<bool> ClaimCancellationDeductionNoticeAsync(Guid trackingId);
+    Task ReleaseCancellationDeductionNoticeAsync(Guid trackingId);
         Task<ClassStatusEditResultDto> CreateStatusEditRequestAsync(Guid scheduleDetailsId, Guid userId, string requesterType, string? reason);
         Task<ClassStatusEditRequestDto?> GetStatusEditRequestAsync(Guid id);
         Task<ClassStatusEditRequestDto?> GetLatestStatusEditRequestAsync(Guid scheduleDetailsId);

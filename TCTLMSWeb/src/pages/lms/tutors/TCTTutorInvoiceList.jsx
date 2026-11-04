@@ -14,7 +14,8 @@ import {
   PaginationComponent,
 } from "../../../components/Component";
 import { Link } from "react-router-dom";
-import { gettutorpayrolllist } from "../../../apiservices/ScheduleService";
+import { gettutorpayrolllist, openTutorPaySlipPdf } from "../../../apiservices/ScheduleService";
+import { toast } from "react-toastify";
 import { config } from "../../../library/config";
 
 const TCTTutorInvoiceList = () => {
@@ -247,15 +248,11 @@ const TCTTutorInvoiceList = () => {
                           <td>
                             <div className="tb-odr-btns d-none d-sm-inline">
                               {/* The tutor's payslip PDF from the API (the same one the payslip page prints). */}
-                              <a
-                                href={`${config.API_URL}/Scheduler/GetTutorPaySlipPdf?invoiceNumber=${encodeURIComponent(item.invoiceNumber)}`}
-                                target="_blank"
-                                rel="noreferrer"
-                              >
-                                <Button color="primary" size="sm" className="btn-icon btn-white btn-dim">
-                                  <Icon name="printer-fill" />
-                                </Button>
-                              </a>
+                              {/* Fetched with the login token: the payslip PDF is no longer served anonymously. */}
+                              <Button color="primary" size="sm" className="btn-icon btn-white btn-dim" aria-label="Open payslip PDF"
+                                onClick={() => openTutorPaySlipPdf(item.invoiceNumber).catch(() => toast.error("Unable to open the payslip."))}>
+                                <Icon name="printer-fill" />
+                              </Button>
                               <Link to={`${process.env.PUBLIC_URL}/lms/tutors/tutor-invoice-details?invNumber=${item.invoiceNumber}`}>
                                 <Button color="primary" size="sm" className="btn btn-dim">
                                   View

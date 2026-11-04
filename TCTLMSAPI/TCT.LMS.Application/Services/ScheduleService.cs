@@ -883,6 +883,20 @@ namespace TCT.LMS.Application.Services
                 var batchResult = await _repository.AddScheduleDetailsBatchAsync(scheduleDetailDtos);
                 var scheduleDetailIds = batchResult.Succeeded ? batchResult.Data : new List<Guid>();
 
+                // Reschedule Class flow: link the one new class to the cancelled class it re-schedules (tutor
+                // cancellation rules). A failure leaves it unlinked and is logged; the class itself is saved.
+                if (input.IsReschedule && input.RescheduledFromScheduleDetailsId is Guid rescheduledFrom && scheduleDetailIds.Count == 1)
+                {
+                    try
+                    {
+                        await _repository.LinkRescheduledClassAsync(rescheduledFrom, scheduleDetailIds[0], input.UserId ?? Guid.Empty);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "ScheduleNewEvent: could not link the re-scheduled class to ScheduleDetailsId {ScheduleDetailsId}", rescheduledFrom);
+                    }
+                }
+
                 _logger.LogInformation(
                     "ScheduleNewEvent: inserted {Count} schedule detail rows in {ElapsedMs}ms",
                     scheduleDetailIds.Count, overallStopwatch.ElapsedMilliseconds);
@@ -1659,6 +1673,22 @@ namespace TCT.LMS.Application.Services
         public async Task<GenerateTutorInvoiceResponseDto> GenerateTutorInvoiceAsync(GenerateTutorInvoiceRequestDto request)
         {
             var result = await _repository.GenerateTutorInvoiceAsync(request);
+            if (result?.InvoiceId != null && result.TotalDeductions > 0)
+                await NotifyCancellationDeductionsAsync(result.InvoiceId.Value, request.CreatedBy);
+            if (result?.InvoiceId != null && result.UncertainCancellations > 0)
+            {
+                // Not deducted because it is not certain whether they were re-scheduled: Operations review them.
+                try
+                {
+                    var review = (await _repository.GetCancellationReviewAsync(request.InputYear, request.InputMonth))
+                        .Where(r => r.TutorUserId == request.TutorId).ToList();
+                    await _notificationService.AddCancellationReviewNotifications(review, result.InvoiceNumber, request.CreatedBy);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Cancellation review notification failed for invoice {InvoiceId}", result.InvoiceId);
+                }
+            }
             if (result != null && result.InvoiceNumber != null)
             {
                 try
@@ -1676,6 +1706,36 @@ namespace TCT.LMS.Application.Services
                 }
             }
             return result;
+        }
+
+        // One notification per deducted class, after the pay slip is saved. Each is claimed first, so a retry or a
+        // second call never notifies twice; a failed send is released so it can be sent again.
+        private async Task NotifyCancellationDeductionsAsync(long invoiceId, Guid createdBy)
+        {
+            try
+            {
+                foreach (var notice in await _repository.GetUnnotifiedCancellationDeductionsAsync(invoiceId))
+                {
+                    if (!await _repository.ClaimCancellationDeductionNoticeAsync(notice.TrackingId)) continue;
+                    try
+                    {
+                        await _notificationService.AddTutorCancellationDeductionNotification(notice.TutorUserId, notice.SalesDetailsId,
+                            notice.ScheduleDetailsId,
+                            TutorCancellationRules.DeductionNotificationMessage(notice.StudentName, notice.Subject, notice.ClassStart,
+                                notice.Percent, notice.Amount, notice.InvoiceNumber),
+                            createdBy);
+                    }
+                    catch (Exception ex)
+                    {
+                        await _repository.ReleaseCancellationDeductionNoticeAsync(notice.TrackingId);
+                        _logger.LogError(ex, "Cancellation deduction notification failed for tracking row {TrackingId}", notice.TrackingId);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Cancellation deduction notifications failed for invoice {InvoiceId}", invoiceId);
+            }
         }
 
         public async Task<byte[]> GetTutorPaySlipPdfAsync(string invoiceNumber)

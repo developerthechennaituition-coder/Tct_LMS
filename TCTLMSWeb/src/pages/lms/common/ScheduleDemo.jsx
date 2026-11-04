@@ -371,6 +371,8 @@ const ScheduleDemo = (props) => {
       ScheduleMode: "OneTime",
       TotalClasses: 1,
       IsReschedule: isReschedule,
+      // The class being re-scheduled, so the new class is linked to it (tutor cancellation rules).
+      RescheduledFromScheduleDetailsId: isClassReschedule ? props?.scheduleDetailsId || null : null,
       EndDate: formData?.startDate,
       UserId: userId,
       DayInNo: formData?.startDate.getDay(),

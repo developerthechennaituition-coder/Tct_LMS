@@ -2,6 +2,12 @@
 
 public class PayrollRequestDto
 {
+    // Pay slip: tutor cancellation deductions included in TotalTutorPayment (null / 0 when none).
+    public decimal? TotalDeductions { get; set; }
+    // Tutor Payroll: the month's tutor cancellations not deducted because it is not certain whether they were
+    // re-scheduled (for Operations to review), with one note per class.
+    public int CancellationsToReview { get; set; }
+    public List<string>? CancellationReviewNotes { get; set; }
     public Guid? TutorId { get; set; }
     public Guid? StudentId { get; set; }
     public string? TutorName { get; set; }

@@ -161,6 +161,7 @@ namespace TCT.LMS.API.Controllers
 
 
         [HttpPost("updateScheduleStatus")]
+        [TypeFilter(typeof(TCT.LMS.API.Filters.ClassActionAuthorizationFilter))]
         public async Task<IActionResult> UpdateScheduleStatus([FromForm] TCTEvent inputData)
         {
             var result = await _scheduleService.UpdateScheduleStatus(inputData);
@@ -189,6 +190,7 @@ namespace TCT.LMS.API.Controllers
         }
 
         [HttpPost("ScheduleEvent")]
+        [TypeFilter(typeof(TCT.LMS.API.Filters.ClassActionAuthorizationFilter))]
         public async Task<IActionResult> ScheduleEvent([FromBody] TimeSlotsGroup input)
         {
             try
@@ -245,6 +247,7 @@ namespace TCT.LMS.API.Controllers
         }
 
         [HttpPost("updatescheduledetails")]
+        [TypeFilter(typeof(TCT.LMS.API.Filters.ClassActionAuthorizationFilter))]
         public async Task<IActionResult> UpdateScheduleDetails(UpdateClass updateClass)
         {
             var result = await _scheduleService.UpdateScheduleDetails(updateClass);
@@ -268,6 +271,7 @@ namespace TCT.LMS.API.Controllers
         }
 
         [HttpGet("gettutorinvoicebyid")]
+        [TypeFilter(typeof(TCT.LMS.API.Filters.PaySlipAccessFilter))]
         public async Task<ActionResult> GetTutorInvoiceByInvoiceNumber(string invoiceNumber)
         {
             var tutors = await _scheduleService.GetTutorInvoiceById(invoiceNumber);
@@ -457,6 +461,7 @@ namespace TCT.LMS.API.Controllers
 
 
         [HttpPost("UpdateScheduleDetail")]
+        [TypeFilter(typeof(TCT.LMS.API.Filters.ClassActionAuthorizationFilter))]
         public async Task<ActionResult> UpdateScheduleDetail([FromBody] TCTEvent inputData)
         {
             var result = await _scheduleService.UpdateScheduleDetail(inputData);
@@ -492,8 +497,9 @@ namespace TCT.LMS.API.Controllers
             }
         }
 
-        [AllowAnonymous]
+        // Signed-in users only (the controller's [Authorize]); a tutor only their own pay slips (PaySlipAccessFilter).
         [HttpGet("GetTutorPaySlipPdf")]
+        [TypeFilter(typeof(TCT.LMS.API.Filters.PaySlipAccessFilter))]
         public async Task<IActionResult> GetTutorPaySlipPdf([FromQuery] string invoiceNumber)
         {
             try

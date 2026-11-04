@@ -84,6 +84,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<TutorPaymentApproval> TutorPaymentApproval { get; set; }
     public DbSet<ClassStatusEditRequest> ClassStatusEditRequest { get; set; }
     public DbSet<ScheduleChangeRequest> ScheduleChangeRequest { get; set; }
+    public DbSet<TutorCancellationTracking> TutorCancellationTracking { get; set; }
     public DbSet<StudentAccountStatusDto> StudentAccountStatusDtos { get; set; }
     public DbSet<TutorAccountStatusDto> TutorAccountStatusDto { get; set; }
     public DbSet<BoardGradeGroupMapping> BoardGradeGroupMapping { get; set; }

@@ -172,6 +172,8 @@ namespace TCT.LMS.DTOs.User
         public List<TimeSlot>? TimeSlots { get; set; }
         public Guid? ScheduleStatus { get; set; }
         public bool IsReschedule { get; set; }
+        // Reschedule Class flow: the class being re-scheduled, so the new class is linked to it (tutor cancellation rules).
+        public Guid? RescheduledFromScheduleDetailsId { get; set; }
     }
 
     public class TimeSlot

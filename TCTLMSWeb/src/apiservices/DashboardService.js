@@ -329,6 +329,9 @@ export const getOperationsTutorMismatch = (fromDate, toDate, take = 200) =>
   axios.get(operationsDashboardUrl("mismatch/tutor", { fromDate, toDate, take }));
 export const getOperationsExtraClasses = (fromDate, toDate, take = 500) =>
   axios.get(operationsDashboardUrl("classes/extra", { fromDate, toDate, take }));
+// Rescheduled card for the selected range: re-scheduled classes and linked make-ups, with Tutor / Student / Operations counts.
+export const getOperationsRescheduledInRange = (fromDate, toDate, take = 500) =>
+  axios.get(operationsDashboardUrl("classes/rescheduled-range", { fromDate, toDate, take }));
 
 export const getCurrentOperationsDashboard = async (date, fromDate, toDate) => {
   const previousDate = new Date(`${date}T00:00:00`);
@@ -353,6 +356,8 @@ export const getCurrentOperationsDashboard = async (date, fromDate, toDate) => {
     getOperationsOperationMismatch(fromDate, toDate),
     getOperationsTutorMismatch(fromDate, toDate),
     getOperationsExtraClasses(fromDate, toDate),
+    // Optional: the rest of the dashboard still loads if this one fails.
+    getOperationsRescheduledInRange(fromDate, toDate).catch(() => null),
   ]);
 
   const data = (response, fallback) => response?.data ?? fallback;
@@ -374,6 +379,8 @@ export const getCurrentOperationsDashboard = async (date, fromDate, toDate) => {
     operationMismatch: data(responses[14], []),
     tutorMismatch: data(responses[15], []),
     extraClasses: data(responses[16], []),
+    // null when the call failed: the card then shows its earlier single-date numbers.
+    rescheduledInRange: responses[17]?.data ?? null,
     dMinusOne,
   };
 };

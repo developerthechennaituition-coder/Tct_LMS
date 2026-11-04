@@ -260,6 +260,8 @@ public partial class ScheduleRepository
         }
         else if (approve)
         {
+            // Classes already on the context, so a make-up is linked to exactly the class this approval adds.
+            var classesBefore = TrackedClassIds();
             var added = await AddWeeklyDayChangeAsync(new WeeklyDayChangeRequestDto
             {
                 SalesDetailsId = request.SalesDetailsId,
@@ -273,6 +275,8 @@ public partial class ScheduleRepository
                 return new() { Succeeded = false, Message = $"Could not add the classes: {added.Message} You can reject this request." };
             request.Summary = added.Message.Length > 300 ? added.Message[..300] : added.Message;
             message = added.Message;
+            // A make-up for a cancelled class: the new class re-schedules that one cancellation.
+            if (request.RequestKind == CancelledClassMakeupKind) await LinkMakeupAsync(request, classesBefore);
         }
 
         request.Status = (int)(approve ? ClassStatusEditRequestStatus.Approved : ClassStatusEditRequestStatus.Rejected);

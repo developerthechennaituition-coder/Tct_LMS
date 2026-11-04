@@ -18,7 +18,8 @@ public enum OperationsDashboardQuery
     StudentMismatch,
     OperationMismatch,
     TutorMismatch,
-    ExtraClasses
+    ExtraClasses,
+    RescheduledInRange
 }
 
 public interface IOperationsDashboardRepository

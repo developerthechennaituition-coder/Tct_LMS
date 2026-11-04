@@ -80,3 +80,24 @@ test("pending payroll sends selected tutor and period once", async () => {
   expect(generateTutorInvoice).toHaveBeenCalledTimes(1);
   expect(generateTutorInvoice).toHaveBeenCalledWith(expect.objectContaining({tutorId:"t2",inputMonth:new Date().getMonth()+1,inputYear:new Date().getFullYear()}));
 });
+
+test("cancelled classes that could not be deducted are flagged for review with each class and reason", async () => {
+  const flagged = { ...row(1), cancellationsToReview: 2, cancellationReviewNotes: [
+    "18-Oct-2026 07:00 AM with Student A (Biology): The class was changed or removed after it was cancelled, and no make-up class is linked.",
+    "25-Oct-2026 07:00 AM with Student A (Biology): A make-up was approved, but its class could not be identified."] };
+  gettutorpayroll.mockResolvedValue({ succeeded: true, data: [flagged, row(2)] });
+  render(<TCTTutorPayroll />);
+  expect(await screen.findByText("2 cancelled classes to review")).toBeTruthy();
+  expect(screen.getByText(/18-Oct-2026 07:00 AM with Student A/)).toBeTruthy();
+  expect(screen.getByText(/could not be identified/)).toBeTruthy();
+  // Only the flagged tutor shows it.
+  expect(screen.getAllByRole("note")).toHaveLength(1);
+});
+test("the tutor's own payroll view does not show the review note", async () => {
+  localStorage.setItem("roleId", "13");
+  gettutorpayroll.mockResolvedValue({ succeeded: true, data: [{ ...row(1), cancellationsToReview: 1, cancellationReviewNotes: ["x"] }] });
+  render(<TCTTutorPayroll />);
+  await screen.findByText("Tutor 1 (T1)");
+  expect(screen.queryByRole("note")).toBeNull();
+  localStorage.removeItem("roleId");
+});

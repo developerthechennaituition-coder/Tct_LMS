@@ -69,7 +69,8 @@ SELECT TOP (@Take) d.ScheduleDetailsId,d.ScheduleId,d.[Date] ClassDate,d.StartTi
  os.TypeCodeName OperationStatus
 FROM dbo.ScheduleDetails d JOIN dbo.Schedule s ON s.ScheduleId=d.ScheduleId
 JOIN dbo.Student st ON st.Id=s.StudentId LEFT JOIN dbo.[User] su ON su.Id=st.UserId
-JOIN dbo.Tutor t ON t.Id=s.TutorId LEFT JOIN dbo.[User] tu ON tu.Id=t.UserId
+-- Schedule.TutorId holds the Tutor.Id, or the tutor's User.Id on older schedules.
+JOIN dbo.Tutor t ON t.Id=s.TutorId OR t.UserId=s.TutorId LEFT JOIN dbo.[User] tu ON tu.Id=t.UserId
 LEFT JOIN dbo.SalesDetails course ON course.Id=s.SalesDetailsId
 LEFT JOIN dbo.Type_Code sub ON sub.Id=course.SubjectId
 LEFT JOIN dbo.Type_Code ts ON ts.Id=d.TutorScheduleStatus
@@ -120,24 +121,23 @@ GROUP BY t.Id,u.UserCode,u.FullName,u.FirstName,u.LastName,u.JoiningDate
 HAVING COUNT(DISTINCT a.StudentId)<=5
 ORDER BY StudentsWithinFirstThreeMonths,TutorName;",
 
-        OperationsDashboardQuery.CancelledClasses => @"
-SELECT TOP (@Take) d.ScheduleDetailsId,d.[Date] ClassDate,d.StartTime,d.EndTime,
- st.Id StudentId,COALESCE(su.FullName,CONCAT(su.FirstName,N' ',su.LastName)) StudentName,
- t.Id TutorId,COALESCE(tu.FullName,CONCAT(tu.FirstName,N' ',tu.LastName)) TutorName,
- sub.TypeCodeName SubjectName,
- CONVERT(bit,CASE WHEN ss.TypeCodeName=N'Class Canceled' THEN 1 ELSE 0 END) IsStudentCancelled,
- CONVERT(bit,CASE WHEN ts.TypeCodeName=N'Class Canceled' THEN 1 ELSE 0 END) IsTutorCancelled,
- d.StudentComment,d.TutorComment
-FROM dbo.ScheduleDetails d JOIN dbo.Schedule s ON s.ScheduleId=d.ScheduleId
-JOIN dbo.Student st ON st.Id=s.StudentId LEFT JOIN dbo.[User] su ON su.Id=st.UserId
-JOIN dbo.Tutor t ON t.Id=s.TutorId LEFT JOIN dbo.[User] tu ON tu.Id=t.UserId
-LEFT JOIN dbo.SalesDetails course ON course.Id=s.SalesDetailsId
-LEFT JOIN dbo.Type_Code sub ON sub.Id=course.SubjectId
-LEFT JOIN dbo.Type_Code ts ON ts.Id=d.TutorScheduleStatus LEFT JOIN dbo.Type_Code ss ON ss.Id=d.StudentScheduleStatus
-WHERE d.IsActive=1 AND ISNULL(s.IsActive,0)=1
- AND d.[Date]>=@FromDate AND d.[Date]<DATEADD(day,1,@ToDate)
- AND (ts.TypeCodeName=N'Class Canceled' OR ss.TypeCodeName=N'Class Canceled')
-ORDER BY d.[Date] DESC,d.StartTime DESC;",
+        // Cancelled classes in the range. Once TutorCancellationRules.sql has created the tracking table, every tracked
+        // cancellation is included whatever the class's later status or IsActive (the Reschedule Class flow sets
+        // Class Re-Scheduled on the original and inactivates it; the cancellation still counts), and its category
+        // decides Tutor / Student exactly. Untracked (older) classes use their statuses.
+        OperationsDashboardQuery.CancelledClasses =>
+            "IF OBJECT_ID(N'dbo.TutorCancellationTracking',N'U') IS NULL" + CancelledClassesSql(tracked: false)
+            + "ELSE" + CancelledClassesSql(tracked: true),
+
+        // Rescheduled card, one date range for the total and its Tutor / Student / Operations breakdown:
+        //   - classes whose own status is Re-Scheduled (tutor, student or Operations), by class date;
+        //   - cancelled classes re-scheduled with a linked make-up (approved request or the Reschedule Class flow), by
+        //     the date it was linked, under the original cancellation's category. Pending or rejected requests are not.
+        // One row per original class: a class in both is counted once (its make-up category wins). Window counts are
+        // computed before TOP. Without the tracking table (TutorCancellationRules.sql not run) only the status part.
+        OperationsDashboardQuery.RescheduledInRange =>
+            "IF OBJECT_ID(N'dbo.TutorCancellationTracking',N'U') IS NULL BEGIN" + RescheduledInRangeSql(tracked: false)
+            + "END ELSE BEGIN" + RescheduledInRangeSql(tracked: true) + "END",
 
         OperationsDashboardQuery.MissedAttendance => @"
 SELECT TOP (@Take) d.ScheduleDetailsId,d.[Date] ClassDate,d.StartTime,d.EndTime,
@@ -274,6 +274,93 @@ ORDER BY d.[Date] DESC,d.StartTime DESC;",
         _ => throw new ArgumentOutOfRangeException(nameof(query), query, null)
     };
 
+    // tracked: also read dbo.TutorCancellationTracking (only referenced when it exists; see CancelledClasses).
+    private static string CancelledClassesSql(bool tracked)
+    {
+        var join = tracked ? "LEFT JOIN dbo.TutorCancellationTracking k ON k.ScheduleDetailsId=d.ScheduleDetailsId AND k.IsActive=1" : "";
+        // One category per class, so Tutor + Student + Operations = the card's total (as on the Rescheduled card):
+        // a tracked cancellation's recorded category; otherwise the tutor's status, then the student's, then Operations'.
+        // Operations' attendance writes the same status to StudentScheduleStatus and OperationScheduleStatus, so a
+        // student status equal to Operations' status is Operations' record, not a student cancellation.
+        const string statusCategory = "CASE WHEN ts.TypeCodeValue IN (1009002,20021) THEN N'tutor' " +
+            "WHEN (ss.TypeCodeValue IN (1009002,1009003) AND (d.OperationScheduleStatus IS NULL OR d.OperationScheduleStatus<>d.StudentScheduleStatus)) " +
+            "OR ts.TypeCodeValue=1009003 THEN N'student' ELSE N'operations' END";
+        var category = tracked ? $"COALESCE(k.Category,{statusCategory})" : statusCategory;
+        string Is(string value) => $"CASE WHEN {category}=N'{value}' THEN 1 ELSE 0 END";
+        // Class Cancelled (1009002) by the tutor, the student or Operations, Class Canceled Tutor Not Available (20021),
+        // Class Cancelled Student Not Available (1009003). (No status is named exactly 'Class Canceled', so the earlier
+        // name match found none.)
+        const string cancelledStatus = "d.IsActive=1 AND (ts.TypeCodeValue IN (1009002,1009003,20021) OR ss.TypeCodeValue IN (1009002,1009003) " +
+            "OR os.TypeCodeValue IN (1009002,1009003,20021))";
+        return $@"
+SELECT TOP (@Take) d.ScheduleDetailsId,d.[Date] ClassDate,d.StartTime,d.EndTime,
+ st.Id StudentId,COALESCE(su.FullName,CONCAT(su.FirstName,N' ',su.LastName)) StudentName,
+ t.Id TutorId,COALESCE(tu.FullName,CONCAT(tu.FirstName,N' ',tu.LastName)) TutorName,
+ sub.TypeCodeName SubjectName,
+ CONVERT(bit,{Is("student")}) IsStudentCancelled,
+ CONVERT(bit,{Is("tutor")}) IsTutorCancelled,
+ CONVERT(bit,{Is("operations")}) IsOperationsCancelled,
+ d.StudentComment,d.TutorComment
+FROM dbo.ScheduleDetails d JOIN dbo.Schedule s ON s.ScheduleId=d.ScheduleId
+JOIN dbo.Student st ON st.Id=s.StudentId LEFT JOIN dbo.[User] su ON su.Id=st.UserId
+-- Schedule.TutorId holds the Tutor.Id, or the tutor's User.Id on older schedules.
+JOIN dbo.Tutor t ON t.Id=s.TutorId OR t.UserId=s.TutorId LEFT JOIN dbo.[User] tu ON tu.Id=t.UserId
+LEFT JOIN dbo.SalesDetails course ON course.Id=s.SalesDetailsId
+LEFT JOIN dbo.Type_Code sub ON sub.Id=course.SubjectId
+LEFT JOIN dbo.Type_Code ts ON ts.Id=d.TutorScheduleStatus LEFT JOIN dbo.Type_Code ss ON ss.Id=d.StudentScheduleStatus
+LEFT JOIN dbo.Type_Code os ON os.Id=d.OperationScheduleStatus
+{join}
+WHERE ISNULL(s.IsActive,0)=1
+ AND d.[Date]>=@FromDate AND d.[Date]<DATEADD(day,1,@ToDate)
+ AND ({cancelledStatus}{(tracked ? " OR k.Id IS NOT NULL" : "")})
+ORDER BY d.[Date] DESC,d.StartTime DESC;
+";
+    }
+
+    private static string RescheduledInRangeSql(bool tracked)
+    {
+        const string rescheduled = "(N'Class Re-Scheduled',N'Re-Schedule Demo')";
+        var makeups = tracked ? $@"
+ mk AS (SELECT k.ScheduleDetailsId OriginalId,k.MakeupScheduleDetailsId ShownId,k.Category,
+   CASE WHEN k.Category=N'tutor' THEN N'Make-up (cancelled by Tutor)' ELSE N'Make-up (cancelled by Student)' END Status
+  FROM dbo.TutorCancellationTracking k
+  WHERE k.IsActive=1 AND k.MakeupScheduleDetailsId IS NOT NULL
+   AND k.RescheduledAt>=@FromDate AND k.RescheduledAt<DATEADD(day,1,@ToDate)),
+ u AS (SELECT COALESCE(mk.OriginalId,st.OriginalId) OriginalId,COALESCE(mk.ShownId,st.ShownId) ShownId,
+   COALESCE(mk.Category,st.Category) Category,COALESCE(mk.Status,st.Status) Status
+  FROM mk FULL OUTER JOIN st ON st.OriginalId=mk.OriginalId)" : @"
+ u AS (SELECT OriginalId,ShownId,Category,Status FROM st)";
+        return $@"
+;WITH st AS (SELECT d.ScheduleDetailsId OriginalId,d.ScheduleDetailsId ShownId,
+   -- Operations' attendance writes the same status to the student and Operations fields: that is Operations' record.
+   CASE WHEN ts.TypeCodeName IN {rescheduled} THEN N'tutor'
+        WHEN ss.TypeCodeName IN {rescheduled} AND (d.OperationScheduleStatus IS NULL OR d.OperationScheduleStatus<>d.StudentScheduleStatus) THEN N'student'
+        ELSE N'operations' END Category,
+   COALESCE(ts.TypeCodeName,ss.TypeCodeName,os.TypeCodeName) Status
+  FROM dbo.ScheduleDetails d JOIN dbo.Schedule s ON s.ScheduleId=d.ScheduleId
+  LEFT JOIN dbo.Type_Code ts ON ts.Id=d.TutorScheduleStatus
+  LEFT JOIN dbo.Type_Code ss ON ss.Id=d.StudentScheduleStatus
+  LEFT JOIN dbo.Type_Code os ON os.Id=d.OperationScheduleStatus
+  WHERE d.IsActive=1 AND ISNULL(s.IsActive,0)=1
+   AND d.[Date]>=@FromDate AND d.[Date]<DATEADD(day,1,@ToDate)
+   AND (ts.TypeCodeName IN {rescheduled} OR ss.TypeCodeName IN {rescheduled} OR os.TypeCodeName IN {rescheduled})),{makeups}
+SELECT TOP (@Take) u.ShownId ScheduleDetailsId,u.OriginalId CancelledScheduleDetailsId,d.[Date] ClassDate,d.StartTime,d.EndTime,
+ COALESCE(su.FullName,CONCAT(su.FirstName,N' ',su.LastName)) StudentName,
+ COALESCE(tu.FullName,CONCAT(tu.FirstName,N' ',tu.LastName)) TutorName,
+ sub.TypeCodeName SubjectName,u.Category RescheduledBy,u.Status,
+ COUNT_BIG(*) OVER () TotalRescheduled,
+ SUM(CASE WHEN u.Category=N'tutor' THEN CONVERT(bigint,1) ELSE 0 END) OVER () TutorRescheduled,
+ SUM(CASE WHEN u.Category=N'student' THEN CONVERT(bigint,1) ELSE 0 END) OVER () StudentRescheduled,
+ SUM(CASE WHEN u.Category=N'operations' THEN CONVERT(bigint,1) ELSE 0 END) OVER () OperationsRescheduled
+FROM u JOIN dbo.ScheduleDetails d ON d.ScheduleDetailsId=u.ShownId
+JOIN dbo.Schedule s ON s.ScheduleId=d.ScheduleId
+LEFT JOIN dbo.Student st2 ON st2.Id=s.StudentId LEFT JOIN dbo.[User] su ON su.Id=st2.UserId
+LEFT JOIN dbo.Tutor t ON t.Id=s.TutorId OR t.UserId=s.TutorId LEFT JOIN dbo.[User] tu ON tu.Id=t.UserId
+LEFT JOIN dbo.SalesDetails course ON course.Id=s.SalesDetailsId
+LEFT JOIN dbo.Type_Code sub ON sub.Id=course.SubjectId
+ORDER BY d.StartTime DESC;
+";
+    }
     private static string MismatchSql(
         string aStatus, string aStart, string aEnd,
         string bStatus, string bStart, string bEnd,

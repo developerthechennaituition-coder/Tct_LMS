@@ -1463,6 +1463,47 @@ public class NotificationService : INotificationService
         }
     }
 
+    // A tutor-cancelled class not re-scheduled by its month end was deducted (TutorCancellationRules): tell that tutor.
+    public async Task AddTutorCancellationDeductionNotification(Guid tutorUserId, Guid salesDetailsId, Guid scheduleDetailsId,
+        string message, Guid createdBy)
+    {
+        var notification = new Notification
+        {
+            Id = Guid.NewGuid(), SalesDetailsId = salesDetailsId, ScheduleDetailsId = scheduleDetailsId,
+            NotificationType = (int)NotificationType.TutorCancellationDeduction,
+            Message = message, CreatedBy = createdBy, CreatedDate = DateTime.UtcNow, IsActive = true
+        };
+        await _repository.AddNotificationAsync(notification);
+        await NotificationDetails(notification.Id, tutorUserId, createdBy);
+    }
+
+    // A pay slip was generated while some of the tutor's cancelled classes could not be deducted because it is not
+    // certain whether they were re-scheduled (TutorCancellationRules): Operations are asked to review them.
+    public async Task AddCancellationReviewNotifications(IReadOnlyList<TCT.LMS.DTOs.Schedule.CancellationReviewItemDto> items,
+        string? invoiceNumber, Guid createdBy)
+    {
+        if (items.Count == 0) return;
+        var operationsRoles = new[] { (int)UserRoleEnum.Operations, (int)UserRoleEnum.OperationsAdmin };
+        var recipients = (await _userRoleRepository.FindAll(r => operationsRoles.Contains(r.RoleId) && r.IsActive))
+            .Select(r => r.UserId).Distinct().ToList();
+        if (recipients.Count == 0) return;
+
+        var classes = string.Join("; ", items.Select(i => $"{i.ClassStart:dd-MMM-yyyy hh:mm tt} with {i.StudentName}" +
+            (string.IsNullOrEmpty(i.Subject) ? "" : $" ({i.Subject})") + $" - {i.Reason}"));
+        var message = $"Pay slip {invoiceNumber} for <b>{items[0].TutorName}</b> was generated without a deduction for " +
+                      $"<b>{items.Count}</b> cancelled class(es), because it is not certain whether they were re-scheduled. " +
+                      $"Please review: {classes}";
+        var notification = new Notification
+        {
+            Id = Guid.NewGuid(), ScheduleDetailsId = items[0].ScheduleDetailsId,
+            NotificationType = (int)NotificationType.TutorCancellationReview,
+            Message = message.Length > 3900 ? message[..3900] : message, CreatedBy = createdBy, CreatedDate = DateTime.UtcNow, IsActive = true
+        };
+        await _repository.AddNotificationAsync(notification);
+        foreach (var userId in recipients)
+            await NotificationDetails(notification.Id, userId, createdBy);
+    }
+
     public async Task<EnrolledCourse> GetNotificationByIdAsync(Guid id)
     {
         return await _repository.GetNotificationByIdAsync(id);
