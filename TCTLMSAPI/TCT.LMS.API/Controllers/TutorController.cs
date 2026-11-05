@@ -120,7 +120,8 @@ public class TutorController : ControllerBase
     [HttpGet("GetTutorsByAvailability")]
     public async Task<ActionResult> GetTutorsByAvailability(Guid studentId, Guid salesId, Guid subjectId)
     {
-        var result = await _tutorService.GetTutorsByAvailability(studentId, salesId, subjectId);
+        // The signed-in user (when a token is sent) decides which tutor assignment rules apply.
+        var result = await _tutorService.GetTutorsByAvailability(studentId, salesId, subjectId, GetCallerId());
         return Ok(result);
     }
 
@@ -175,7 +176,10 @@ public class TutorController : ControllerBase
             item.BasePaymentAmount, item.RequestedPaymentAmount, item.ApprovedPaymentAmount,
             item.ApprovalStatus, item.RequestReason, DecisionComment = item.ApprovalRemarks,
             item.EffectiveDate, item.RequestedBy,
-            TutorName = user?.FullName, item.Board, item.Grade, item.SubjectId, item.SalesDetailsId });
+            TutorName = user?.FullName, item.Board, item.Grade, item.SubjectId, item.SalesDetailsId,
+            item.AssignmentRuleCodes,
+            AssignmentRuleReason = item.AssignmentRuleCodes == null ? null
+                : TCT.LMS.Application.Services.TutorAssignmentThresholdRules.Describe(item.AssignmentRuleCodes) });
     }
 
     [HttpPost("payment-approval/decision")]
@@ -188,8 +192,11 @@ public class TutorController : ControllerBase
         var approval = await _dbContext.TutorPaymentApproval.FirstOrDefaultAsync(x => x.Id == input.ApprovalId && x.IsActive);
         if (approval == null) return NotFound(new { succeeded = false, message = "Pending payment request was not found." });
 
-        var finalAmount = input.Approved ? (input.ApprovedAmount ?? approval.RequestedPaymentAmount) : approval.BasePaymentAmount;
-        if (input.Approved && finalAmount <= 0)
+        // A tutor assignment rule request (no payment change) keeps the assignment's payment either way.
+        var keepsAssignment = TCT.LMS.Application.Services.TutorAssignmentThresholdRules.KeepsAssignmentOnApproval(approval.RequestType);
+        var finalAmount = keepsAssignment ? approval.BasePaymentAmount
+            : input.Approved ? (input.ApprovedAmount ?? approval.RequestedPaymentAmount) : approval.BasePaymentAmount;
+        if (input.Approved && !keepsAssignment && finalAmount <= 0)
             return BadRequest(new { succeeded = false, message = "Approved amount must be greater than zero." });
 
         if (approval.RequestType == (int)TutorPaymentRequestType.TutorRateChange)
@@ -202,15 +209,36 @@ public class TutorController : ControllerBase
             var salesDetail = await _dbContext.SalesDetails.FindAsync(approval.SalesDetailsId.Value);
             if (salesDetail != null)
             {
-                if (input.Approved)
+                if (input.Approved && keepsAssignment)
                 {
-                    salesDetail.TutorPayment = finalAmount;
-                    if (approval.RequestType == (int)TutorPaymentRequestType.AssignmentWithPaymentChange)
+                    // Approved under the tutor assignment rules: the saved assignment (tutor, status awaiting the
+                    // Coordinator Admin, payment) continues through the normal approval. The tenure rule alone needs only
+                    // the Super Admin, whose approval also approves the assignment.
+                    if (TCT.LMS.Application.Services.TutorAssignmentThresholdRules.StatusAfterSuperAdminApproval(approval.RequestType, approval.AssignmentRuleCodes)
+                        == TCT.LMS.Application.Services.TutorAssignmentThresholdRules.StatusAfterApproval.MoveToApproved)
                     {
                         var approvedStatus = await _dbContext.Type_Code.FirstOrDefaultAsync(x => x.TypeCodeValue == (int)FollowUpStatus.DemoPendingTutorAssignedApproved);
                         if (approvedStatus != null) salesDetail.Status = approvedStatus.Id;
                     }
-                    else if (approval.PreviousStatusId.HasValue) salesDetail.Status = approval.PreviousStatusId.Value;
+                }
+                else if (input.Approved)
+                {
+                    salesDetail.TutorPayment = finalAmount;
+                    switch (TCT.LMS.Application.Services.TutorAssignmentThresholdRules.StatusAfterSuperAdminApproval(approval.RequestType, approval.AssignmentRuleCodes))
+                    {
+                        case TCT.LMS.Application.Services.TutorAssignmentThresholdRules.StatusAfterApproval.MoveToApproved:
+                            var approvedStatus = await _dbContext.Type_Code.FirstOrDefaultAsync(x => x.TypeCodeValue == (int)FollowUpStatus.DemoPendingTutorAssignedApproved);
+                            if (approvedStatus != null) salesDetail.Status = approvedStatus.Id;
+                            break;
+                        case TCT.LMS.Application.Services.TutorAssignmentThresholdRules.StatusAfterApproval.RestorePrevious:
+                            if (approval.PreviousStatusId.HasValue) salesDetail.Status = approval.PreviousStatusId.Value;
+                            break;
+                        case TCT.LMS.Application.Services.TutorAssignmentThresholdRules.StatusAfterApproval.KeepCurrent:
+                            // Payment approved together with a tutor assignment rule: the course keeps its current status
+                            // (awaiting the Coordinator Admin), who approves or rejects the assignment as usual. Neither the
+                            // approved status nor the pre-request status is applied.
+                            break;
+                    }
                 }
                 else
                 {
@@ -218,15 +246,23 @@ public class TutorController : ControllerBase
                     if (approval.PreviousTutorId.HasValue) salesDetail.TutorId = approval.PreviousTutorId;
                     if (approval.PreviousStatusId.HasValue) salesDetail.Status = approval.PreviousStatusId.Value;
                 }
+                // The decision updates the course, so it is attributed to the signed-in Super Admin
+                // (shown as Updated by / Updated on in Student Class Info), not the requester.
+                salesDetail.ModifiedBy = callerId;
+                salesDetail.ModifiedDate = DateTime.UtcNow;
             }
-            var allocation = await _dbContext.TutorStudentAllocations.FindAsync(approval.TutorStudentAllocationId);
+            var allocation = await _dbContext.TutorStudentAllocations
+                    .Where(TCT.LMS.Application.Services.TutorPaymentApprovalRules.IsCurrentAllocation(approval.SalesDetailsId.Value, approval.TutorId))
+                    .OrderByDescending(a => a.CreatedDate)
+                    .FirstOrDefaultAsync()
+                ?? await _dbContext.TutorStudentAllocations.FindAsync(approval.TutorStudentAllocationId);
             if (allocation != null)
             {
                 allocation.PaymentAmount = finalAmount;
-                if (!input.Approved && approval.RequestType == (int)TutorPaymentRequestType.AssignmentWithPaymentChange)
+                if (!input.Approved && TCT.LMS.Application.Services.TutorAssignmentThresholdRules.DeactivatesAllocationOnRejection(approval.RequestType))
                     allocation.IsActive = false;
             }
-            if (input.Approved)
+            if (input.Approved && !keepsAssignment)
             {
                 var sales = salesDetail == null ? null : await _dbContext.Sales.FindAsync(salesDetail.SalesId);
                 var skillRate = sales == null ? null : await _dbContext.TutorDetails.FirstOrDefaultAsync(x =>
@@ -245,7 +281,8 @@ public class TutorController : ControllerBase
         await _dbContext.SaveChangesAsync();
         await _notificationService.AddTutorPaymentDecisionNotification(approval.Id, callerId);
         if (input.Approved &&
-            approval.RequestType == (int)TutorPaymentRequestType.AssignmentWithPaymentChange &&
+            TCT.LMS.Application.Services.TutorAssignmentThresholdRules.StatusAfterSuperAdminApproval(approval.RequestType, approval.AssignmentRuleCodes)
+                == TCT.LMS.Application.Services.TutorAssignmentThresholdRules.StatusAfterApproval.MoveToApproved &&
             approval.SalesDetailsId.HasValue)
         {
             var approvedSalesDetail = await _dbContext.SalesDetails
@@ -257,7 +294,9 @@ public class TutorController : ControllerBase
                     approvedSalesDetail.Id, callerId, NotificationType.ApproveTutorAssignment);
             }
         }
-        return Ok(new { succeeded = true, finalAmount, message = input.Approved ? "Payment request approved." : "Payment request rejected." });
+        return Ok(new { succeeded = true, finalAmount, message = keepsAssignment
+            ? (input.Approved ? "Tutor assignment approved." : "Tutor assignment rejected.")
+            : input.Approved ? "Payment request approved." : "Payment request rejected." });
     }
     [HttpGet("getalltutordetails")]
     public async Task<ActionResult> GetAllTutorDetails()
@@ -274,9 +313,12 @@ public class TutorController : ControllerBase
         string? gradeGroupIds, string? subjectIds,
              string? search,
              int pageSize,
-             int pageNumber)
+             int pageNumber,
+             Guid? salesDetailsId = null)
     {
-        var tutors = await _tutorService.GetAllTutorDetailsWithFilter(boardIds, gradeIds, gradeGroupIds, subjectIds, search, pageSize, pageNumber);
+        // salesDetailsId: the list was opened to assign a tutor to that course (tutor assignment rules apply).
+        var tutors = await _tutorService.GetAllTutorDetailsWithFilter(boardIds, gradeIds, gradeGroupIds, subjectIds, search, pageSize, pageNumber,
+            salesDetailsId, GetCallerId());
         if (await IsCallerInRoleAsync("Student") && tutors.Data != null)
         {
             foreach (var tutor in tutors.Data) tutor.Email = null;

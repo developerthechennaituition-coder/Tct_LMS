@@ -58,7 +58,9 @@ export const getAllTutorDetails = async () => {
   return await axios.get("/Tutor/getalltutordetails");
 };
 
-export const getFilteredTutors = (board, grade, gradeGroups, subject, search, pageSize, pageNumber, signal) => {
+// salesDetailsId (optional): the list is opened to assign a tutor to that course, so the API applies the
+// tutor assignment rules (held tutors left out, blocked / approval-needing tutors flagged).
+export const getFilteredTutors = (board, grade, gradeGroups, subject, search, pageSize, pageNumber, signal, salesDetailsId) => {
   return axios.get("/Tutor/getalltutordetailswithfilter", {
     signal,
     params: {
@@ -69,6 +71,7 @@ export const getFilteredTutors = (board, grade, gradeGroups, subject, search, pa
       search: search || "",
       pageSize: pageSize,
       pageNumber: pageNumber,
+      salesDetailsId: salesDetailsId || undefined,
     },
   });
 };

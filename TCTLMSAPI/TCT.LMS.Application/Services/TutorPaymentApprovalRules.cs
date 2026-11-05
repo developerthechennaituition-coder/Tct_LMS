@@ -24,6 +24,11 @@ public static class TutorPaymentApprovalRules
              && p.IsActive
              && p.ApprovalStatus == (int)TutorPaymentStatus.Pending;
 
+    // Re-saving an assignment replaces its allocation, so the request's stored TutorStudentAllocationId can be an inactive
+    // one; the Super Admin decision applies to the course's current allocation for the tutor.
+    public static Expression<Func<TutorStudentAllocations, bool>> IsCurrentAllocation(Guid salesDetailsId, Guid tutorId) =>
+        a => a.SalesDetailsId == salesDetailsId && a.TutorId == tutorId && a.IsActive;
+
     // Coordinator Admin approval (20013) and rejection (20014) wait for the Super Admin payment decision.
     public static bool BlocksCoordinatorAdminDecision(int status, bool hasPendingSuperAdminRequest) =>
         hasPendingSuperAdminRequest

@@ -7,6 +7,7 @@ namespace TCT.LMS.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[TypeFilter(typeof(TCT.LMS.API.Filters.ThresholdWritePermissionFilter))]
 [TypeFilter(typeof(TCT.LMS.API.Filters.TutorCancellationThresholdFilter))]
 public class ThresholdController : BaseAPIController<Thresholds>
 {

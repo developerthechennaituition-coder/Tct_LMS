@@ -252,9 +252,24 @@ public class SalesController : ControllerBase
     [HttpPost("UpdateSalesDetailsStatus")]
     public async Task<IActionResult> UpdateSalesDetailsStatus(UpdateSalesDetailsDTO salesDetailsDto)
     {
+        if (salesDetailsDto.Status == (int)TCT.LMS.Domain.FollowUpStatus.DemoPendingTutorAssigned
+            || salesDetailsDto.Status == (int)TCT.LMS.Domain.FollowUpStatus.DemoPendingTutorAssignedNotApproved)
+        {
+            // Assigning a tutor: the tutor assignment rules are per assigning user, so it is the signed-in user,
+            // never the UserId in the request body.
+            var callerId = GetCallerId();
+            if (callerId == Guid.Empty)
+                return StatusCode(StatusCodes.Status401Unauthorized,
+                    new { succeeded = false, message = "Your session could not be identified. Please sign in again." });
+            salesDetailsDto.UserId = callerId;
+        }
+
         var result = await _salesService.UpdateSalesDetailsStatus(salesDetailsDto);
         return Ok(result);
     }
+
+    private Guid GetCallerId() =>
+        Guid.TryParse(User.FindFirst("UserId")?.Value, out var id) ? id : Guid.Empty;
 
     [HttpPost("UpdateStudentDropout")]
     public async Task<IActionResult> UpdateStudentDropout(UpdateSalesDetailsDTO salesDetailsDto)

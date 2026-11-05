@@ -106,5 +106,10 @@ public class TutorResponsesDto
     public Guid? GradeGroupId { get; set; }
     public decimal? MinPayment { get; set; }
     public decimal? MaxPayment { get; set; }
+    // Tutor assignment rules, filled only when the list is opened for a course (salesDetailsId).
+    public DateTime? AssignBlockedUntil { get; set; }
+    public string? AssignBlockedReason { get; set; }
+    public bool RequiresSuperAdminApproval { get; set; }
+    public string? ApprovalReason { get; set; }
 
 }

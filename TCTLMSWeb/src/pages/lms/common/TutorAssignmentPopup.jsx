@@ -97,11 +97,18 @@ const TutorAssignmentPopup = (props) => {
         if (response?.succeeded && Array.isArray(response?.data)) {
           response.data.forEach((s) => {
             if (!s?.tutorId) return;
+            // Tutor assignment rules (API): a tutor this coordinator cannot assign yet is shown disabled.
             temp.push({
               value: s?.tutorId.toString(),
-              label: s?.fullName,
+              label: s?.assignBlockedReason
+                ? `${s?.fullName} (${s?.assignBlockedUntil ? `available from ${moment.utc(s.assignBlockedUntil).local().format("DD MMM YYYY hh:mm A")}` : "not available"})`
+                : s?.requiresSuperAdminApproval ? `${s?.fullName} (needs Super Admin approval)` : s?.fullName,
               userId: s?.userId,
               isAvailable: s?.isAvailable,
+              isDisabled: !!s?.assignBlockedReason,
+              blockedReason: s?.assignBlockedReason,
+              requiresSuperAdminApproval: !!s?.requiresSuperAdminApproval,
+              approvalReason: s?.approvalReason,
             });
           });
         }
@@ -226,7 +233,9 @@ const TutorAssignmentPopup = (props) => {
         if (response?.succeeded !== true) {
           throw new Error(response?.message || "Tutor assignment was not confirmed. Refresh the record before retrying.");
         }
-        toast.success("Tutor assigned successfully.", {
+        toast.success(response?.data?.assignmentRuleCodes
+          ? "Tutor assigned and sent to the Super Admin for approval."
+          : "Tutor assigned successfully.", {
           position: "top-right",
           autoClose: true,
           hideProgressBar: true,
@@ -302,6 +311,38 @@ const TutorAssignmentPopup = (props) => {
   const tutorInfoModalHandler = () => {
     setTutorInfoModal(false);
   };
+
+  // Tutor assignment rules for the selected tutor: from the dropdown's tutor list, or from the Tutor List row it
+  // was picked in. The API re-checks them when saving.
+  const selectedTutorKey = (salesDetails.tutorUserId || salesDetails.tutorId)?.toString();
+  const listedTutor = tutorList.find((t) => t.userId?.toString() === selectedTutorKey || t.value === selectedTutorKey);
+  const gridTutor = props.isTabContent == true && props.selectedTutor
+    && (props.selectedTutor.userId?.toString() === selectedTutorKey || props.selectedTutor.tutorId?.toString() === selectedTutorKey)
+    ? props.selectedTutor : null;
+  const assignmentRule = listedTutor
+    ? { blockedReason: listedTutor.blockedReason, requiresSuperAdminApproval: listedTutor.requiresSuperAdminApproval, approvalReason: listedTutor.approvalReason }
+    : gridTutor
+      ? { blockedReason: gridTutor.assignBlockedReason, requiresSuperAdminApproval: !!gridTutor.requiresSuperAdminApproval, approvalReason: gridTutor.approvalReason }
+      : null;
+  const assignmentRuleNotice = assignmentRule?.blockedReason ? (
+    <Row className="col-md-12">
+      <Col md="12">
+        <div className="alert alert-danger mb-2" style={{ borderRadius: "6px" }}>
+          <Icon name="alert-circle" className="mr-1" />
+          {assignmentRule.blockedReason}
+        </div>
+      </Col>
+    </Row>
+  ) : assignmentRule?.requiresSuperAdminApproval ? (
+    <Row className="col-md-12">
+      <Col md="12">
+        <div className="alert alert-info mb-2" style={{ borderRadius: "6px" }}>
+          <Icon name="info" className="mr-1" />
+          {assignmentRule.approvalReason || "This assignment needs Super Admin approval."} It will be sent to the Super Admin when you save.
+        </div>
+      </Col>
+    </Row>
+  ) : null;
 
   const onChangeHandler = () => {};
   const RenderContent = ({ onChangeHandler }) => {
@@ -486,6 +527,7 @@ const TutorAssignmentPopup = (props) => {
               </Col>
             </Row>
           )}
+          {assignmentRuleNotice}
           <Row className="col-md-12">
             <Col md="12">
               <FormGroup>
@@ -515,7 +557,7 @@ const TutorAssignmentPopup = (props) => {
           <Row className="col-md-12 pt-3">
             <Col size="6"></Col>
             <Col size="6">
-              <Button className="footer-btn-right ml-4" type="submit" color="primary" id="tests" size="md" disabled={isSaving || isLoadingAssignment || assignmentLoadError || !tutorHasAvailability || !!errors.tutorPayment || !tutorPaymentInfo?.tutorPercentage}>
+              <Button className="footer-btn-right ml-4" type="submit" color="primary" id="tests" size="md" disabled={isSaving || isLoadingAssignment || assignmentLoadError || !tutorHasAvailability || !!errors.tutorPayment || !tutorPaymentInfo?.tutorPercentage || !!assignmentRule?.blockedReason}>
                 {isSaving ? (
                   <>
                     <Spinner size="sm" className="mr-1" /> Saving...
@@ -723,6 +765,7 @@ const TutorAssignmentPopup = (props) => {
                 </Col>
               </Row>
             )}
+            {assignmentRuleNotice}
             <Row className="col-md-12">
               <Col md="12">
                 <FormGroup>
@@ -752,7 +795,7 @@ const TutorAssignmentPopup = (props) => {
             <Row className="col-md-12 pt-3">
               <Col size="6"></Col>
               <Col size="6">
-                <Button className="footer-btn-right ml-4" type="submit" color="primary" id="tests" size="md" disabled={isSaving || isLoadingAssignment || assignmentLoadError || !tutorHasAvailability || !!errors.tutorPayment || !tutorPaymentInfo?.tutorPercentage}>
+                <Button className="footer-btn-right ml-4" type="submit" color="primary" id="tests" size="md" disabled={isSaving || isLoadingAssignment || assignmentLoadError || !tutorHasAvailability || !!errors.tutorPayment || !tutorPaymentInfo?.tutorPercentage || !!assignmentRule?.blockedReason}>
                   {isSaving ? (
                     <>
                       <Spinner size="sm" className="mr-1" /> Saving...

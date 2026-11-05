@@ -139,9 +139,12 @@ const TCTTutorListGrid = ({ salesDetails: parentSalesDetails, search: toolbarSea
           <>
             <div className="nk-tb-action">
               <ul className="nk-tb-actions gx-1">
+                {/* Tutor assignment rules (API): this coordinator cannot assign the tutor until the cooldown ends. */}
                 <li
                   className="nk-tb-action-hidden1"
+                  style={row?.assignBlockedReason ? { opacity: 0.4, cursor: "not-allowed" } : undefined}
                   onClick={() => {
+                    if (row?.assignBlockedReason) return;
                     setSelectedTutor(row);
                     setAssignTutorModal(true);
                   }}
@@ -152,7 +155,7 @@ const TCTTutorListGrid = ({ salesDetails: parentSalesDetails, search: toolbarSea
                     id={"changeTutor" + row?.id}
                     icon="icon ni ni-user-add-fill"
                     direction="top"
-                    text="Select Tutor"
+                    text={row?.assignBlockedReason || (row?.requiresSuperAdminApproval ? "Select Tutor (needs Super Admin approval)" : "Select Tutor")}
                   />
                 </li>
               </ul>
@@ -209,6 +212,7 @@ const TCTTutorListGrid = ({ salesDetails: parentSalesDetails, search: toolbarSea
         size || 50,
         page || 1,
         requestController.signal,
+        saleDetailsId,
       );
       if (requestSequence !== tutorRequestSequenceRef.current) return;
       const rows = Array.isArray(response?.data)

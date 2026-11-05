@@ -1416,12 +1416,20 @@ public class NotificationService : INotificationService
             TutorPaymentRequestType.AssignmentWithPaymentChange => "Tutor assignment and payment change",
             TutorPaymentRequestType.ExistingAssignmentPaymentChange => "Existing assignment payment change",
             TutorPaymentRequestType.TutorRateChange => "General tutor rate change",
+            TutorPaymentRequestType.AssignmentRuleApproval => "Tutor assignment approval",
             _ => "Tutor payment change"
         };
-        var message = $"{requestLabel} requested for <b>{tutorUser?.FullName ?? "Tutor"}</b>, " +
-                      $"{approval.Board} {approval.Grade}: <b>{approval.BasePaymentAmount:0.##}</b> to " +
-                      $"<b>{approval.RequestedPaymentAmount:0.##}</b>. " +
-                      $"Reason: {approval.RequestReason ?? "Not provided"}. Please review the request and enter a decision comment.";
+        // Tutor assignment rules that sent the assignment to the Super Admin (TutorAssignmentThresholdRules).
+        var ruleText = approval.AssignmentRuleCodes == null ? string.Empty
+            : $"Needs approval because {TutorAssignmentThresholdRules.Describe(approval.AssignmentRuleCodes)}. ";
+        var message = approval.RequestType == (int)TutorPaymentRequestType.AssignmentRuleApproval
+            ? $"{requestLabel} requested for <b>{tutorUser?.FullName ?? "Tutor"}</b>, {approval.Board} {approval.Grade}. " +
+              ruleText +
+              $"Reason: {approval.RequestReason ?? "Not provided"}. Please review the request and enter a decision comment."
+            : $"{requestLabel} requested for <b>{tutorUser?.FullName ?? "Tutor"}</b>, " +
+              $"{approval.Board} {approval.Grade}: <b>{approval.BasePaymentAmount:0.##}</b> to " +
+              $"<b>{approval.RequestedPaymentAmount:0.##}</b>. " + ruleText +
+              $"Reason: {approval.RequestReason ?? "Not provided"}. Please review the request and enter a decision comment.";
         var notification = new Notification
         {
             Id = Guid.NewGuid(), SalesDetailsId = approval.Id,
@@ -1445,9 +1453,11 @@ public class NotificationService : INotificationService
         var tutorUser = tutor == null ? null : await _userRepository.GetByIdAsync(tutor.UserId);
         var approved = approval.ApprovalStatus == (int)TutorPaymentStatus.Approved;
         var finalAmount = approved ? approval.ApprovedPaymentAmount : approval.BasePaymentAmount;
-        var message = $"Tutor payment request for <b>{tutorUser?.FullName ?? "Tutor"}</b> was " +
-                      $"<b>{(approved ? "approved" : "rejected")}</b>. Final amount: <b>{finalAmount:0.##}</b>. " +
-                      $"Comment: {approval.ApprovalRemarks}.";
+        var message = approval.RequestType == (int)TutorPaymentRequestType.AssignmentRuleApproval
+            ? TutorAssignmentThresholdRules.AssignmentDecisionMessage(tutorUser?.FullName, approved, approval.ApprovalRemarks)
+            : $"Tutor payment request for <b>{tutorUser?.FullName ?? "Tutor"}</b> was " +
+              $"<b>{(approved ? "approved" : "rejected")}</b>. Final amount: <b>{finalAmount:0.##}</b>. " +
+              $"Comment: {approval.ApprovalRemarks}.";
         var notification = new Notification
         {
             Id = Guid.NewGuid(), SalesDetailsId = approval.Id,

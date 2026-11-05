@@ -507,10 +507,17 @@ const TCTUserNotificationList = () => {
       const request = await getTutorPaymentApproval(approvalId);
       if (!request || request.approvalStatus !== 1012003) {
         toast.info("This payment request has already been processed.");
-        return;
+        return false;
       }
+      // A tutor assignment rule request (no payment change): the Super Admin approves or rejects the assignment only.
+      const isRuleOnly = request.requestTypeName === "AssignmentRuleApproval";
+      const ruleReasonRow = request.assignmentRuleReason
+        ? `<strong>Needs approval because</strong><span style="overflow-wrap:anywhere;">${request.assignmentRuleReason}</span>`
+        : "";
       const result = await Swal.fire({
-        title: request.requestTypeName === "AssignmentWithPaymentChange"
+        title: isRuleOnly
+          ? "Review tutor assignment"
+          : request.requestTypeName === "AssignmentWithPaymentChange"
           ? "Review assignment and payment"
           : "Review tutor payment change",
         width: 680,
@@ -518,18 +525,23 @@ const TCTUserNotificationList = () => {
           <div style="display:grid; grid-template-columns:170px minmax(0,1fr); gap:10px 18px; padding:16px 18px; margin-bottom:22px; background:#f5f7fa; border-radius:6px; line-height:1.45;">
             <strong>Tutor</strong><span>${request.tutorName || "-"}</span>
             <strong>Course</strong><span>${request.board || "-"} ${request.grade || ""}</span>
-            <strong>Current amount</strong><span>${request.basePaymentAmount}</span>
-            <strong>Proposed amount</strong><span>${request.requestedPaymentAmount}</span>
+            ${isRuleOnly
+              ? `<strong>Tutor payment</strong><span>${request.basePaymentAmount}</span>`
+              : `<strong>Current amount</strong><span>${request.basePaymentAmount}</span>
+            <strong>Proposed amount</strong><span>${request.requestedPaymentAmount}</span>`}
+            ${ruleReasonRow}
             <strong>Request reason</strong><span style="overflow-wrap:anywhere;">${request.requestReason || "Not provided"}</span>
           </div>
-          <label for="payment-approved-amount" style="display:block; font-weight:600; margin-bottom:7px;">Approved amount</label>
-          <input id="payment-approved-amount" class="swal2-input" style="width:100%; margin:0 0 18px; box-sizing:border-box;" type="number" min="0.01" step="0.01" value="${request.requestedPaymentAmount}" />
+          ${isRuleOnly ? "" : `<label for="payment-approved-amount" style="display:block; font-weight:600; margin-bottom:7px;">Approved amount</label>
+          <input id="payment-approved-amount" class="swal2-input" style="width:100%; margin:0 0 18px; box-sizing:border-box;" type="number" min="0.01" step="0.01" value="${request.requestedPaymentAmount}" />`}
           <label for="payment-decision-comment" style="display:block; font-weight:600; margin-bottom:7px;">Decision comment <span style="color:#e85347;">*</span></label>
           <textarea id="payment-decision-comment" class="swal2-textarea" style="width:100%; min-height:120px; margin:0; box-sizing:border-box; resize:vertical;" placeholder="Enter approval or rejection reason"></textarea>
         </div>`,
         showDenyButton: true,
         showCancelButton: true,
-        confirmButtonText: request.requestTypeName === "AssignmentWithPaymentChange"
+        confirmButtonText: isRuleOnly
+          ? "Approve assignment"
+          : request.requestTypeName === "AssignmentWithPaymentChange"
           ? "Approve assignment & payment" : "Approve payment",
         denyButtonText: "Reject",
         cancelButtonText: "Cancel",
@@ -552,8 +564,9 @@ const TCTUserNotificationList = () => {
         },
         preConfirm: () => {
           const comment = document.getElementById("payment-decision-comment")?.value?.trim();
-          const approvedAmount = Number(document.getElementById("payment-approved-amount")?.value);
           if (!comment) return Swal.showValidationMessage("Decision comment is required.");
+          if (isRuleOnly) return { comment, approvedAmount: null };
+          const approvedAmount = Number(document.getElementById("payment-approved-amount")?.value);
           if (!approvedAmount || approvedAmount <= 0) return Swal.showValidationMessage("Approved amount must be greater than zero.");
           return { comment, approvedAmount };
         },
@@ -563,7 +576,7 @@ const TCTUserNotificationList = () => {
           return { comment };
         },
       });
-      if (!result.isConfirmed && !result.isDenied) return;
+      if (!result.isConfirmed && !result.isDenied) return false;
       await decideTutorPaymentApproval({
         ApprovalId: approvalId,
         UserId: userId,
@@ -571,11 +584,15 @@ const TCTUserNotificationList = () => {
         ApprovedAmount: result.isConfirmed ? result.value.approvedAmount : null,
         Comment: result.value.comment,
       });
-      toast.success(result.isConfirmed ? "Payment request approved." : "Payment request rejected.");
+      toast.success(isRuleOnly
+        ? (result.isConfirmed ? "Tutor assignment approved." : "Tutor assignment rejected.")
+        : result.isConfirmed ? "Payment request approved." : "Payment request rejected.");
       const notifications = await fetchNotifications(userId);
       setNotificationDataSource(notifications);
+      return true;
     } catch (error) {
       toast.error(error?.response?.data?.message || "Unable to process the payment request.");
+      return false;
     }
   };
 
@@ -1104,7 +1121,13 @@ const TCTUserNotificationList = () => {
     };
 
     if (inputData.startDate == null || inputData.startDate == undefined || inputData.startDate == "") {
-      updateStatus(inputData).then(handleSuccess).catch(handleError);
+      // Not saved (e.g. a tutor assignment rule refused it): show the reason instead of a success message.
+      updateStatus(inputData)
+        .then((response) =>
+          response?.succeeded === false
+            ? handleError(new Error(response.message || "The status could not be updated."))
+            : handleSuccess())
+        .catch(handleError);
     } else {
       inputData.stringStartDate = new Date(inputData.startDate).toISOString();
 
@@ -1199,6 +1222,16 @@ const TCTUserNotificationList = () => {
     };
 
     updateStatus(inputData).then((response) => {
+      // Not saved (e.g. a tutor assignment rule refused it): keep the details open and show the reason.
+      if (response?.succeeded === false) {
+        toast.error(response.message || "The tutor could not be assigned.", {
+          position: "top-right",
+          autoClose: true,
+          hideProgressBar: true,
+          closeOnClick: true,
+        });
+        return;
+      }
       setShowSalesDetails(false);
       fetchNotifications(userId).then((data) => {
         setNotificationDataSource(data);
@@ -1917,9 +1950,44 @@ const TCTUserNotificationList = () => {
                 </Col>
               </ModalFooter>
             )}
+            {/* Super Admin with a pending payment change decides the payment, not a re-save of the assignment. */}
+            {salesDetails?.statusTypeCode == FollowUpStatus.DemoPendingTutorAssignedNotApproved &&
+              localStorage.getItem("userRole") === "SuperAdmin" &&
+              salesDetails?.tutorPaymentApprovalId && (
+              <ModalFooter className="bg-light">
+                <Col size="12">
+                  <ul className="align-center flex-wrap flex-sm-nowrap gx-4 gy-2">
+                    <li>
+                      <Button
+                        color="primary"
+                        size="md"
+                        disabled={isAssigning}
+                        onClick={async () => {
+                          setIsAssigning(true);
+                          const decided = await reviewPaymentRequest(salesDetails.tutorPaymentApprovalId);
+                          setIsAssigning(false);
+                          if (decided) setShowSalesDetails(false);
+                        }}
+                      >
+                        {isAssigning ? (
+                          <>
+                            <Spinner size="sm" className="mr-1" /> Reviewing...
+                          </>
+                        ) : (
+                          <>
+                            <Icon name="wallet-in" /> Review Payment Request
+                          </>
+                        )}
+                      </Button>
+                    </li>
+                  </ul>
+                </Col>
+              </ModalFooter>
+            )}
             {salesDetails?.statusTypeCode == FollowUpStatus.DemoPendingTutorAssignedNotApproved &&
               localStorage.getItem("userRole") !== "CoordinatorAdmin" &&
-              localStorage.getItem("userRole") !== "Tutor" && (
+              localStorage.getItem("userRole") !== "Tutor" &&
+              !(localStorage.getItem("userRole") === "SuperAdmin" && salesDetails?.tutorPaymentApprovalId) && (
               <ModalFooter className="bg-light">
                 <Col size="12">
                   <ul className="align-center flex-wrap flex-sm-nowrap gx-4 gy-2">

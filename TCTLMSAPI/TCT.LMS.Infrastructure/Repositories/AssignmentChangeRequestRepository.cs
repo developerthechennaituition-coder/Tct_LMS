@@ -365,6 +365,16 @@ public sealed class AssignmentChangeRequestRepository : IAssignmentChangeRequest
             select t).FirstOrDefaultAsync(token);
         if (newTutor == null) return ChangeRequestApproveOutcome.Fail(400, "The selected tutor is not available.");
 
+        // Tenure limits (TutorAssignmentThresholdRules), as for any assignment: this flow has no Super Admin request, so
+        // above the standard limit only a Super Admin may approve the change.
+        var tenure = (await TutorAssignmentEligibility.TenureAsync(_dbContext, course.Id,
+            new[] { new TutorAssignmentEligibility.TutorKey(newTutor.Id, newTutor.UserId) }, deciderUserId, now))[newTutor.Id];
+        if (tenure.Outcome == TutorAssignmentThresholdRules.Outcome.Blocked)
+            return ChangeRequestApproveOutcome.Fail(400, tenure.Message!);
+        if (tenure.Outcome == TutorAssignmentThresholdRules.Outcome.NeedsSuperAdmin)
+            return ChangeRequestApproveOutcome.Fail(400,
+                $"The selected tutor has {tenure.ActiveStudents} active students, above the standard limit of {tenure.Limit}. Only a Super Admin can approve this change.");
+
         var hasSkill = await _dbContext.TutorDetails.AnyAsync(td => td.TutorId == newTutor.Id && td.IsActive
             && td.SubjectId == course.SubjectId && td.BoardId == sales.BoardId && td.GradeId == sales.GradeId, token);
         if (!hasSkill)

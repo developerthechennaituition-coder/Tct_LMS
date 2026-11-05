@@ -1246,6 +1246,7 @@ public class SalesRepository : GenericRepository<Sales>, ISalesRepository
             bool tutorPaymentApprovalRequired = false;
             Guid? tutorPaymentApprovalId = null;
             int? tutorPaymentRequestType = null;
+            string? assignmentRuleCodesForResponse = null;
             int previouseStatus = input.Status;
             var _tutor = _dbContext.Tutor.FirstOrDefault(s => s.UserId == input.TutorId || s.Id == input.TutorId);
             var _sales = _dbContext.Sales.Find(existingSalesDetails.SalesId);
@@ -1264,6 +1265,43 @@ public class SalesRepository : GenericRepository<Sales>, ISalesRepository
                     response.Succeeded = false;
                     response.Message = TCT.LMS.Application.Services.TutorReassignmentRules.OlderTutorChangeBlockedMessage;
                     return response;
+                }
+
+                // Tutor assignment thresholds (TutorAssignmentThresholdRules). Assignments of one tutor run one at a time:
+                // the tutor row stays locked until commit, so the checks below see every earlier assignment.
+                string? assignmentRuleCodes = null;
+                await _dbContext.Database.ExecuteSqlInterpolatedAsync(
+                    $"SELECT 1 FROM dbo.Tutor WITH (UPDLOCK, ROWLOCK) WHERE Id = {_tutor.Id}");
+
+                // The same attempt saved again while its Super Admin request is pending (the course then already shows
+                // this tutor): nothing new is created and the pending request is kept.
+                if (await _dbContext.TutorPaymentApproval.AnyAsync(
+                        TCT.LMS.Application.Services.TutorAssignmentThresholdRules.IsPendingRuleRequest(existingSalesDetails.Id, _tutor.Id, input.UserId)))
+                {
+                    await _dbContext.Entry(existingSalesDetails).ReloadAsync();
+                    response.Succeeded = false;
+                    response.Message = TCT.LMS.Application.Services.TutorAssignmentThresholdRules.AlreadyAwaitingSuperAdminMessage;
+                    return response;
+                }
+
+                var sameTutorOnCourse = tutorBeforeRequest == _tutor.Id || tutorBeforeRequest == _tutor.UserId;
+                var hasActiveAllocationForTutor = sameTutorOnCourse && await _dbContext.TutorStudentAllocations.AnyAsync(a =>
+                    a.SalesDetailsId == existingSalesDetails.Id && a.IsActive && (a.TutorId == _tutor.Id || a.TutorId == _tutor.UserId));
+                if (!TCT.LMS.Application.Services.TutorAssignmentThresholdRules.IsExistingAssignment(sameTutorOnCourse, hasActiveAllocationForTutor))
+                {
+                    var decisions = await TutorAssignmentEligibility.EvaluateAsync(_dbContext, existingSalesDetails.Id,
+                        new[] { new TutorAssignmentEligibility.TutorKey(_tutor.Id, _tutor.UserId) }, input.UserId, DateTime.UtcNow);
+                    if (decisions.TryGetValue(_tutor.Id, out var decision))
+                    {
+                        if (decision.Outcome == TCT.LMS.Application.Services.TutorAssignmentThresholdRules.Outcome.Blocked)
+                        {
+                            await _dbContext.Entry(existingSalesDetails).ReloadAsync();
+                            response.Succeeded = false;
+                            response.Message = decision.Message;
+                            return response;
+                        }
+                        assignmentRuleCodes = decision.RuleCodesText;
+                    }
                 }
 
                 // Store the normalized Tutor entity id, irrespective of whether the UI sent
@@ -1320,11 +1358,14 @@ public class SalesRepository : GenericRepository<Sales>, ISalesRepository
                 _dbContext.TutorStudentAllocations.Add(assingment);
                 allocationId = assingment.Id;
 
-                if (input.TutorPayment > 0 && input.TutorPayment != existingSalesDetails.TutorPayment)
+                var paymentChangeRequested = input.TutorPayment > 0 && input.TutorPayment != existingSalesDetails.TutorPayment;
+                if (paymentChangeRequested || assignmentRuleCodes != null)
                 {
                     // Approval records are relevant only when the coordinator is
                     // proposing a different payment. A first assignment at the
                     // tutor's configured rate must not depend on this workflow.
+                    // A tutor assignment rule needing the Super Admin also creates one; with a payment change the
+                    // single request carries both.
                     var previousRequests = await _dbContext.TutorPaymentApproval
                         .Where(p => p.SalesDetailsId == existingSalesDetails.Id && p.IsActive)
                         .ToListAsync();
@@ -1335,7 +1376,10 @@ public class SalesRepository : GenericRepository<Sales>, ISalesRepository
 
                     tutorPaymentApprovalRequired = true;
                     tutorPaymentApprovalId = Guid.NewGuid();
-                    tutorPaymentRequestType = sameTutorWasAlreadyAssigned
+                    assignmentRuleCodesForResponse = assignmentRuleCodes;
+                    tutorPaymentRequestType = !paymentChangeRequested
+                        ? (int)TutorPaymentRequestType.AssignmentRuleApproval
+                        : sameTutorWasAlreadyAssigned
                         ? (int)TutorPaymentRequestType.ExistingAssignmentPaymentChange
                         : (int)TutorPaymentRequestType.AssignmentWithPaymentChange;
                     var boardName = await _dbContext.Type_Code
@@ -1360,7 +1404,7 @@ public class SalesRepository : GenericRepository<Sales>, ISalesRepository
                         SubjectId = existingSalesDetails.SubjectId,
                         Grade = gradeName,
                         Board = boardName,
-                        RequestedPaymentAmount = input.TutorPayment,
+                        RequestedPaymentAmount = paymentChangeRequested ? input.TutorPayment : existingSalesDetails.TutorPayment,
                         BasePaymentAmount = existingSalesDetails.TutorPayment,
                         TutorCurrentMaxPayment = currentMaxPayment,
                         ApprovalStatus = (int)TutorPaymentStatus.Pending,
@@ -1370,7 +1414,8 @@ public class SalesRepository : GenericRepository<Sales>, ISalesRepository
                         RequestReason = input.NoteText,
                         RequestedBy = input.UserId,
                         RequestedDate = DateTime.UtcNow,
-                        IsActive = true
+                        IsActive = true,
+                        AssignmentRuleCodes = assignmentRuleCodes
                     });
                 }
                 await _dbContext.SaveChangesAsync();
@@ -1495,6 +1540,7 @@ public class SalesRepository : GenericRepository<Sales>, ISalesRepository
                 TutorPaymentApprovalRequired = tutorPaymentApprovalRequired,
                 TutorPaymentApprovalId = tutorPaymentApprovalId,
                 TutorPaymentRequestType = tutorPaymentRequestType,
+                AssignmentRuleCodes = assignmentRuleCodesForResponse,
             };
             response.Succeeded = true;
             //response.Data = true;
@@ -1693,6 +1739,7 @@ public class SalesRepository : GenericRepository<Sales>, ISalesRepository
                 PreviousTutorPayment = paymentApproval?.BasePaymentAmount ?? _salesDetails.TutorPayment,
                 RequestedTutorPayment = paymentApproval?.RequestedPaymentAmount ?? effectiveTutorPayment,
                 TutorPaymentApprovalRequired = paymentApproval != null,
+                TutorPaymentApprovalId = paymentApproval?.Id,
                 GradId = sales1?.GradeId,
                 BoardId = sales1?.BoardId,
                 BoardName = _dbContext.Type_Code.Find(sales1?.BoardId)?.TypeCodeName,

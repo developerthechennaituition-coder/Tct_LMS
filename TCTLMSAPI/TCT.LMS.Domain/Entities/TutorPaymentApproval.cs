@@ -29,6 +29,9 @@ namespace TCT.LMS.Domain.Entities
         public Guid? PreviousTutorId { get; set; }
         public Guid? PreviousStatusId { get; set; }
         public bool IsActive { get; set; }
+        // Tutor assignment rules that sent the request to the Super Admin (comma-separated
+        // TutorAssignmentThresholdRules codes); null for an ordinary payment request.
+        public string? AssignmentRuleCodes { get; set; }
     }
 
     public enum TutorPaymentRequestType
@@ -36,7 +39,9 @@ namespace TCT.LMS.Domain.Entities
         AssignmentOnly = 1,
         AssignmentWithPaymentChange = 2,
         ExistingAssignmentPaymentChange = 3,
-        TutorRateChange = 4
+        TutorRateChange = 4,
+        // An assignment that needs Super Admin approval under a tutor assignment rule, with no payment change.
+        AssignmentRuleApproval = 5
     }
 }
 

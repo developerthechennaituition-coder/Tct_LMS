@@ -30,5 +30,7 @@ namespace TCT.LMS.DTOs.Sales
         public bool TutorPaymentApprovalRequired { get; set; }
         public Guid? TutorPaymentApprovalId { get; set; }
         public int? TutorPaymentRequestType { get; set; }
+        // Tutor assignment rules that sent this assignment to the Super Admin (TutorAssignmentThresholdRules codes).
+        public string? AssignmentRuleCodes { get; set; }
     }
 }

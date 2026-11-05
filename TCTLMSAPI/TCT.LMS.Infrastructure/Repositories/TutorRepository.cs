@@ -711,7 +711,7 @@ namespace TCT.LMS.Infrastructure.Repositories
 
             return response;
         }
-        public async Task<Response<List<TutorResponseDto>>> GetTutorsByAvailability(Guid studentId, Guid salesId, Guid subjectId)
+        public async Task<Response<List<TutorResponseDto>>> GetTutorsByAvailability(Guid studentId, Guid salesId, Guid subjectId, Guid callerUserId = default)
         {
             try
             {
@@ -821,6 +821,37 @@ namespace TCT.LMS.Infrastructure.Repositories
                     t.IsAvailable = availableTutorIds.Contains(t.UserId);
                 });
 
+                // 6. Tutor assignment rules for the signed-in user (TutorAssignmentThresholdRules): tutors held for
+                // another coordinator's pending demo are left out; blocked or approval-needing tutors are flagged.
+                // The course's current tutor is not re-evaluated (saving it again is not a new assignment).
+                var course = await _dbContext.SalesDetails.AsNoTracking()
+                    .Where(sd => sd.SalesId == salesId && sd.SubjectId == subjectId && sd.IsActive)
+                    .Select(sd => new { sd.Id, sd.TutorId })
+                    .FirstOrDefaultAsync();
+                if (course != null && tutors.Count > 0)
+                {
+                    var candidates = tutors
+                        .Where(t => t.TutorId != course.TutorId && t.UserId != course.TutorId)
+                        .Select(t => new TutorAssignmentEligibility.TutorKey(t.TutorId, t.UserId))
+                        .DistinctBy(k => k.TutorId).ToList();
+                    var decisions = await TutorAssignmentEligibility.EvaluateAsync(_dbContext, course.Id, candidates, callerUserId, DateTime.UtcNow);
+                    tutors = tutors.Where(t => !(decisions.TryGetValue(t.TutorId, out var d) && d.HeldForOtherCoordinator)).ToList();
+                    foreach (var t in tutors)
+                    {
+                        if (!decisions.TryGetValue(t.TutorId, out var decision)) continue;
+                        if (decision.Outcome == TCT.LMS.Application.Services.TutorAssignmentThresholdRules.Outcome.Blocked)
+                        {
+                            t.AssignBlockedUntil = decision.BlockedUntilUtc;
+                            t.AssignBlockedReason = decision.Message;
+                        }
+                        else if (decision.Outcome == TCT.LMS.Application.Services.TutorAssignmentThresholdRules.Outcome.NeedsSuperAdmin)
+                        {
+                            t.RequiresSuperAdminApproval = true;
+                            t.ApprovalReason = decision.Message;
+                        }
+                    }
+                }
+
                 return new Response<List<TutorResponseDto>>
                 {
                     Succeeded = true,
@@ -905,7 +936,8 @@ namespace TCT.LMS.Infrastructure.Repositories
             return response;
         }
 
-        public async Task<Response<List<TutorResponsesDto>>> GetAllTutorDetailsWithFilter(string boardIds, string gradeIds, string gradeGroupIds, string subjectIds, string search, int pageSize, int pageNumber)
+        public async Task<Response<List<TutorResponsesDto>>> GetAllTutorDetailsWithFilter(string boardIds, string gradeIds, string gradeGroupIds, string subjectIds, string search, int pageSize, int pageNumber,
+            Guid? salesDetailsId = null, Guid callerUserId = default)
         {
             Response<List<TutorResponsesDto>> response = new Response<List<TutorResponsesDto>>();
             response.Data = new List<TutorResponsesDto>();
@@ -963,6 +995,23 @@ namespace TCT.LMS.Infrastructure.Repositories
 
                 if (!string.IsNullOrEmpty(search))
                     tutorsQuery = tutorsQuery.Where(t => t.TutorName.Contains(search) || t.Email.Contains(search));
+
+                // Opened to assign a tutor to a course: leave out tutors held for another coordinator's pending demo
+                // (TutorAssignmentThresholdRules), before counting and paging. The course's current tutor stays.
+                Guid? courseTutorId = null;
+                if (salesDetailsId.HasValue)
+                {
+                    courseTutorId = await _dbContext.SalesDetails.AsNoTracking()
+                        .Where(sd => sd.Id == salesDetailsId.Value).Select(sd => sd.TutorId).FirstOrDefaultAsync();
+                    var courseTutorEntityId = courseTutorId == null ? null : await _dbContext.Tutor.AsNoTracking()
+                        .Where(x => x.Id == courseTutorId || x.UserId == courseTutorId)
+                        .Select(x => (Guid?)x.Id).FirstOrDefaultAsync();
+                    var held = (await TutorAssignmentEligibility.HeldTutorIdsAsync(_dbContext, salesDetailsId.Value, callerUserId, DateTime.UtcNow))
+                        .Where(id => id != courseTutorEntityId)
+                        .Select(id => (Guid?)id).ToList();
+                    if (held.Count > 0)
+                        tutorsQuery = tutorsQuery.Where(t => !held.Contains(t.TutorId));
+                }
 
                 pageSize = Math.Clamp(pageSize, 1, 50);
                 pageNumber = Math.Max(pageNumber, 1);
@@ -1093,6 +1142,30 @@ namespace TCT.LMS.Infrastructure.Repositories
                     t.MinPayment = paymentStats?.MinPayment ?? 0;
                     t.MaxPayment = paymentStats?.MaxPayment ?? 0;
 
+                }
+
+                if (salesDetailsId.HasValue && tutorsQuery1.Count > 0)
+                {
+                    // Flag the page's tutors that this user cannot assign now or that need Super Admin approval.
+                    var candidates = tutorsQuery1
+                        .Where(t => t.TutorId.HasValue && t.TutorId != courseTutorId && t.UserId != courseTutorId)
+                        .Select(t => new TutorAssignmentEligibility.TutorKey(t.TutorId!.Value, t.UserId ?? Guid.Empty))
+                        .DistinctBy(k => k.TutorId).ToList();
+                    var decisions = await TutorAssignmentEligibility.EvaluateAsync(_dbContext, salesDetailsId.Value, candidates, callerUserId, DateTime.UtcNow);
+                    foreach (var t in tutorsQuery1)
+                    {
+                        if (!t.TutorId.HasValue || !decisions.TryGetValue(t.TutorId.Value, out var decision)) continue;
+                        if (decision.Outcome == TCT.LMS.Application.Services.TutorAssignmentThresholdRules.Outcome.Blocked)
+                        {
+                            t.AssignBlockedUntil = decision.BlockedUntilUtc;
+                            t.AssignBlockedReason = decision.Message;
+                        }
+                        else if (decision.Outcome == TCT.LMS.Application.Services.TutorAssignmentThresholdRules.Outcome.NeedsSuperAdmin)
+                        {
+                            t.RequiresSuperAdminApproval = true;
+                            t.ApprovalReason = decision.Message;
+                        }
+                    }
                 }
 
                 response.Data.AddRange(tutorsQuery1);

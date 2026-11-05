@@ -26,6 +26,8 @@ public class SalesDetailsDTO
     public decimal PreviousTutorPayment { get; set; }
     public decimal RequestedTutorPayment { get; set; }
     public bool TutorPaymentApprovalRequired { get; set; }
+    // The active Pending TutorPaymentApproval behind TutorPaymentApprovalRequired; null when none.
+    public Guid? TutorPaymentApprovalId { get; set; }
     public decimal ParentPayment { get; set; }
     public string? SubjectCode { get; set; }
     public string? AuthorBookDetails { get; set; }

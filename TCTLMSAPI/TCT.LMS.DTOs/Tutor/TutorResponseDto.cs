@@ -14,5 +14,10 @@ namespace TCT.LMS.DTOs.Tutor
         public DateTime? JoiningDate { get; set; }   // u.JoiningDate
         public Guid TutorId { get; set; }           // t.Id
         public bool IsAvailable { get; set; }   // hardcoded 0 in SQL
+        // Tutor assignment rules for the signed-in user and this course (TutorAssignmentThresholdRules).
+        public DateTime? AssignBlockedUntil { get; set; }
+        public string? AssignBlockedReason { get; set; }
+        public bool RequiresSuperAdminApproval { get; set; }
+        public string? ApprovalReason { get; set; }
     }
 }

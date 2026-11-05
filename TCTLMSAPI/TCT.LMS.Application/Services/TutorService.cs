@@ -110,9 +110,9 @@ namespace TCT.LMS.Application.Services
             return result;
         }
 
-        public async Task<Response<List<TutorResponseDto>>> GetTutorsByAvailability(Guid studentId, Guid salesId, Guid subjectId)
+        public async Task<Response<List<TutorResponseDto>>> GetTutorsByAvailability(Guid studentId, Guid salesId, Guid subjectId, Guid callerUserId = default)
         {
-            var result = await _tutorRepository.GetTutorsByAvailability(studentId, salesId, subjectId);
+            var result = await _tutorRepository.GetTutorsByAvailability(studentId, salesId, subjectId, callerUserId);
             return result;
         }
 
@@ -126,9 +126,10 @@ namespace TCT.LMS.Application.Services
             var result = await _tutorRepository.GetAllTutorDetails();
             return result;
         }
-        public async Task<Response<List<TutorResponsesDto>>> GetAllTutorDetailsWithFilter(string boardIds, string gradeIds, string gradeGroupIds, string subjectIds, string search, int pageSize , int pageNumber)
+        public async Task<Response<List<TutorResponsesDto>>> GetAllTutorDetailsWithFilter(string boardIds, string gradeIds, string gradeGroupIds, string subjectIds, string search, int pageSize , int pageNumber,
+            Guid? salesDetailsId = null, Guid callerUserId = default)
         {
-            var result = await _tutorRepository.GetAllTutorDetailsWithFilter(boardIds, gradeIds, gradeGroupIds, subjectIds, search, pageSize, pageNumber);
+            var result = await _tutorRepository.GetAllTutorDetailsWithFilter(boardIds, gradeIds, gradeGroupIds, subjectIds, search, pageSize, pageNumber, salesDetailsId, callerUserId);
             return result;
         }
         public async Task<Response<bool>> DeleteTutorSkillset(Guid id)

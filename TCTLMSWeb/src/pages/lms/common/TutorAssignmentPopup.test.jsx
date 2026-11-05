@@ -76,6 +76,24 @@ test("network failure clears saving state without claiming success", async () =>
   expect(close).not.toHaveBeenCalled(); expect(toast.success).not.toHaveBeenCalled();
   expect(screen.getByRole("button", { name: "Save" }).disabled).toBe(false);
 });
+test("a tutor the coordinator cannot assign yet keeps Save disabled and shows why", async () => {
+  getTutorsByAvailability.mockResolvedValue({ succeeded: true, data: [{ tutorId: "tutor", userId: "tutor-user", fullName: "Tutor",
+    isAvailable: true, assignBlockedUntil: "2026-11-10T10:00:00", assignBlockedReason: "You assigned this tutor within the last 7 days." }] });
+  open();
+  expect(await screen.findByText("You assigned this tutor within the last 7 days.")).toBeTruthy();
+  await waitFor(() => expect(getPaymentPercentage).toHaveBeenCalled());
+  expect(screen.getByRole("button", { name: "Save" }).disabled).toBe(true);
+  expect(updateStatus).not.toHaveBeenCalled();
+});
+test("a tutor needing Super Admin approval can be saved and the coordinator is told it was sent", async () => {
+  getTutorsByAvailability.mockResolvedValue({ succeeded: true, data: [{ tutorId: "tutor", userId: "tutor-user", fullName: "Tutor",
+    isAvailable: true, requiresSuperAdminApproval: true, approvalReason: "This assignment needs Super Admin approval: grade." }] });
+  updateStatus.mockResolvedValue({ succeeded: true, data: { assignmentRuleCodes: "GradeMismatch" } });
+  open();
+  expect(await screen.findByText(/It will be sent to the Super Admin when you save/)).toBeTruthy();
+  fireEvent.click(await saveButton());
+  await waitFor(() => expect(toast.success).toHaveBeenCalledWith("Tutor assigned and sent to the Super Admin for approval.", expect.anything()));
+});
 test("failed initialization blocks saving incomplete assignment data", async () => {
   GetSalesDetails.mockRejectedValue(new Error("Load failed"));
   open();

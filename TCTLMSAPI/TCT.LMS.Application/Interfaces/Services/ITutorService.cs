@@ -22,8 +22,9 @@ namespace TCT.LMS.Application.Interfaces.Services
         Task<Response<List<TutorBankAndPaymentDetailsDto>>> GetBankDetailsByTutorId(Guid id); 
         Task<Response<List<TutorBankAndPaymentDetailsDto>>> GetPaymentDetailsByTutorId(Guid id);
         Task<Response<List<TutorCourseDetailsDto>>> GetTutorSubjects(Guid tutorId);
-        Task<Response<List<TutorResponseDto>>> GetTutorsByAvailability(Guid studentId, Guid salesId, Guid subjectId);
-        Task<Response<List<TutorResponsesDto>>> GetAllTutorDetailsWithFilter(string boardIds, string gradeIds, string gradeGroupIds, string subjectIds, string search, int pageSize, int pageNumber);
+        Task<Response<List<TutorResponseDto>>> GetTutorsByAvailability(Guid studentId, Guid salesId, Guid subjectId, Guid callerUserId = default);
+        Task<Response<List<TutorResponsesDto>>> GetAllTutorDetailsWithFilter(string boardIds, string gradeIds, string gradeGroupIds, string subjectIds, string search, int pageSize, int pageNumber,
+            Guid? salesDetailsId = null, Guid callerUserId = default);
         Task<Response<bool>> UpdateTutorPayment(UpdateTutorPaymentDto input);
         Task<Response<bool>> DeleteTutorSkillset(Guid id);
     }
