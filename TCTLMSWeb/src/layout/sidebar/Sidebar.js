@@ -124,6 +124,20 @@ const Sidebar = ({ fixed, theme, className, sidebarToggle, mobileView, ...props 
         }
       }
 
+      // Tutors: the Invoice submenu "Tutor Invoice" reads "Salary Slip" (label only; same link and page).
+      if (isTutor && Array.isArray(finalMenuData)) {
+        finalMenuData = finalMenuData.map((item) =>
+          Array.isArray(item?.subMenu)
+            ? {
+                ...item,
+                subMenu: item.subMenu.map((sub) =>
+                  sub?.link === "/tct-tutor-invoice-list" ? { ...sub, text: "Salary Slip" } : sub
+                ),
+              }
+            : item
+        );
+      }
+
       // "Support" (Help, PTM) comes from the menu API like every other menu: it is granted per role
       // in Settings → Role Permission (see TCTDatabase/DDL/add_support_menus.sql).
 
@@ -141,21 +155,33 @@ const Sidebar = ({ fixed, theme, className, sidebarToggle, mobileView, ...props 
           finalMenuData = [...finalMenuData, { text: "My Calendar", link: myCalendarLink, icon: "calendar-booking", subMenu: [] }];
         }
 
-        // Tasks: opens the Tasks page (the My Calendar Tasks panel on its own), right after My Calendar (in the same
-        // list), with the live "Assigned to me" count as its badge.
+        // Tasks (the Tasks page): shown only when the role has the Tasks menu in Settings → Role Permission
+        // (TCTDatabase/DDL/add_tasks_menu.sql). The menu API's item is moved right after My Calendar (in the same
+        // list) and gets the live "Assigned to me" count as its badge.
         const tasksLink = "/lms/tasks";
-        const tasksItem = { text: "Tasks", link: tasksLink, icon: "task", badge: <TaskCountBadge />, subMenu: [] };
-        const insertAfterMyCalendar = (items) => {
-          if (items.some((item) => item?.link === tasksLink)) return items;
-          const index = items.findIndex((item) => item?.link === myCalendarLink);
-          if (index >= 0) return [...items.slice(0, index + 1), tasksItem, ...items.slice(index + 1)];
-          return items.map((item) =>
-            Array.isArray(item?.subMenu) && item.subMenu.some((sub) => sub?.link === myCalendarLink)
-              ? { ...item, subMenu: insertAfterMyCalendar(item.subMenu) }
-              : item
+        const findTasks = (items) =>
+          items.reduce(
+            (found, item) => found || (item?.link === tasksLink ? item : Array.isArray(item?.subMenu) ? findTasks(item.subMenu) : null),
+            null
           );
-        };
-        finalMenuData = insertAfterMyCalendar(finalMenuData);
+        const withoutTasks = (items) =>
+          items
+            .filter((item) => item?.link !== tasksLink)
+            .map((item) => (Array.isArray(item?.subMenu) ? { ...item, subMenu: withoutTasks(item.subMenu) } : item));
+        const permittedTasks = findTasks(finalMenuData);
+        if (permittedTasks) {
+          const tasksItem = { ...permittedTasks, icon: permittedTasks.icon || "task", badge: <TaskCountBadge />, subMenu: [] };
+          const insertAfterMyCalendar = (items) => {
+            const index = items.findIndex((item) => item?.link === myCalendarLink);
+            if (index >= 0) return [...items.slice(0, index + 1), tasksItem, ...items.slice(index + 1)];
+            return items.map((item) =>
+              Array.isArray(item?.subMenu) && item.subMenu.some((sub) => sub?.link === myCalendarLink)
+                ? { ...item, subMenu: insertAfterMyCalendar(item.subMenu) }
+                : item
+            );
+          };
+          finalMenuData = insertAfterMyCalendar(withoutTasks(finalMenuData));
+        }
       }
 
       // Reports parent (present only when the API returned at least one permitted report) opens the Reports landing page.

@@ -1193,26 +1193,39 @@ const [selectedCalendarDate, setSelectedCalendarDate] = useState(null);
     }
 
     setIsSaving(true);
-    updateScheduleStatus(_formData).then((response) => {
+    updateScheduleStatus(_formData).then(async (response) => {
       if (response?.succeeded === false) {
         toast.error(response?.message || "Unable to update the class status.");
         return;
       }
+      // The rating is saved before any message is shown, so the status and rating messages never contradict.
+      let ratingError = null;
       if (formData.rate) {
-        const ratingInput = {
-          rating: formData.rate,
-          userId: localStorage.getItem("userId"),
-          ratedUserId: scheduleType == "student" ? target.tutorUserId : target.studentUserId,
-          referenceId: target.scheduleDetailsId,
-          ratingTypeId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-        };
-        addRating(ratingInput).catch(() => {});
+        // The event's tutorUserId / studentUserId is empty when the class stores a Tutor.Id; resolve the User.Id
+        // the same way as the class timezone labels (resolveClassUserIds), instead of posting a null id.
+        const ids = await resolveClassUserIds(target);
+        const ratedUserId = scheduleType == "student" ? ids.tutorUserId : ids.studentUserId;
+        if (!ratedUserId) {
+          ratingError = "The rating could not be saved: the rated user was not found.";
+        } else {
+          const ratingInput = {
+            rating: formData.rate,
+            userId: localStorage.getItem("userId"),
+            ratedUserId,
+            referenceId: target.scheduleDetailsId,
+            ratingTypeId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+          };
+          await addRating(ratingInput, { skipErrorToast: true }).catch((error) => {
+            ratingError = `The rating could not be saved${error?.response?.data?.message ? `: ${error.response.data.message}` : "."}`;
+          });
+        }
       }
       tutorToggle();
       onEdit(
         "class update",
         target.scheduleType == "Class" ? "Class has been updated successfully" : "Demo has been updated successfully",
       );
+      if (ratingError) toast.warning(ratingError);
     }).catch(() => {
       toast.error("Unable to update the class status.");
     }).finally(() => setIsSaving(false));

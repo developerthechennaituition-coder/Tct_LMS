@@ -189,11 +189,23 @@ const tutorStudentListStyle = `
   @media (min-width: 768px) {
     /* Same fixed height as the pagination row (both centre their content), so the two line up. */
     .tct-sl-subbar { position: absolute; right: 18px; bottom: 0; height: 64px; }
-    .tct-sl .dataTables_wrapper .row.align-items-center { min-height: 64px; padding-top: 0 !important; padding-bottom: 0 !important; padding-right: 240px !important; }
+    /* Footer as three tracks: page controls | result count (centred) | space under the Rows per page control.
+       The two outer tracks share the leftover width equally, so the count sits in the middle of the footer. */
+    .tct-sl .dataTables_wrapper .row.align-items-center {
+      display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(230px, 1fr); align-items: center; column-gap: 16px;
+      min-height: 64px; padding-top: 0 !important; padding-bottom: 0 !important;
+    }
+    .tct-sl .dataTables_wrapper .row.align-items-center > [class*="col"] { flex: none; width: auto; max-width: none; min-width: 0; }
+    .tct-sl .dataTables_wrapper .row.align-items-center > [class*="col"]:last-child { grid-column: 2; text-align: center !important; }
   }
   @media (max-width: 767.98px) {
     .tct-sl-subbar { padding: 0 14px 12px; }
+    /* Page controls and result count on one line (wrapping if needed); Rows per page below, right-aligned. */
+    .tct-sl .dataTables_wrapper .row.align-items-center { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; padding: 12px 14px !important; }
+    .tct-sl .dataTables_wrapper .row.align-items-center > [class*="col"] { flex: 0 0 auto; width: auto; max-width: 100%; }
+    .tct-sl .dataTables_wrapper .row.align-items-center > [class*="col"]:last-child { text-align: right !important; }
   }
+  .tct-sl .dataTables_info { white-space: nowrap; font-variant-numeric: tabular-nums; }
   .tct-sl-size { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 13px; font-weight: 500; color: #6b7a90; white-space: nowrap; }
   .tct-sl-size-toggle {
     display: inline-flex; align-items: center; justify-content: space-between; gap: 10px;
@@ -269,7 +281,57 @@ const tutorStudentListStyle = `
   .tct-sl .dataTables_wrapper .row.align-items-center .pagination { margin: 0; padding: 0; border-top: 0; background: transparent; }
   .tct-sl .dataTables_info { font-size: 13px; color: #8094ae; }
 
+  /* Summary tiles (values derived from the loaded list) */
+  .tct-sl-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 0 0 16px; padding: 0; list-style: none; }
+  .tct-sl-summary li { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #fff; border: 1px solid #e5e9f2; border-radius: 12px; }
+  .tct-sl-summary-icon { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 38px; height: 38px; border-radius: 10px; background: #f1ebff; color: #854fff; font-size: 18px; }
+  .tct-sl-summary-text { display: flex; flex-direction: column; min-width: 0; line-height: 1.2; }
+  .tct-sl-summary-text strong { font-size: 1.25rem; font-weight: 700; color: #1c2b46; }
+  .tct-sl-summary-text small { margin-top: 2px; font-size: 12px; color: #6b7a90; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* Search clear button */
+  .tct-sl-toolbar .search-content .form-control { padding-right: 36px; }
+  .tct-sl-search-clear {
+    position: absolute; top: 50%; right: 6px; transform: translateY(-50%);
+    display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px;
+    padding: 0; border: 0; border-radius: 6px; background: transparent; color: #8094ae; cursor: pointer;
+  }
+  .tct-sl-search-clear:hover { background: #f5f1ff; color: #854fff; }
+  .tct-sl-search-clear:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.25); color: #854fff; }
+
+  /* Student code pill + name */
+  .tct-sl-code {
+    display: inline-block; padding: 2px 8px; border-radius: 6px; background: #f5f6fa;
+    font-family: SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.02em; color: #364a63;
+  }
+  .tct-sl .rdt_TableCell .user-card { gap: 0; }
+  .tct-sl .rdt_TableCell .user-card .user-avatar { flex: none; }
+  .tct-sl .rdt_TableCell .user-card .tb-lead { font-size: 14px; }
+  .tct-sl .rdt_TableCol_Sortable:hover { color: #854fff; }
+
+  /* Row actions: one grouped toolbar */
+  .tct-sl-actions { display: inline-flex; align-items: center; gap: 2px; padding: 2px; border: 1px solid #eef0f5; border-radius: 10px; background: #fff; }
+  .tct-sl-actions > a,
+  .tct-sl-actions > span { margin: 0 !important; }
+  .tct-sl-actions a:focus-visible .btn-icon { box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.25); color: #854fff; }
+
+  /* Loading / error / empty states */
+  .tct-sl-state { display: flex; align-items: center; gap: 10px; margin: 12px 18px; padding: 10px 14px; border-radius: 8px; font-size: 14px; }
+  .tct-sl-state.is-loading { background: #f5f1ff; color: #4c1fd0; }
+  .tct-sl-state.is-error { background: #fff1f1; border: 1px solid #fbd5d5; color: #c0392b; }
+  .tct-sl-state.is-error .icon { font-size: 18px; }
+  .tct-sl.is-loading .dataTables_wrapper { opacity: 0.55; transition: opacity 0.15s ease; }
+  .tct-sl.is-empty .dataTables_wrapper { display: none; }
+  .tct-sl-empty { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 48px 18px; text-align: center; color: #6b7a90; font-size: 14px; }
+  .tct-sl-empty strong { font-size: 15px; color: #364a63; }
+  .tct-sl-empty-icon { display: inline-flex; align-items: center; justify-content: center; width: 52px; height: 52px; margin-bottom: 6px; border-radius: 50%; background: #f1ebff; color: #854fff; font-size: 24px; }
+
+  /* Small screens: the table keeps its columns and scrolls sideways inside the card. */
+  .tct-sl .dataTables_wrapper > div:not(.row) { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .tct-sl .rdt_Table { min-width: 720px; }
+
   @media (max-width: 767.98px) {
+    .tct-sl-summary { grid-template-columns: 1fr; gap: 8px; }
     .tct-sl-toolbar { padding: 12px 14px; }
     .tct-sl-toolbar .entrolled-list[title] { flex-basis: 100%; }
     .tct-sl-toolbar .card-search.search-wrap { flex: 1 1 100%; }
@@ -372,7 +434,7 @@ const StudentList = () => {
       width: "100px",
       selector: (row) => row.code,
       sortable: true,
-      cell: (row) => <span>{row.code}</span>,
+      cell: (row) => <span className={isTutorView && row.code ? "tct-sl-code" : undefined}>{row.code}</span>,
     },
     {
       name: "Student Name",
@@ -480,10 +542,12 @@ const StudentList = () => {
       name: "Action",
       minWidth: "100px",
       selector: (row) => row.userId,
-      cell: (row) => (
+      cell: (row) => {
+        const actions = (
         <>
           {canDeleteStudent && (
             <span
+              aria-label={`Delete ${row.studentName || "student"}`}
               onClick={() => {
                 onDeleteHandler(row.userId);
               }}
@@ -516,6 +580,7 @@ const StudentList = () => {
           {can("Student List", "view") && (
             <Link
               className="user-card mt-2 mb-2"
+              aria-label={`View ${row.studentName || "student"}`}
               to={userRole === "13"
                 ? { pathname: `${process.env.PUBLIC_URL}/student-profile`, search: `?id=${row.userId}`, state: tutorProfileOrigin }
                 : `${process.env.PUBLIC_URL}/student-profile-regular-new?id=${row.id}&userId=${row.userId}&mode=view`}
@@ -557,6 +622,7 @@ const StudentList = () => {
           )}
           <Link
   className="user-card mt-2 mb-2"
+  aria-label={`View attendance for ${row.studentName || "student"} (opens in a new tab)`}
   to={`/lms/completed-class-details?studentId=${row.id}`}
   target="_blank"
 >
@@ -570,7 +636,14 @@ const StudentList = () => {
   />
 </Link>
         </>
-      ),
+        );
+        // Tutor view groups the same action links into one toolbar; other roles render them as before.
+        return isTutorView ? (
+          <div className="tct-sl-actions" role="group" aria-label={`Actions for ${row.studentName || "student"}`}>
+            {actions}
+          </div>
+        ) : actions;
+      },
     },
   ];
 
@@ -588,6 +661,16 @@ const StudentList = () => {
   const coordinatorColumns = dtStudentColumns.map((col) =>
     coordinatorColumnLayout[col.name] ? { ...col, ...coordinatorColumnLayout[col.name] } : col
   );
+
+  // Tutor summary: derived only from the loaded response (rows are one per student/course enrolment).
+  const tutorSummary = isTutorView && studentDataSource?.length > 0
+    ? {
+        enrolments: totalRecords,
+        students: new Set(studentDataSource.map((row) => row.userId)).size,
+        courses: new Set(studentDataSource.map((row) => row.enrolledCourse).filter(Boolean)).size,
+      }
+    : null;
+  const tutorListEmpty = isTutorView && !listLoading && !listError && Array.isArray(studentDataSource) && studentDataSource.length === 0;
 
   // Get current list, pagination
   const indexOfLastItem = currentPage * itemPerPage;
@@ -721,8 +804,10 @@ const StudentList = () => {
         <BlockHead size="sm">
           <BlockBetween>
             <BlockHeadContent>
-              <BlockTitle tag="h4" className={isTutorView ? "tct-sl-title" : isCoordinatorView ? "tct-csl-title" : undefined}>Student List</BlockTitle>
-              {isTutorView && <div className="tct-sl-des">Students assigned to you.</div>}
+              <BlockTitle tag="h4" className={isTutorView ? "tct-sl-title" : isCoordinatorView ? "tct-csl-title" : undefined}>
+                {isTutorView ? "My Students" : "Student List"}
+              </BlockTitle>
+              {isTutorView && <div className="tct-sl-des">View and manage the students assigned to you.</div>}
             </BlockHeadContent>
             <BlockHeadContent>
               <div className="toggle-wrap nk-block-tools-toggle">
@@ -742,13 +827,72 @@ const StudentList = () => {
           </BlockBetween>
         </BlockHead>
 
+        {isTutorView && tutorSummary && (
+          <ul className="tct-sl-summary" aria-label="Student summary">
+            <li>
+              <span className="tct-sl-summary-icon"><Icon name="list-check" /></span>
+              <span className="tct-sl-summary-text">
+                <strong>{tutorSummary.enrolments}</strong>
+                <small>Enrolments</small>
+              </span>
+            </li>
+            <li>
+              <span className="tct-sl-summary-icon"><Icon name="users" /></span>
+              <span className="tct-sl-summary-text">
+                <strong>{tutorSummary.students}</strong>
+                <small>Students on this page</small>
+              </span>
+            </li>
+            <li>
+              <span className="tct-sl-summary-icon"><Icon name="book" /></span>
+              <span className="tct-sl-summary-text">
+                <strong>{tutorSummary.courses}</strong>
+                <small>Courses on this page</small>
+              </span>
+            </li>
+          </ul>
+        )}
+
         <Block>
-          <div className={isTutorView ? "tct-sl" : isCoordinatorView ? "tct-csl" : undefined}>
+          <div
+            className={isTutorView ? `tct-sl${tutorListEmpty ? " is-empty" : ""}${listLoading ? " is-loading" : ""}` : isCoordinatorView ? "tct-csl" : undefined}
+            aria-busy={isTutorView ? listLoading : undefined}
+          >
           <div className={isTutorView ? "tct-sl-toolbar" : isCoordinatorView ? "tct-csl-toolbar" : undefined}>
-            <StudentFilter key={headerSearch} initialSearch={headerSearch} filterHandlerCallback={filterHandlerCallback} coordinatorView={isCoordinatorView}></StudentFilter>
+            <StudentFilter key={headerSearch} initialSearch={headerSearch} filterHandlerCallback={filterHandlerCallback} coordinatorView={isCoordinatorView} tutorView={isTutorView}></StudentFilter>
           </div>
-          {listLoading && <div role="status" className="px-3">Loading students…</div>}
-          {listError && <div role="alert" className="text-danger px-3">{listError}</div>}
+          {isTutorView ? (
+            <>
+              {listLoading && (
+                <div role="status" className="tct-sl-state is-loading">
+                  <span className="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                  <span>Loading students…</span>
+                </div>
+              )}
+              {listError && (
+                <div role="alert" className="tct-sl-state is-error">
+                  <Icon name="alert-circle" />
+                  <span>{listError}</span>
+                </div>
+              )}
+              {tutorListEmpty && (
+                <div className="tct-sl-empty" role="status">
+                  <span className="tct-sl-empty-icon"><Icon name="users" /></span>
+                  <strong>{searchText ? "No students match your search" : "No students assigned yet"}</strong>
+                  <span>
+                    {searchText
+                      ? `Nothing found for “${searchText}”. Try a different name, code or parent name.`
+                      : "Students allocated to you will appear here."}
+                  </span>
+                </div>
+              )}
+            </>
+          ) : (
+            <>
+              {listLoading && <div role="status" className="px-3">Loading students…</div>}
+              {listError && <div role="alert" className="text-danger px-3">{listError}</div>}
+            </>
+          )}
           {isCoordinatorView && studentDataSource && (
             <div className="dataTables_wrapper dt-bootstrap4 no-footer tct-csl-table">
               <RdtDataTable

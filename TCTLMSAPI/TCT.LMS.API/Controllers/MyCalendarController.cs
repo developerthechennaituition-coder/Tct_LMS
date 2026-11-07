@@ -6,7 +6,8 @@ using TCT.LMS.Application.Interfaces.Services;
 namespace TCT.LMS.API.Controllers;
 
 /// <summary>
-/// My Calendar (demo classes) and its Tasks tab, for every role except Tutor and Student.
+/// My Calendar (demo classes) and the Tasks page, for every role except Tutor and Student; the task endpoints also
+/// need the Tasks menu (/lms/tasks) in Settings → Role Permission.
 /// The caller's user id and role always come from the JWT; request bodies never carry the sender.
 /// </summary>
 [ApiController]
@@ -14,9 +15,18 @@ namespace TCT.LMS.API.Controllers;
 [Route("api/my-calendar")]
 public sealed class MyCalendarController : ControllerBase
 {
-    private readonly IMyCalendarService _service;
+    /// <summary>Menu of the Tasks page (TCTDatabase/DDL/add_tasks_menu.sql); granted per role in Settings → Role Permission.</summary>
+    private const string TasksMenuLink = "/lms/tasks";
 
-    public MyCalendarController(IMyCalendarService service) => _service = service;
+    private readonly IMyCalendarService _service;
+    // Its HasMenuPermissionAsync is the existing menu-permission check (same rule as the sidebar menu).
+    private readonly IAssignmentChangeRequestService _menuPermissions;
+
+    public MyCalendarController(IMyCalendarService service, IAssignmentChangeRequestService menuPermissions)
+    {
+        _service = service;
+        _menuPermissions = menuPermissions;
+    }
 
     private Guid CallerId =>
         User.Claims
@@ -37,6 +47,16 @@ public sealed class MyCalendarController : ControllerBase
             return Unauthorized(new { success = false, message = "Your login session is invalid. Please sign in again." });
         if (!_service.IsEligible(CallerRoles))
             return StatusCode(StatusCodes.Status403Forbidden, new { success = false, message = "My Calendar is not available for your role." });
+        return null;
+    }
+
+    /// <summary>Task endpoints: as <see cref="Reject"/>, and the caller's role must have the Tasks menu.</summary>
+    private async Task<IActionResult?> RejectTasksAsync(CancellationToken token)
+    {
+        if (Reject() is { } rejected) return rejected;
+        if (!await _menuPermissions.HasMenuPermissionAsync(CallerRoles, TasksMenuLink, token))
+            return StatusCode(StatusCodes.Status403Forbidden,
+                new { success = false, message = "You do not have permission for Tasks. A Super Admin can grant it in Settings → Role Permission." });
         return null;
     }
 
@@ -62,21 +82,21 @@ public sealed class MyCalendarController : ControllerBase
     [HttpGet("task-assignees")]
     public async Task<IActionResult> TaskAssignees(CancellationToken token)
     {
-        if (Reject() is { } rejected) return rejected;
+        if (await RejectTasksAsync(token) is { } rejected) return rejected;
         return Ok(new { success = true, data = await _service.GetTaskAssigneesAsync(token) });
     }
 
     [HttpGet("tasks")]
     public async Task<IActionResult> Tasks(CancellationToken token)
     {
-        if (Reject() is { } rejected) return rejected;
+        if (await RejectTasksAsync(token) is { } rejected) return rejected;
         return Ok(new { success = true, data = await _service.GetTasksAsync(CallerId, token) });
     }
 
     [HttpPost("tasks")]
     public async Task<IActionResult> CreateTask([FromBody] CreateUserTaskRequest request, CancellationToken token)
     {
-        if (Reject() is { } rejected) return rejected;
+        if (await RejectTasksAsync(token) is { } rejected) return rejected;
         if (request == null) return BadRequest(new { success = false, message = "Task details are required." });
         return FromResult(await _service.CreateTaskAsync(CallerId, request, token));
     }
@@ -84,7 +104,7 @@ public sealed class MyCalendarController : ControllerBase
     [HttpPut("tasks/{taskId:guid}/complete")]
     public async Task<IActionResult> CompleteTask(Guid taskId, CancellationToken token)
     {
-        if (Reject() is { } rejected) return rejected;
+        if (await RejectTasksAsync(token) is { } rejected) return rejected;
         return FromResult(await _service.CompleteTaskAsync(CallerId, taskId, token));
     }
 
@@ -94,14 +114,14 @@ public sealed class MyCalendarController : ControllerBase
     [HttpGet("tasks/pending-verification")]
     public async Task<IActionResult> PendingVerificationTasks(CancellationToken token)
     {
-        if (Reject() is { } rejected) return rejected;
+        if (await RejectTasksAsync(token) is { } rejected) return rejected;
         return Ok(new { success = true, data = await _service.GetPendingVerificationTasksAsync(CallerId, CallerRoles, token) });
     }
 
     [HttpPut("tasks/{taskId:guid}/start")]
     public async Task<IActionResult> StartTask(Guid taskId, CancellationToken token)
     {
-        if (Reject() is { } rejected) return rejected;
+        if (await RejectTasksAsync(token) is { } rejected) return rejected;
         return FromResult(await _service.StartTaskAsync(CallerId, taskId, token));
     }
 
@@ -110,7 +130,7 @@ public sealed class MyCalendarController : ControllerBase
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> SubmitForVerification(Guid taskId, [FromForm] string? notes, [FromForm] List<IFormFile>? files, CancellationToken token)
     {
-        if (Reject() is { } rejected) return rejected;
+        if (await RejectTasksAsync(token) is { } rejected) return rejected;
         var uploads = (files ?? new List<IFormFile>()).Where(f => f != null).ToList();
         var streams = new List<Stream>();
         try
@@ -132,14 +152,14 @@ public sealed class MyCalendarController : ControllerBase
     [HttpPut("tasks/{taskId:guid}/verify")]
     public async Task<IActionResult> VerifyTask(Guid taskId, [FromBody] ReviewUserTaskRequest? request, CancellationToken token)
     {
-        if (Reject() is { } rejected) return rejected;
+        if (await RejectTasksAsync(token) is { } rejected) return rejected;
         return FromResult(await _service.ReviewTaskAsync(CallerId, CallerRoles, taskId, approve: true, request?.Comment, token));
     }
 
     [HttpPut("tasks/{taskId:guid}/request-changes")]
     public async Task<IActionResult> RequestTaskChanges(Guid taskId, [FromBody] ReviewUserTaskRequest? request, CancellationToken token)
     {
-        if (Reject() is { } rejected) return rejected;
+        if (await RejectTasksAsync(token) is { } rejected) return rejected;
         return FromResult(await _service.ReviewTaskAsync(CallerId, CallerRoles, taskId, approve: false, request?.Comment, token));
     }
 
@@ -147,7 +167,7 @@ public sealed class MyCalendarController : ControllerBase
     [HttpGet("tasks/attachments/{attachmentId:guid}")]
     public async Task<IActionResult> TaskAttachment(Guid attachmentId, CancellationToken token)
     {
-        if (Reject() is { } rejected) return rejected;
+        if (await RejectTasksAsync(token) is { } rejected) return rejected;
         var result = await _service.GetTaskAttachmentAsync(CallerId, CallerRoles, attachmentId, token);
         if (!result.Succeeded) return StatusCode(result.StatusCode, new { success = false, message = result.Message });
         return File(result.Data!.Data, result.Data.ContentType, result.Data.FileName);

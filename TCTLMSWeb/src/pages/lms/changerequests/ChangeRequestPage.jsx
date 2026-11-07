@@ -44,7 +44,7 @@ const RequestModal = ({ page, item, reasons, onClose, onSent }) => {
   };
 
   return (
-    <Modal isOpen toggle={sending ? undefined : onClose} className="modal-dialog-centered tct-cr-modal" size="md">
+    <Modal isOpen toggle={sending ? undefined : onClose} className={`modal-dialog-centered tct-cr-modal${isTutor ? " cr-sc-modal" : ""}`} size="md">
       <div className="cr-modal-head">
         <span className="cr-chip" aria-hidden="true"><Icon name="swap" /></span>
         <div>
@@ -75,11 +75,12 @@ const RequestModal = ({ page, item, reasons, onClose, onSent }) => {
           <label className="form-label" htmlFor="cr-description">Description <span className="text-danger">*</span></label>
           <textarea id="cr-description" className="form-control" rows={5} maxLength={MAX_DESCRIPTION_LENGTH} value={form.description}
             disabled={sending} onChange={(e) => setField("description", e.target.value)}
+            aria-describedby={isTutor ? "cr-description-count" : undefined}
             placeholder={isTutor ? "Explain why the student should move to another tutor." : "Explain why you would like a different tutor."} />
-          <span className="cr-hint">{form.description.length}/{MAX_DESCRIPTION_LENGTH}</span>
+          <span className="cr-hint" id={isTutor ? "cr-description-count" : undefined}>{form.description.length}/{MAX_DESCRIPTION_LENGTH}</span>
           {errors.description && <span className="cr-error">{errors.description}</span>}
         </div>
-        <p className="cr-note"><Icon name="info" /> Your current {isTutor ? "student" : "tutor"} and classes stay as they are until Operations decides.</p>
+        <p className="cr-note" role={isTutor ? "note" : undefined}><Icon name="info" aria-hidden={isTutor ? "true" : undefined} /> Your current {isTutor ? "student" : "tutor"} and classes stay as they are until Operations decides.</p>
         {errors.form && <div className="cr-state is-error" role="alert"><Icon name="alert-circle" /> {errors.form}</div>}
       </ModalBody>
       <ModalFooter>
@@ -113,17 +114,25 @@ const ChangeRequestPage = ({ pageKey }) => {
   const assignments = state.data?.assignments || [];
   const reasons = state.data?.reasons?.length ? state.data.reasons : reasonsFor(page.type);
   const groups = groupBySubject(assignments);
+  // Student Change (tutor) header summary, from the loaded list only: one row per course.
+  const studentCount = new Set(assignments.map((a) => a.studentId || a.studentName)).size;
 
   return (
     <React.Fragment>
       <Head title={page.title} />
       <Content>
-        <div className="tct-change-requests">
+        <div className={`tct-change-requests${isTutor ? " cr-student-change" : ""}`}>
           <BlockHead size="sm">
             <BlockHeadContent>
               <BlockTitle page tag="h3">{page.title}</BlockTitle>
               <p className="cr-sub">{page.sub}</p>
             </BlockHeadContent>
+            {isTutor && assignments.length > 0 && (
+              <ul className="cr-summary" aria-label="Summary">
+                <li><strong>{studentCount}</strong> {studentCount === 1 ? "student" : "students"}</li>
+                <li><strong>{groups.length}</strong> {groups.length === 1 ? "subject" : "subjects"}</li>
+              </ul>
+            )}
           </BlockHead>
 
           {permission.loading ? (
@@ -143,7 +152,14 @@ const ChangeRequestPage = ({ pageKey }) => {
             <div className="cr-groups">
               {groups.map((group) => (
                 <section key={group.subject} className="cr-card" aria-label={group.subject}>
-                  <h6 className="cr-card-title"><Icon name="book" /> {group.subject}</h6>
+                  <h6 className="cr-card-title">
+                    <Icon name="book" /> {group.subject}
+                    {isTutor && (
+                      <span className="cr-card-count" aria-label={`${group.items.length} ${group.items.length === 1 ? "student" : "students"}`}>
+                        {group.items.length}
+                      </span>
+                    )}
+                  </h6>
                   <ul className="cr-rows">
                     {group.items.map((item) => {
                       const person = isTutor ? item.studentName : item.tutorName;
@@ -162,7 +178,8 @@ const ChangeRequestPage = ({ pageKey }) => {
                           {item.pendingRequestNo ? (
                             <span className="cr-badge is-pending" title="Waiting for Operations">Request #{item.pendingRequestNo} pending</span>
                           ) : (
-                            <button type="button" className="btn btn-sm btn-outline-primary" onClick={() => setSelected(item)}>
+                            <button type="button" className="btn btn-sm btn-outline-primary" onClick={() => setSelected(item)}
+                              aria-label={isTutor ? `${page.button}: ${person || "student"}, ${group.subject}` : undefined}>
                               <Icon name="swap" /> <span>{page.button}</span>
                             </button>
                           )}

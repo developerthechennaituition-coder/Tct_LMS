@@ -48,12 +48,14 @@ import {
 } from "../../../library/myCalendarTasks";
 import { showsClassEvents, toClassEvent, visibleClassEvents } from "../../../library/myCalendarClasses";
 import { UserTimeZoneText } from "../common/UserTimeZoneLabel";
+import useMenuPermission from "../changerequests/useMenuPermission";
 import "./MyCalendar.css";
 
 // Roles without My Calendar (the server enforces the same rule).
 const EXCLUDED_ROLES = ["tutor", "student"];
-// The Tasks page (route/Index.js; sidebar → Tasks).
-const TASKS_PATH = `${process.env.PUBLIC_URL}/lms/tasks`;
+// The Tasks page (route/Index.js; sidebar → Tasks) and its menu in Settings → Role Permission.
+const TASKS_MENU_LINK = "/lms/tasks";
+const TASKS_PATH = `${process.env.PUBLIC_URL}${TASKS_MENU_LINK}`;
 const PRIORITIES = ["Low", "Medium", "High"];
 const roleLabel = (role) => String(role || "").replace(/([a-z])([A-Z])/g, "$1 $2");
 const emptyTaskForm = { assignee: null, title: "", description: "", dueDate: "", dueTime: "", priority: "" };
@@ -1435,9 +1437,12 @@ const MyCalendar = () => {
 
 // Tasks page (sidebar → Tasks, /lms/tasks): the same Tasks panel, APIs and state as My Calendar had, without the
 // calendar heading and tabs. ?list=mine / given / verification opens that list, as before.
+// Access also needs the Tasks menu (Settings → Role Permission), read fresh on every visit so a typed URL cannot bypass a
+// revoked permission; the task APIs enforce the same permission.
 export const MyTasks = () => {
   const role = localStorage.getItem("userRole")?.trim().toLowerCase();
   const allowed = role && !EXCLUDED_ROLES.includes(role);
+  const permission = useMenuPermission(TASKS_MENU_LINK);
 
   return (
     <React.Fragment>
@@ -1453,6 +1458,16 @@ export const MyTasks = () => {
           {!allowed ? (
             <Block>
               <div className="mc-state is-error"><Icon name="lock-alt" /> Tasks are not available for your role.</div>
+            </Block>
+          ) : permission.loading ? (
+            <Block>
+              <div className="mc-state" role="status"><Spinner size="sm" color="primary" /> Checking access…</div>
+            </Block>
+          ) : !permission.allowed ? (
+            <Block>
+              <div className="mc-state is-error">
+                <Icon name="lock-alt" /> You do not have permission to view Tasks. A Super Admin can grant it in Settings → Role Permission.
+              </div>
             </Block>
           ) : (
             <Block>

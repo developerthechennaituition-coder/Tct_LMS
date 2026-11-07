@@ -62,6 +62,8 @@ const StudentFilter = (props) => {
   const toggle = () => setonSearch(!onSearch);
   // Coordinator Student List layout (StudentList passes coordinatorView); other roles keep the original markup.
   const coordinatorView = !!props.coordinatorView;
+  // Tutor Student List (StudentList passes tutorView): clearer placeholder and a clear-search button.
+  const tutorView = !!props.tutorView;
   const isAllValue = (v) => !v || String(v).trim().toLowerCase() === "all";
   const activeFilters = [
     ["Board", boardName],
@@ -420,10 +422,25 @@ const StudentFilter = (props) => {
                 <input
                   type="text"
                   className="border-transparent form-focus-none form-control"
-                  placeholder="Search by user or email"
+                  placeholder={tutorView ? "Search by name, code or parent name" : "Search by user or email"}
+                  aria-label={tutorView ? "Search students" : undefined}
                   value={onSearchText}
                   onChange={(e) => onFilterChange(e)}
                 />
+                {tutorView && onSearchText && (
+                  <button
+                    type="button"
+                    className="tct-sl-search-clear"
+                    aria-label="Clear search"
+                    title="Clear search"
+                    onClick={() => {
+                      setSearchText("");
+                      props.filterHandlerCallback(boardId, gradeId, subjectId, "");
+                    }}
+                  >
+                    <Icon name="cross"></Icon>
+                  </button>
+                )}
                 <Button className="search-submit btn-icon">
                   <Icon name="search"></Icon>
                 </Button>

@@ -156,8 +156,9 @@ export const getStudentInvoice = (invoiceNumber) => {
   return axios.get(`/Scheduler/getstudentinvoicebyid?invoiceNumber=${invoiceNumber}`);
 };
 
-export const addRating = (inputData) => {
-  return axios.post(`/Rating/addrating`, inputData);
+// requestConfig (optional): e.g. { skipErrorToast: true } when the caller reports the error itself.
+export const addRating = (inputData, requestConfig) => {
+  return axios.post(`/Rating/addrating`, inputData, requestConfig);
 };
 
 export const getDemoPending = () => {

@@ -20,6 +20,8 @@ import { config } from "../../../library/config";
 
 const TCTTutorInvoiceList = () => {
   const tutorId = localStorage.getItem("userId");
+  // Tutors see this page as "Salary Slip" (sidebar); other roles keep the invoice wording. Labels only.
+  const isTutor = localStorage.getItem("userRole")?.trim().toLowerCase() === "tutor";
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [onSearch, setOnSearch] = useState(true);
@@ -85,9 +87,9 @@ const TCTTutorInvoiceList = () => {
         <BlockHead size="sm">
           <BlockBetween>
             <BlockHeadContent>
-              <BlockTitle page>{localStorage.getItem("userName")}'s Invoices</BlockTitle>
+              <BlockTitle page>{localStorage.getItem("userName")}'s {isTutor ? "Salary Slips" : "Invoices"}</BlockTitle>
               <BlockDes className="text-soft">
-                <p>You have total {data.length} invoices.</p>
+                <p>You have total {data.length} {isTutor ? "salary slips" : "invoices"}.</p>
               </BlockDes>
             </BlockHeadContent>
           </BlockBetween>
@@ -99,7 +101,7 @@ const TCTTutorInvoiceList = () => {
               <div className="card-inner">
                 <div className="card-title-group">
                   <div className="card-title">
-                    <h5 className="title">All Invoices</h5>
+                    <h5 className="title">{isTutor ? "All Salary Slips" : "All Invoices"}</h5>
                   </div>
                   <div className="card-tools mr-n1">
                     <ul className="btn-toolbar">

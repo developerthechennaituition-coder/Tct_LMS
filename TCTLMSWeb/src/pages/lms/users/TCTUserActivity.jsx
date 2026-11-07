@@ -280,6 +280,13 @@ const TCTUserActivity = ({ showSearchAndPageSize = false }) => {
             pagination
             className="nk-tb-list"
           />
+        ) : showSearchAndPageSize ? (
+          // Tutor Student Profile: same message, shown as an empty state (styled by .tct-tsp in TCTStudentProfileLayout).
+          <div className="tct-act-empty" role="status">
+            <span className="tct-act-empty-icon"><Icon name="activity-round" /></span>
+            <strong>No user activities found.</strong>
+            <span>Log in and log out times will appear here.</span>
+          </div>
         ) : (
           <p>No user activities found.</p>
         )}

@@ -40,6 +40,8 @@ import {
 import UserAvailableSlotsProgressBar from "./UserAvailableSlotsProgressBar";
 import TutorAvailabilityModal from "./TutorAvailabilityModal";
 import { UserTimeZoneLabels } from "./UserTimeZoneLabel";
+import { DemoLocalTimes, DemoTimeZoneNote, ParticipantTimeZones } from "./ScheduleDemoTimeZones";
+import "./ScheduleDemo.css";
 
 // The enrollment's Preferred Demo Date ("YYYY-MM-DD...") as DD-MM-YYYY, read without a time-zone shift.
 const formatPreferredDemoDate = (value) => {
@@ -463,12 +465,12 @@ const ScheduleDemo = (props) => {
               setIsModalOpen(false);
               props.modalStateChange("closeaction");
             }}
-            className="modal-dialog-centered custom-modal"
+            className="modal-dialog-centered custom-modal tct-schedule-demo"
             size="xl"
           >
             <ModalHeader
               close={
-                <div>
+                <div className="tct-sd-actions">
                   <Button
                     color="primary"
                     type="button"
@@ -503,57 +505,31 @@ const ScheduleDemo = (props) => {
             </ModalHeader>
             <ModalBody>
               <Form className="row gy-1" ref={formRef} noValidate onSubmit={handleSubmit(onStatusUpdateHandler)}>
-                <Row className="col-md-12">
-                  <Col md="2">
-                    <FormGroup>
-                      <label className="overline-title" htmlFor="firstName">
-                        Coordinator:
-                      </label>
-                    </FormGroup>
-                  </Col>
-                  <Col md="4">
-                    <FormGroup>
-                      <p id="preview-event-start">{salesDetails.coordinatorName}</p>
-                    </FormGroup>
-                  </Col>
-                  <Col sm="2">
-                    <FormGroup>
-                      <label className="overline-title">Tutor:</label>
-                    </FormGroup>
-                  </Col>
-                  <Col sm="3">
-                    <FormGroup>
-                      <p id="preview-event-start">{salesDetails.tutorName}</p>
-                    </FormGroup>
-                  </Col>
-                </Row>
-
-                <Row className="col-md-12">
-                  <Col sm="2">
-                    <FormGroup>
-                      <label className="overline-title" htmlFor="dob">
-                        Board:
-                      </label>
-                    </FormGroup>
-                  </Col>
-                  <Col sm="4">
-                    <FormGroup>
-                      <p id="preview-event-start">{salesDetails.boardName}</p>
-                    </FormGroup>
-                  </Col>
-                  <Col md="2">
-                    <FormGroup>
-                      <label className="overline-title" htmlFor="email">
-                        Grade:
-                      </label>
-                    </FormGroup>
-                  </Col>
-                  <Col md="4">
-                    <FormGroup>
-                      <p id="preview-event-start">{salesDetails.gradeName}</p>
-                    </FormGroup>
-                  </Col>
-                </Row>
+                <div className="col-12">
+                  <dl className="tct-sd-info">
+                    <div>
+                      <dt>Coordinator</dt>
+                      <dd>{salesDetails.coordinatorName || "—"}</dd>
+                    </div>
+                    <div>
+                      <dt>Tutor</dt>
+                      <dd>{salesDetails.tutorName || "—"}</dd>
+                    </div>
+                    <div>
+                      <dt>Board</dt>
+                      <dd>{salesDetails.boardName || "—"}</dd>
+                    </div>
+                    <div>
+                      <dt>Grade</dt>
+                      <dd>{salesDetails.gradeName || "—"}</dd>
+                    </div>
+                  </dl>
+                  <ParticipantTimeZones
+                    studentUserId={props.dataItem?.stdUserId || salesDetails.stdUserId}
+                    tutorUserId={props.dataItem?.tutorUserId || salesDetails.tutorUserId}
+                    coordinatorUserId={salesDetails.coordinatorId}
+                  />
+                </div>
 
                 <Row className="col-md-12">
                   <Col md="6">
@@ -598,7 +574,7 @@ const ScheduleDemo = (props) => {
                   </Col>
                 </Row>
                 <Row className="col-md-12">
-                  <Col md="6">
+                  <Col md={isClassRescheduleFlow ? "6" : "4"}>
                     <FormGroup>
                       <label className="form-label">{isClassRescheduleFlow ? "Date" : "Actual Demo Date"}</label>
                       <div className="w-100">
@@ -623,12 +599,11 @@ const ScheduleDemo = (props) => {
                           />
                         </div>
                       </div>
+                      <DemoTimeZoneNote />
                     </FormGroup>
-                    {/* Opened from the class calendar: the class's tutor and student timezones (display only). */}
-                    {props.source === "Calender" && (
-                      <UserTimeZoneLabels className="mb-2" tutorUserId={props.tutorUserId} studentUserId={props.studentUserId} start={props.classStart} end={props.classEnd} />
-                    )}
-                    {!isClassRescheduleFlow && (
+                  </Col>
+                  {!isClassRescheduleFlow && (
+                    <Col md="4">
                       <FormGroup>
                         <label className="form-label">Preferred Demo Date</label>
                         <input
@@ -640,9 +615,9 @@ const ScheduleDemo = (props) => {
                           title="Change the preference in Edit Enrolled Course"
                         />
                       </FormGroup>
-                    )}
-                  </Col>
-                  <Col md="6">
+                    </Col>
+                  )}
+                  <Col md={isClassRescheduleFlow ? "6" : "4"}>
                     <FormGroup>
                       <label className="form-label">Note</label>
                       <div className="w-100">
@@ -666,17 +641,23 @@ const ScheduleDemo = (props) => {
                       </div>
                     </FormGroup>
                   </Col>
+                  {/* Opened from the class calendar: the class's tutor and student timezones (display only). */}
+                  {props.source === "Calender" && (
+                    <Col md="12">
+                      <UserTimeZoneLabels className="mb-2" tutorUserId={props.tutorUserId} studentUserId={props.studentUserId} start={props.classStart} end={props.classEnd} />
+                    </Col>
+                  )}
                 </Row>
 
                 <Row className="col-md-12">
                   <Col md="12">
                     {filtteredTimeSlot &&
                       filtteredTimeSlot.map((elem, index) => (
-                        <div key={"divSlots" + index} className="row border border-primary rounded mb-1">
-                          <div className="col-md-1" style={{ lineHeight: "50px" }}>
+                        <div key={"divSlots" + index} className="tct-sd-slot">
+                          <div className="tct-sd-slot-day">
                             {elem?.dayofWeek}
                           </div>
-                          <div className="col-md-11">
+                          <div className="tct-sd-slot-picker">
                             <DragTimeRangePicker
                               component_key={"slots" + index}
                               slots={elem.slots}
@@ -694,6 +675,13 @@ const ScheduleDemo = (props) => {
                           </div>
                         </div>
                       ))}
+                    <DemoLocalTimes
+                      date={formData?.startDate}
+                      slotGroups={filtteredTimeSlot}
+                      studentUserId={props.dataItem?.stdUserId || salesDetails.stdUserId}
+                      tutorUserId={props.dataItem?.tutorUserId || salesDetails.tutorUserId}
+                      coordinatorUserId={salesDetails.coordinatorId}
+                    />
                   </Col>
 
                   <Col md="12">
@@ -732,15 +720,12 @@ const ScheduleDemo = (props) => {
                   </Col>
                 </Row>
 
-                <Row className="col-md-12">
-                  <Col md="6">
-                    <Row className="col-md-12">
-                      <Col md="12">
-                        <FormGroup>
-                          <label className="overline-title">Tutor Available Slots:</label>
-                        </FormGroup>
-                      </Col>
-                      <Col md="12">
+                <div className="col-12 tct-sd-availability">
+                  <section className="tct-sd-panel">
+                    <h6 className="tct-sd-panel-title">
+                      <em className="icon ni ni-user-alt" aria-hidden="true" /> Tutor available slots
+                    </h6>
+                    <div>
                         {tutorAvailableSlots && tutorAvailableSlots.length > 0 ? (
                           <UserAvailableSlotsProgressBar
                             type="tutor"
@@ -756,17 +741,13 @@ const ScheduleDemo = (props) => {
                             )}
                           </p>
                         )}
-                      </Col>
-                    </Row>
-                  </Col>
-                  <Col md="6">
-                    <Row className="col-md-12">
-                      <Col md="12">
-                        <FormGroup>
-                          <label className="overline-title">Student Available Slots:</label>
-                        </FormGroup>
-                      </Col>
-                      <Col md="12">
+                    </div>
+                  </section>
+                  <section className="tct-sd-panel">
+                    <h6 className="tct-sd-panel-title">
+                      <em className="icon ni ni-user" aria-hidden="true" /> Student available slots
+                    </h6>
+                    <div>
                         {studentFilteredSlots && studentFilteredSlots.length > 0 ? (
                           <UserAvailableSlotsProgressBar
                             type="student"
@@ -782,10 +763,9 @@ const ScheduleDemo = (props) => {
                             )}
                           </p>
                         )}
-                      </Col>
-                    </Row>
-                  </Col>
-                </Row>
+                    </div>
+                  </section>
+                </div>
               </Form>
               {studentAvailabilityModalOpen && (
                 <TutorAvailabilityModal

@@ -205,7 +205,7 @@ const UserAvailability = (props) => {
       cell: (row) => (
         <>
           <UncontrolledDropdown>
-            <DropdownToggle color="tranparent" className="dropdown-toggle btn btn-icon btn-trigger mr-n1">
+            <DropdownToggle color="tranparent" className="dropdown-toggle btn btn-icon btn-trigger mr-n1" aria-label="Slot actions" title="Slot actions">
               <Icon name="more-h"></Icon>
             </DropdownToggle>
             <DropdownMenu right>

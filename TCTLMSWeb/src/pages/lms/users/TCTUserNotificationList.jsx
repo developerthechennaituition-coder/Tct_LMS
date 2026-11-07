@@ -246,6 +246,108 @@ const notificationPageStyle = `
   }
 `;
 
+// Tutor Notifications page only: every selector is under .tct-notif-tutor, which is rendered only for role 13
+// on the Notifications page. Builds on notificationPageStyle above (Coordinator view keeps that alone).
+const tutorNotificationPageStyle = `
+  .tct-notif-tutor .nk-block-head { padding-bottom: 20px; }
+  .tct-notif-tutor .nk-block-title { font-size: 1.65rem; letter-spacing: -0.01em; }
+
+  /* Summary cards: even spacing, count with a small "unread" unit */
+  .tct-notif-tutor .tct-notif-teams { grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 14px; margin-bottom: 20px; }
+  .tct-notif-tutor .tct-notif-team { min-height: 104px; padding: 16px; row-gap: 14px; border-radius: 12px; }
+  .tct-notif-tutor .tct-notif-team:hover { transform: none; }
+  .tct-notif-tutor .tct-notif-team-count { display: inline-flex; align-items: baseline; gap: 4px; font-size: 24px; }
+  .tct-notif-tutor .tct-notif-team-unit { font-size: 11px; font-weight: 600; letter-spacing: 0.02em; color: #8094ae; }
+  .tct-notif-tutor .tct-notif-team.is-active .tct-notif-team-unit { color: #8a63f0; }
+  .tct-notif-tutor .tct-notif-team-name { font-size: 13.5px; }
+
+  /* Table card */
+  .tct-notif-tutor .tct-notif-card { border-radius: 14px; }
+  .tct-notif-tutor .tct-notif-card .rdt_TableHeadRow { min-height: 48px; }
+  .tct-notif-tutor .tct-notif-card .rdt_TableCol { font-size: 11.5px; letter-spacing: 0.06em; }
+  .tct-notif-tutor .tct-notif-card .rdt_TableCol_Sortable:hover { color: #854fff; }
+  .tct-notif-tutor .tct-notif-card .rdt_TableRow { min-height: 72px; transition: background-color 0.15s ease; }
+  .tct-notif-tutor .tct-notif-card .rdt_TableCell { padding-top: 14px; padding-bottom: 14px; }
+
+  /* Source team label: the team's own colour (same palette as the cards) */
+  .tct-notif-src {
+    display: inline-flex; align-items: center; gap: 6px; max-width: 100%; padding: 3px 10px 3px 8px;
+    border-radius: 999px; font-size: 12px; font-weight: 600; line-height: 1.5; white-space: nowrap;
+    color: var(--tn-accent, #854fff); background: var(--tn-bg, #f1ecff);
+  }
+  .tct-notif-src::before { content: ""; flex: none; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+  /* Read / unread: unread = soft tint + accent bar + dark text + dot; read = plain row, muted text */
+  .tct-notif-tutor .tct-notif-card .rdt_TableRow:has(.tct-notif-actions.is-unread) { background: #fbf9ff; box-shadow: inset 3px 0 0 #854fff; }
+  .tct-notif-tutor .tct-notif-card .rdt_TableRow:has(.tct-notif-actions.is-unread):hover { background: #f5f0ff; }
+  .tct-notif-tutor .tct-notif-card .rdt_TableCell .n_unread,
+  .tct-notif-tutor .tct-notif-card .rdt_TableCell .n_read { position: relative; padding-left: 16px; font-size: 14px; line-height: 1.6; }
+  .tct-notif-tutor .tct-notif-card .rdt_TableCell .n_unread { color: #1c2b46 !important; font-weight: 500; cursor: pointer; }
+  .tct-notif-tutor .tct-notif-card .rdt_TableCell .n_unread::before {
+    content: ""; position: absolute; left: 0; top: 0.55em; width: 8px; height: 8px; border-radius: 50%; background: #854fff;
+  }
+  .tct-notif-tutor .tct-notif-card .rdt_TableCell .n_read { color: #6b7a90 !important; font-weight: 400; }
+  .tct-notif-tutor .tct-notif-card .rdt_TableCell .n_unread strong { font-weight: 700; color: #1c2b46; }
+  .tct-notif-tutor .tct-notif-card .rdt_TableCell .n_read strong { font-weight: 600; color: #364a63; }
+  /* Date */
+  .tct-notif-tutor .tct-notif-card .rdt_TableCell > span > strong { font-size: 13px; font-weight: 500; color: #6b7a90; font-variant-numeric: tabular-nums; }
+  .tct-notif-tutor .tct-notif-card .rdt_TableRow:has(.tct-notif-actions.is-unread) .rdt_TableCell > span > strong { font-weight: 600; color: #364a63; }
+
+  /* Actions: icon buttons + Mark as Read in the purple theme, with hover and keyboard focus */
+  .tct-notif-tutor .tct-notif-actions { gap: 6px 8px; }
+  .tct-notif-tutor .tct-notif-card .rdt_TableCell .btn-trigger.btn-icon { border: 1px solid #e5e9f2; background: #fff; }
+  .tct-notif-tutor .tct-notif-card .rdt_TableCell .btn-trigger.btn-icon:hover { border-color: #d9cbff; }
+  .tct-notif-tutor .tct-notif-card .rdt_TableCell a:focus-visible .btn-icon,
+  .tct-notif-tutor .tct-notif-card .rdt_TableCell .btn-trigger.btn-icon:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.25); color: #854fff; }
+  .tct-notif-tutor .tct-notif-markread.btn {
+    height: 30px; padding: 0 12px; font-size: 12px; border-radius: 8px;
+    color: #6a35e8; background: #fff; border: 1px solid #d9cbff; box-shadow: none;
+  }
+  .tct-notif-tutor .tct-notif-markread.btn:hover:not(:disabled) { color: #fff; background: #854fff; border-color: #854fff; }
+  .tct-notif-tutor .tct-notif-markread.btn:focus { box-shadow: none; }
+  .tct-notif-tutor .tct-notif-markread.btn:focus-visible { box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.25); }
+  .tct-notif-tutor .tct-notif-markall:focus-visible { box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.25); }
+
+  /* Pagination footer: page controls | result count (centred) | Rows per page */
+  @media (min-width: 768px) {
+    .tct-notif-tutor .tct-notif-card .dataTables_wrapper .row.align-items-center {
+      display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(240px, 1fr); align-items: center; column-gap: 16px;
+      padding-right: 18px;
+    }
+    .tct-notif-tutor .tct-notif-card .dataTables_wrapper .row.align-items-center > [class*="col"] { flex: none; width: auto; max-width: none; min-width: 0; }
+    .tct-notif-tutor .tct-notif-card .dataTables_wrapper .row.align-items-center > [class*="col"]:last-child { grid-column: 2; text-align: center !important; }
+  }
+  @media (max-width: 767.98px) {
+    /* Stacked and centred: page controls, result count, then Rows per page. */
+    .tct-notif-tutor .tct-notif-card .dataTables_wrapper .row.align-items-center { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px; }
+    .tct-notif-tutor .tct-notif-card .dataTables_wrapper .row.align-items-center > [class*="col"] { flex: none; width: auto; max-width: 100%; text-align: center !important; }
+    .tct-notif-tutor .tct-notif-card .dataTables_wrapper .pagination { flex-wrap: wrap; justify-content: center; }
+    .tct-notif-tutor .tct-notif-rpp { justify-content: center; padding: 0 14px 16px; }
+  }
+  .tct-notif-tutor .tct-notif-card .dataTables_info { white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+  /* Tablet / mobile: each notification becomes a stacked card (no page-level sideways scroll).
+     The header row stays as a compact sort bar for the sortable columns. */
+  @media (max-width: 991.98px) {
+    .tct-notif-tutor .tct-notif-card .rdt_TableHeadRow { flex-wrap: wrap; gap: 0 18px; min-height: 42px; padding: 0 14px; }
+    .tct-notif-tutor .tct-notif-card .rdt_TableHeadRow > .rdt_TableCol { flex: 0 0 auto !important; min-width: 0 !important; max-width: none !important; padding: 0; }
+    .tct-notif-tutor .tct-notif-card .rdt_TableHeadRow > .rdt_TableCol:nth-child(n + 3) { display: none; }
+    .tct-notif-tutor .tct-notif-card .rdt_TableRow { flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 14px 16px; min-height: 0; }
+    .tct-notif-tutor .tct-notif-card .rdt_TableRow > .rdt_TableCell { flex: 0 0 auto !important; min-width: 0 !important; max-width: 100% !important; padding: 0 !important; }
+    .tct-notif-tutor .tct-notif-card .rdt_TableRow > .rdt_TableCell:nth-child(1) { order: 1; }
+    .tct-notif-tutor .tct-notif-card .rdt_TableRow > .rdt_TableCell:nth-child(3) { order: 2; margin-left: auto; }
+    .tct-notif-tutor .tct-notif-card .rdt_TableRow > .rdt_TableCell:nth-child(2) { order: 3; flex-basis: 100% !important; }
+    .tct-notif-tutor .tct-notif-card .rdt_TableRow > .rdt_TableCell:nth-child(4) { order: 4; flex-basis: 100% !important; }
+    .tct-notif-tutor .tct-notif-card .rdt_TableRow > .rdt_TableCell:nth-child(2) > div { width: 100%; }
+  }
+  @media (max-width: 575.98px) {
+    .tct-notif-tutor .tct-notif-teams { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .tct-notif-tutor .tct-notif-team { min-height: 92px; padding: 12px; }
+    .tct-notif-tutor .tct-notif-team-count { font-size: 20px; }
+    .tct-notif-tutor .nk-block-head .nk-block-between { flex-wrap: wrap; gap: 10px; }
+  }
+`;
+
 // Icon / accent for a source-team card. Cards themselves are generated from the data; unknown teams get the default.
 const SOURCE_TEAM_LOOK = {
   all: { icon: "bell", accent: "#854fff", bg: "#f1ecff" },
@@ -274,6 +376,8 @@ const TCTUserNotificationList = () => {
     `${process.env.PUBLIC_URL}/lms/users/coordinator-notification`,
     `${process.env.PUBLIC_URL}/lms/users/coadmin-notification`,
   ].includes(window.location.pathname.replace(/\/$/, ""));
+  // Tutor (role 13) on the Notifications page: extra presentation layer (.tct-notif-tutor), styles only.
+  const isTutorNotificationPage = isStyledNotificationPage && localStorage.getItem("roleId") === "13";
   const viewTooltip = isStyledNotificationPage ? "View details" : "View";
   // Rows per page (Tutor / Coordinator Notifications page only). Starts at the existing page size (100);
   // other roles / embedded lists keep the fixed 100.
@@ -979,7 +1083,17 @@ const TCTUserNotificationList = () => {
       name: "Source Team",
       selector: (row) => row.sourceTeam || "System",
       sortable: true,
-      cell: (row) => <span className="badge badge-dim badge-primary">{row.sourceTeam || "System"}</span>,
+      cell: (row) => {
+        if (!isTutorNotificationPage) return <span className="badge badge-dim badge-primary">{row.sourceTeam || "System"}</span>;
+        // Tutor: same team, shown with its card colour and spaced name (as on the filter cards).
+        const team = notificationSourceTeam(row);
+        const look = SOURCE_TEAM_LOOK[team] || SOURCE_TEAM_LOOK.all;
+        return (
+          <span className="tct-notif-src" style={{ "--tn-accent": look.accent, "--tn-bg": look.bg }}>
+            {sourceTeamLabel(team)}
+          </span>
+        );
+      },
       minWidth: "140px",
       maxWidth: "180px",
     },
@@ -998,19 +1112,20 @@ const TCTUserNotificationList = () => {
           <span><NotificationMessage message={row.message} /></span>{" "}
         </div>
       ),
-      hide: "md",
+      // Tutor: never hidden; narrow screens stack each row as a card instead (CSS, .tct-notif-tutor).
+      hide: isTutorNotificationPage ? undefined : "md",
     },
     {
       name: "Date",
-      minWidth: "200px",
-      maxWidth: "200px",
+      minWidth: isTutorNotificationPage ? "140px" : "200px",
+      maxWidth: isTutorNotificationPage ? "160px" : "200px",
       selector: (row) => row.createdDate,
       cell: (row) => (
         <span>
           <strong>{moment(row.createdDate).format("DD-MMM-yyyy")}</strong>
         </span>
       ),
-      hide: "md",
+      hide: isTutorNotificationPage ? undefined : "md",
     },
     {
       name: "Action",
@@ -1284,7 +1399,8 @@ const TCTUserNotificationList = () => {
         <Head title="Coordinator"></Head>
         <Content>
           {isStyledNotificationPage && <style>{notificationPageStyle}</style>}
-          <div className={isStyledNotificationPage ? "tct-notif" : undefined}>
+          {isTutorNotificationPage && <style>{tutorNotificationPageStyle}</style>}
+          <div className={isStyledNotificationPage ? `tct-notif${isTutorNotificationPage ? " tct-notif-tutor" : ""}` : undefined}>
           <BlockHead size="sm">
             <BlockBetween>
               <BlockHeadContent>
@@ -1344,7 +1460,10 @@ const TCTUserNotificationList = () => {
                         </span>
                         <span className="tct-notif-team-sub">{team ? "Notifications" : "Every team"}</span>
                       </span>
-                      <span className="tct-notif-team-count">{unread}</span>
+                      <span className="tct-notif-team-count">
+                        {unread}
+                        {isTutorNotificationPage && <small className="tct-notif-team-unit">unread</small>}
+                      </span>
                     </button>
                   );
                 })}
@@ -2042,10 +2161,8 @@ const TCTUserNotificationList = () => {
                 </Col>
               </ModalFooter>
             )}
-            {(currentNotificationType == NotificationType.TutorAssigned ||
-              currentNotificationType == NotificationType.ApproveTutorAssignment ||
-              localStorage.getItem("userRole") === "CoordinatorAdmin") &&
-              localStorage.getItem("userRole") !== "Tutor" &&
+            {/* Approving or rejecting a tutor assignment is the Coordinator Admin's decision (also enforced by the API). */}
+            {localStorage.getItem("userRole") === "CoordinatorAdmin" &&
               salesDetails?.statusTypeCode == FollowUpStatus.DemoPendingTutorAssignedNotApproved && (
                 <ModalFooter className="bg-light modal-footer-custom">
                   <Col size="8"></Col>

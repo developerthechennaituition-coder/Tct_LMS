@@ -7,6 +7,7 @@ import { gettutorpayroll } from "../../../apiservices/ScheduleService";
 import { generateTutorInvoice } from "../../../apiservices/TutorService";
 import { Link } from "react-router-dom";
 import { Button, Input, UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem } from "reactstrap";
+import DataTable from "react-data-table-component";
 
 // Page-scoped styles: every selector starts with .tct-pr (rendered only by this page).
 const tutorPayrollStyle = `
@@ -165,12 +166,240 @@ const tutorPayrollStyle = `
   }
 `;
 
+// Tutor role only: every selector is under .tct-pr-tutor (rendered for roleId 13); other roles keep tutorPayrollStyle alone.
+const tutorRolePayrollStyle = `
+  .tct-pr-tutor .nk-block-head { padding-bottom: 16px; }
+  .tct-pr-tutor .nk-block-title.page-title { font-size: 1.65rem; letter-spacing: -0.01em; }
+  /* Toolbar: Refresh keeps the same height as the other controls */
+  .tct-pr-tutor .tct-pr-toolbar { gap: 10px; }
+  .tct-pr-tutor .tct-pr-toolbar > .btn { height: 38px; padding: 0 18px; border-radius: 8px; font-weight: 600; }
+  .tct-pr-tutor .tct-pr-toolbar > .btn:focus-visible { box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.25); }
+
+  /* Table: tighter rows, clear header */
+  .tct-pr-tutor .tct-pr-card { border-radius: 14px; }
+  .tct-pr-tutor .tct-pr-card .rdt_TableHeadRow { min-height: 44px; }
+  .tct-pr-tutor .tct-pr-card .rdt_TableCol { font-size: 11.5px; letter-spacing: 0.06em; }
+  .tct-pr-tutor .tct-pr-card .rdt_TableCol_Sortable:hover { color: #854fff; }
+  .tct-pr-tutor .tct-pr-card .rdt_TableRow { min-height: 0; }
+  .tct-pr-tutor .tct-pr-card .rdt_TableCell { padding-top: 10px; padding-bottom: 10px; }
+  .tct-pr-tutor .tct-pr-card .rdt_TableRow:hover { background: #faf7ff; }
+  /* Tutor name: wraps on word boundaries; month is secondary */
+  .tct-pr-tutor .tct-pr-card .rdt_TableCell .user-info { min-width: 0; }
+  .tct-pr-tutor .tct-pr-card .rdt_TableCell .tb-lead { line-height: 1.45; white-space: normal; overflow-wrap: anywhere; }
+  .tct-pr-tutor .tct-pr-card .rdt_TableCell:nth-child(2) .tb-lead { font-weight: 500; color: #526484; }
+
+  /* Classes: compact 2 x 2 group (label left, count right) */
+  .tct-pr-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 6px; width: 100%; max-width: 300px; margin: 0; }
+  .tct-pr-stat {
+    display: flex; align-items: center; justify-content: space-between; gap: 6px; min-width: 0;
+    padding: 3px 8px; border-radius: 6px; background: #f6f7fb; line-height: 1.4;
+  }
+  .tct-pr-stat dt { min-width: 0; margin: 0; font-size: 11.5px; font-weight: 500; color: #6b7a90; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tct-pr-stat dd { margin: 0; font-size: 13px; font-weight: 700; color: #1c2b46; font-variant-numeric: tabular-nums; }
+  .tct-pr-stat:last-child { background: #f3eeff; }
+  .tct-pr-stat:last-child dt { color: #6a35e8; }
+  .tct-pr-card .rdt_TableRow:hover .tct-pr-stat { background: #fff; }
+
+  /* Payment: amount prominent, helper text readable */
+  .tct-pr-tutor .tct-pr-card .tct-pr-amount .tb-lead { font-size: 16px; color: #1c2b46; letter-spacing: -0.01em; }
+  .tct-pr-tutor .tct-pr-card .rdt_TableRow:hover .tct-pr-amount .tb-lead { color: #4c1fd0; }
+  .tct-pr-tutor .tct-pr-card .tct-pr-amount small { margin-top: 2px; font-size: 12px; color: #8094ae !important; }
+
+  /* Status: soft filled badges, darker text for contrast (same text and status as before) */
+  .tct-pr-tutor .tct-pr-card .rdt_TableCell .badge > p.tct-pr-status {
+    display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px 4px 8px; border: 0; white-space: normal; text-align: left;
+  }
+  .tct-pr-tutor .tct-pr-card .rdt_TableCell .badge > p.tct-pr-status::before { content: ""; flex: none; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .tct-pr-status.is-processed { color: #0c8a68 !important; background: #e3f9f2 !important; }
+  .tct-pr-status.is-pending { color: #946b00 !important; background: #fff6dc !important; }
+  .tct-pr-status.is-awaiting-operations-approval { color: #067a8c !important; background: #e1f7fb !important; }
+  .tct-pr-status.is-no-classes-taken { color: #5d6b82 !important; background: #f1f3f8 !important; }
+
+  /* Action */
+  .tct-pr-note { font-size: 13px; line-height: 1.45; color: #8094ae; }
+  .tct-pr-note.is-waiting { color: #067a8c; }
+  .tct-pr-tutor .tct-pr-card .rdt_TableCell a { font-size: 13px; font-weight: 600; line-height: 1.6; color: #6a35e8; }
+  .tct-pr-tutor .tct-pr-card .rdt_TableCell a:hover { color: #4c1fd0; text-decoration: underline; }
+  .tct-pr-tutor .tct-pr-card .rdt_TableCell a:focus-visible,
+  .tct-pr-tutor .tct-pr-card .rdt_TableCell .btn:focus-visible { outline: none; border-radius: 4px; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.25); }
+
+  /* Compact pager (TutorPayrollPagination): page controls | record range (centred) | Rows per page */
+  .tct-pr-pager {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 12px 16px;
+    padding: 12px 18px; border-top: 1px solid #e5e9f2;
+  }
+  .tct-pr-pager-nav { justify-self: start; min-width: 0; }
+  .tct-pr-pager .pagination { display: flex; flex-wrap: nowrap; align-items: center; gap: 4px; margin: 0; padding: 0; border: 0; background: transparent; }
+  .tct-pr-pager .page-item .page-link {
+    display: inline-flex; align-items: center; justify-content: center; gap: 4px; min-width: 34px; height: 34px; margin: 0; padding: 0 10px;
+    font-size: 13px; font-weight: 600; line-height: 1; color: #526484; background: #fff; border: 1px solid #e5e9f2; border-radius: 8px;
+    font-variant-numeric: tabular-nums; transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+  .tct-pr-pager .page-item .page-link .icon { font-size: 14px; }
+  .tct-pr-pager .page-item:not(.disabled):not(.active) .page-link:hover { color: #6a35e8; background: #f5f1ff; border-color: #d9cbff; }
+  .tct-pr-pager .page-item.active .page-link { color: #fff; background: #854fff; border-color: #854fff; box-shadow: 0 4px 10px rgba(133, 79, 255, 0.25); }
+  .tct-pr-pager .page-item.disabled .page-link { color: #b7c2d0; background: #fafbfc; cursor: not-allowed; }
+  .tct-pr-pager .page-link.tct-pr-pager-gap { min-width: 24px; padding: 0 2px; color: #8094ae; background: transparent; border-color: transparent; letter-spacing: 0.08em; }
+  .tct-pr-pager .page-link:focus { outline: none; box-shadow: none; }
+  .tct-pr-pager .page-link:focus-visible { box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.28); }
+  .tct-pr-pager-range { justify-self: center; font-size: 13px; font-weight: 500; color: #6b7a90; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  /* Rows per page sits in the pager's third track (not over the footer, as on the other roles' layout). */
+  .tct-pr-tutor .tct-pr-pager .tct-pr-rpp { position: static; height: auto; padding: 0; justify-self: end; }
+  @media (max-width: 767.98px) {
+    /* Stacked and centred: page controls, record range, then Rows per page */
+    .tct-pr-pager { grid-template-columns: 1fr; justify-items: center; padding: 14px; gap: 10px; }
+    .tct-pr-pager-nav, .tct-pr-tutor .tct-pr-pager .tct-pr-rpp { justify-self: center; }
+  }
+
+  /* Status filter (themed dropdown) */
+  .tct-pr-filter-toggle {
+    display: inline-flex; align-items: center; gap: 10px; width: 280px; max-width: 100%; height: 38px; padding: 0 12px 0 14px;
+    font-size: 14px; font-weight: 600; line-height: 1; color: #364a63; text-align: left; cursor: pointer;
+    background: #fff; border: 1px solid #dbdfea; border-radius: 8px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+  }
+  .tct-pr-filter-toggle:hover { border-color: #c4b0ff; background: #fbf9ff; }
+  .tct-pr-filter-toggle:focus { outline: none; }
+  .tct-pr-filter-toggle:focus-visible,
+  .tct-pr-filter .show > .tct-pr-filter-toggle { border-color: #854fff; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.18); }
+  .tct-pr-filter-toggle > .icon { flex: none; margin-left: 2px; font-size: 14px; color: #854fff; transition: transform 0.15s ease; }
+  .tct-pr-filter .show > .tct-pr-filter-toggle > .icon { transform: rotate(180deg); }
+  .tct-pr-filter-label { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tct-pr-filter-count {
+    flex: none; min-width: 26px; padding: 3px 7px; border-radius: 999px; text-align: center;
+    font-size: 12px; font-weight: 700; line-height: 1.2; color: #6a35e8; background: #f1ebff; font-variant-numeric: tabular-nums;
+  }
+  .tct-pr-filter-dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: #854fff; }
+  .tct-pr-filter-dot.is-no-classes-taken { background: #8094ae; }
+  .tct-pr-filter-dot.is-awaiting-operations-approval { background: #09c2de; }
+  .tct-pr-filter-dot.is-pending { background: #f4bd0e; }
+  .tct-pr-filter-dot.is-processed { background: #1ee0ac; }
+  .tct-pr-filter .tct-pr-filter-menu {
+    z-index: 1000; width: 300px; max-width: calc(100vw - 32px); margin-top: 6px; padding: 6px;
+    background: #fff; border: 1px solid #e5e9f2; border-radius: 12px; box-shadow: 0 12px 30px rgba(31, 43, 58, 0.16);
+  }
+  .tct-pr-filter .tct-pr-filter-menu .dropdown-item {
+    display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px;
+    font-size: 14px; font-weight: 500; line-height: 1.3; color: #364a63; white-space: normal;
+  }
+  .tct-pr-filter .tct-pr-filter-menu .dropdown-item + .dropdown-item { margin-top: 2px; }
+  .tct-pr-filter .tct-pr-filter-menu .dropdown-item .tct-pr-filter-label { white-space: normal; }
+  .tct-pr-filter .tct-pr-filter-menu .dropdown-item .tct-pr-filter-count { color: #526484; background: #f1f3f8; }
+  .tct-pr-filter .tct-pr-filter-menu .dropdown-item .tct-pr-filter-check { flex: none; width: 16px; font-size: 14px; color: #854fff; visibility: hidden; }
+  .tct-pr-filter .tct-pr-filter-menu .dropdown-item:hover,
+  .tct-pr-filter .tct-pr-filter-menu .dropdown-item:focus { background: #f5f1ff; color: #4c1fd0; outline: none; }
+  .tct-pr-filter .tct-pr-filter-menu .dropdown-item:focus-visible { box-shadow: inset 0 0 0 2px rgba(133, 79, 255, 0.4); }
+  .tct-pr-filter .tct-pr-filter-menu .dropdown-item.active { background: #f1ebff; color: #4c1fd0; font-weight: 600; }
+  .tct-pr-filter .tct-pr-filter-menu .dropdown-item.active .tct-pr-filter-count { color: #fff; background: #854fff; }
+  .tct-pr-filter .tct-pr-filter-menu .dropdown-item.active .tct-pr-filter-check { visibility: visible; }
+
+  /* Tablet / phone: the table keeps every column and scrolls sideways inside the card only */
+  .tct-pr-tutor .tct-pr-card { max-width: 100%; }
+  .tct-pr-tutor .tct-pr-card .dataTables_wrapper > div:not(.row) { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  @media (max-width: 991.98px) {
+    .tct-pr-tutor .nk-block-head .nk-block-between > .nk-block-head-content:last-child { flex: 1 1 100%; margin-left: 0; }
+    .tct-pr-tutor .tct-pr-toolbar { justify-content: flex-start; }
+  }
+  @media (max-width: 575.98px) {
+    .tct-pr-tutor .tct-pr-toolbar > .tct-pr-month { flex: 1 1 100%; justify-content: space-between; }
+    /* One full-width control per row, in the same order as on desktop (keeps keyboard order). */
+    .tct-pr-tutor .tct-pr-toolbar > .tct-pr-year,
+    .tct-pr-tutor .tct-pr-toolbar > .btn { flex: 1 1 100%; min-width: 0; }
+    .tct-pr-tutor .tct-pr-toolbar .tct-pr-filter-toggle,
+    .tct-pr-tutor .tct-pr-toolbar .tct-pr-year-toggle { width: 100%; }
+    .tct-pr-tutor .tct-pr-year .dropdown { display: block; }
+    .tct-pr-filter .tct-pr-filter-menu { width: 100%; }
+  }
+`;
+
 const money = value => new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(Number(value) || 0);
 const errorMessage = error => error?.response?.data?.message ||
   (typeof error?.response?.data === "string" ? error.response.data : error?.message) || "Unable to load payroll.";
 const PAGE_SIZE_OPTIONS = [5, 10, 15, 25];
 const AWAITING_OPS = "Awaiting Operations Approval";
 const STATUS_COLORS = { "Processed": "#1ee0ac", "Pending": "#f4bd0e", [AWAITING_OPS]: "#09c2de", "No classes taken": "#8094ae" };
+const STATUS_OPTIONS = ["All", "No classes taken", AWAITING_OPS, "Pending", "Processed"];
+// "Awaiting Operations Approval" → "awaiting-operations-approval" (CSS modifier for the tutor view's status colours).
+const statusSlug = value => String(value || "").toLowerCase().replace(/[^a-z]+/g, "-");
+
+// Tutor view pager: page numbers to show — first and last page, the current page and its neighbours, and the
+// first four pages near the start (or last four near the end). A one-page gap shows that page instead of "…".
+const compactPageItems = (page, totalPages) => {
+  if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
+  const keep = new Set([1, totalPages, page - 1, page, page + 1]);
+  if (page <= 3) [2, 3, 4].forEach(n => keep.add(n));
+  if (page >= totalPages - 2) [totalPages - 3, totalPages - 2, totalPages - 1].forEach(n => keep.add(n));
+  const pages = [...keep].filter(n => n >= 1 && n <= totalPages).sort((a, b) => a - b);
+  const items = [];
+  pages.forEach((n, i) => {
+    const gap = i > 0 ? n - pages[i - 1] : 1;
+    if (gap === 2) items.push(n - 1);
+    else if (gap > 2) items.push(`gap-${n}`);
+    items.push(n);
+  });
+  return items;
+};
+
+// Tutor view footer: page controls | record range | Rows per page. The table component owns the page state and
+// passes onChangePage; the page-size choice goes back to the page's existing handler (paginationComponentOptions).
+const TutorPayrollPagination = ({ currentPage, rowsPerPage, rowCount, onChangePage, paginationComponentOptions }) => {
+  const totalPages = Math.max(1, Math.ceil(rowCount / rowsPerPage));
+  const current = Math.min(Math.max(1, currentPage), totalPages);
+  const from = rowCount === 0 ? 0 : (current - 1) * rowsPerPage + 1;
+  const to = Math.min(current * rowsPerPage, rowCount);
+  const go = next => { if (next >= 1 && next <= totalPages && next !== current) onChangePage(next); };
+  const { pageSizes = [], onPageSizeSelected } = paginationComponentOptions || {};
+  return (
+    <div className="tct-pr-pager">
+      <nav aria-label="Payroll pages" className="tct-pr-pager-nav">
+        <ul className="pagination mb-0">
+          <li className={`page-item${current === 1 ? " disabled" : ""}`}>
+            <button type="button" className="page-link tct-pr-pager-step" onClick={() => go(current - 1)} disabled={current === 1} aria-label="Previous page">
+              <Icon name="chevrons-left" /><span>Prev</span>
+            </button>
+          </li>
+          {compactPageItems(current, totalPages).map(item => typeof item === "number" ? (
+            <li key={item} className={`page-item d-none d-sm-block${item === current ? " active" : ""}`}>
+              <button type="button" className="page-link" onClick={() => go(item)}
+                aria-label={`Page ${item}`} aria-current={item === current ? "page" : undefined}>{item}</button>
+            </li>
+          ) : (
+            <li key={item} className="page-item disabled d-none d-sm-block" aria-hidden="true">
+              <span className="page-link tct-pr-pager-gap">…</span>
+            </li>
+          ))}
+          <li className="page-item active d-sm-none">
+            <span className="page-link tct-pr-pager-of">{current} / {totalPages}</span>
+          </li>
+          <li className={`page-item${current === totalPages ? " disabled" : ""}`}>
+            <button type="button" className="page-link tct-pr-pager-step" onClick={() => go(current + 1)} disabled={current === totalPages} aria-label="Next page">
+              <span>Next</span><Icon name="chevrons-right" />
+            </button>
+          </li>
+        </ul>
+      </nav>
+      <span className="tct-pr-pager-range" role="status" aria-live="polite">{from}–{to} of {rowCount}</span>
+      <div className="tct-pr-rpp">
+        <span>Rows per page</span>
+        <UncontrolledDropdown direction="up">
+          <DropdownToggle tag="button" type="button" className="tct-pr-rpp-toggle" aria-label={`Rows per page: ${rowsPerPage}`}>
+            <span>{rowsPerPage}</span>
+            <Icon name="chevron-down" />
+          </DropdownToggle>
+          <DropdownMenu right className="tct-pr-rpp-menu">
+            {pageSizes.map(size => (
+              <DropdownItem key={size} tag="button" type="button" active={rowsPerPage === size}
+                onClick={() => onPageSizeSelected && onPageSizeSelected(size)}>
+                <span>{size}</span>
+                {rowsPerPage === size && <Icon name="check" />}
+              </DropdownItem>
+            ))}
+          </DropdownMenu>
+        </UncontrolledDropdown>
+      </div>
+    </div>
+  );
+};
 
 export default function TCTTutorPayroll() {
   const [period, setPeriod] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1));
@@ -223,11 +452,23 @@ export default function TCTTutorPayroll() {
     }
   };
 
+  // Tutor role (13): presentation layer only (.tct-pr-tutor styles, compact Classes group, column widths).
+  const isTutorView = localStorage.getItem("roleId") === "13";
+  const classCounts = row => [
+    ["Scheduled", row.totalNoOfClasses || 0],
+    ["Completed", row.noOfDaysPresent || 0],
+    ["Cancelled", row.noOfDaysAbsent || 0],
+    ["Operations approved", row.approved || 0],
+  ];
+
   const columns = [
     { name: "Tutor", selector: row => row.tutorName, sortable: true,
       cell: row => <div className="user-info"><span className="tb-lead">{row.tutorName} ({row.userCode})</span></div> },
     { name: "Month", cell: row => <div className="user-info"><span className="tb-lead">{row.scheduleMonthName} {row.scheduleYear}</span></div> },
-    { name: "Classes", cell: row => <div className="user-info tct-pr-details">
+    { name: "Classes", cell: row => isTutorView
+      ? <dl className="tct-pr-stats">{classCounts(row).map(([label, value]) =>
+          <div key={label} className="tct-pr-stat"><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
+      : <div className="user-info tct-pr-details">
       <span>Scheduled: {row.totalNoOfClasses || 0}</span>
       <span>Completed: {row.noOfDaysPresent || 0}</span>
       <span>Cancelled: {row.noOfDaysAbsent || 0}</span>
@@ -237,7 +478,9 @@ export default function TCTTutorPayroll() {
         <small className="d-block text-soft">{row.isInvoiceGenerated ? "Saved payslip total" : "Approved classes estimate"}</small></div> },
     { name: "Status", selector: row => row.payrollStatus,
       cell: row => <div>
-        <div className="badge"><p style={{ color: STATUS_COLORS[row.payrollStatus] || "#526484" }}>{row.payrollStatus}</p></div>
+        <div className="badge"><p
+          className={isTutorView ? `tct-pr-status is-${statusSlug(row.payrollStatus)}` : undefined}
+          style={{ color: STATUS_COLORS[row.payrollStatus] || "#526484" }}>{row.payrollStatus}</p></div>
         {/* Cancelled classes not deducted because it is not certain whether they were re-scheduled: for review. */}
         {/* Staff view only: not on a tutor's own payroll (roleId 13). Independent of the tutor-view styling. */}
         {localStorage.getItem("roleId") !== "13" && row.cancellationsToReview > 0 && (
@@ -251,22 +494,34 @@ export default function TCTTutorPayroll() {
     { name: "Action", cell: row => row.isInvoiceGenerated
       ? <div>{(row.invoiceNumbers?.length ? row.invoiceNumbers : [row.invoiceNumber]).filter(Boolean).map(number =>
           <Link key={number} to={`${process.env.PUBLIC_URL}/lms/tutors/tutor-invoice-details?invNumber=${encodeURIComponent(number)}&from=payroll`}>View Payslip {number}<br /></Link>)}</div>
-      : !row.noOfDaysPresent ? <span>No completed classes</span>
+      : !row.noOfDaysPresent ? <span className={isTutorView ? "tct-pr-note" : undefined}>No completed classes</span>
       // No payable (Operations-approved) class yet, or some completed classes still unapproved: no payslip.
-      : !row.approved || row.approved !== row.noOfDaysPresent ? <span>Waiting for Operations approval</span>
+      : !row.approved || row.approved !== row.noOfDaysPresent ? <span className={isTutorView ? "tct-pr-note is-waiting" : undefined}>Waiting for Operations approval</span>
       : <Button size="sm" color="primary" disabled={Boolean(processing)} onClick={() => generate(row)}>
           {processing === row.tutorId ? "Processing…" : "Generate Payslip"}
         </Button> }
   ];
+  // Tutor view: column sizing only (same columns, selectors, sorting and cells).
+  const tutorColumnLayout = {
+    "Tutor": { minWidth: "210px", grow: 2, wrap: true },
+    "Month": { minWidth: "120px", maxWidth: "140px" },
+    "Classes": { minWidth: "270px", grow: 2 },
+    "Tutor Payment": { minWidth: "170px", grow: 1 },
+    "Status": { minWidth: "200px", grow: 1 },
+    "Action": { minWidth: "190px", grow: 1, wrap: true },
+  };
+  const tableColumns = isTutorView ? columns.map(column => ({ ...column, ...tutorColumnLayout[column.name] })) : columns;
 
   const visibleRows = status === "All" ? rows : rows.filter(row => row.payrollStatus === status);
+  const statusCount = value => value === "All" ? rows.length : rows.filter(row => row.payrollStatus === value).length;
   const currentYear = new Date().getFullYear();
   const years = Array.from(new Set([...Array.from({ length: 11 }, (_, index) => currentYear - 5 + index), year])).sort();
   return <>
     <Head title="Tutor Payroll" />
     <Content>
       <style>{tutorPayrollStyle}</style>
-      <div className="tct-pr">
+      {isTutorView && <style>{tutorRolePayrollStyle}</style>}
+      <div className={isTutorView ? "tct-pr tct-pr-tutor" : "tct-pr"}>
       <BlockHead size="sm">
         <BlockBetween>
           <BlockHeadContent>
@@ -300,13 +555,40 @@ export default function TCTTutorPayroll() {
                   </DropdownMenu>
                 </UncontrolledDropdown>
               </div>
+              {isTutorView ? (
+                // Tutor view: themed dropdown (a native select's option list cannot be styled); same options,
+                // counts and setStatus handler as the select below.
+                <div className="tct-pr-year tct-pr-filter">
+                  <UncontrolledDropdown>
+                    <DropdownToggle tag="button" type="button" className="tct-pr-filter-toggle"
+                      aria-label={`Payroll status: ${status} (${statusCount(status)})`}>
+                      <span className={`tct-pr-filter-dot is-${statusSlug(status)}`} aria-hidden="true" />
+                      <span className="tct-pr-filter-label">{status}</span>
+                      <span className="tct-pr-filter-count">{statusCount(status)}</span>
+                      <Icon name="chevron-down" />
+                    </DropdownToggle>
+                    <DropdownMenu right className="tct-pr-filter-menu">
+                      {STATUS_OPTIONS.map(value => (
+                        <DropdownItem key={value} tag="button" type="button" active={status === value}
+                          aria-current={status === value ? "true" : undefined} onClick={() => setStatus(value)}>
+                          <span className={`tct-pr-filter-dot is-${statusSlug(value)}`} aria-hidden="true" />
+                          <span className="tct-pr-filter-label">{value}</span>
+                          <span className="tct-pr-filter-count">{statusCount(value)}</span>
+                          <Icon name="check" className="tct-pr-filter-check" />
+                        </DropdownItem>
+                      ))}
+                    </DropdownMenu>
+                  </UncontrolledDropdown>
+                </div>
+              ) : (
               <div className="tct-pr-year">
                 <Input type="select" aria-label="Payroll status" value={status} style={{ width: "280px" }}
                   onChange={event => setStatus(event.target.value)}>
-                  {["All", "No classes taken", AWAITING_OPS, "Pending", "Processed"].map(value =>
-                    <option key={value} value={value}>{value} ({value === "All" ? rows.length : rows.filter(row => row.payrollStatus === value).length})</option>)}
+                  {STATUS_OPTIONS.map(value =>
+                    <option key={value} value={value}>{value} ({statusCount(value)})</option>)}
                 </Input>
               </div>
+              )}
               <Button outline color="primary" disabled={loading} onClick={() => fetchPayroll(month, year)}>Refresh</Button>
             </div>
           </BlockHeadContent>
@@ -316,13 +598,23 @@ export default function TCTTutorPayroll() {
         : error ? <div role="alert" className="text-danger">{error} <Button size="sm" onClick={() => fetchPayroll(month, year)}>Retry</Button></div>
         : <Block>
             <div className="tct-pr-card">
-              {visibleRows.length > 0 ? (
-                <ReactDataTable key={`${year}-${month}-${status}-${itemPerPage}`} data={visibleRows} columns={columns}
+              {visibleRows.length > 0 && isTutorView ? (
+                // Tutor view: same table library and props as ReactDataTable, with the compact TutorPayrollPagination footer.
+                <div className="dataTables_wrapper dt-bootstrap4 no-footer">
+                  <DataTable key={`${year}-${month}-${status}-${itemPerPage}`} data={visibleRows} columns={tableColumns}
+                    className="nk-tb-list" pagination paginationPerPage={itemPerPage} paginationRowsPerPageOptions={PAGE_SIZE_OPTIONS}
+                    paginationComponent={TutorPayrollPagination}
+                    paginationComponentOptions={{ pageSizes: PAGE_SIZE_OPTIONS, onPageSizeSelected: size => { if (itemPerPage !== size) setItemPerPage(size); } }}
+                    noDataComponent={<div className="p-2">There are no records found</div>}
+                    sortIcon={<div><span>&darr;</span><span>&uarr;</span></div>} />
+                </div>
+              ) : visibleRows.length > 0 ? (
+                <ReactDataTable key={`${year}-${month}-${status}-${itemPerPage}`} data={visibleRows} columns={tableColumns}
                   pagination pageSize={itemPerPage} className="nk-tb-list" />
               ) : (
                 <p className="tct-pr-empty">No records found for this month</p>
               )}
-              {visibleRows.length > 0 && (
+              {visibleRows.length > 0 && !isTutorView && (
                 <div className="tct-pr-rpp">
                   <span>Rows per page</span>
                   <UncontrolledDropdown direction="up">

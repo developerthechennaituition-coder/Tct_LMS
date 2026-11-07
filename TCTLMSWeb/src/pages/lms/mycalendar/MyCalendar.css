@@ -46,6 +46,9 @@
 
 .my-calendar .mc-form { display: flex; flex-direction: column; gap: 14px; }
 .my-calendar .mc-field { display: flex; flex-direction: column; min-width: 0; }
+/* The theme stretches the date/time picker indicator over its nearest positioned ancestor (_forms.scss);
+   keep it inside the Due date / Due time input so clicks elsewhere on the page do not open the picker. */
+.my-calendar .mc-field input[type="date"], .my-calendar .mc-field input[type="time"] { position: relative; }
 .my-calendar .mc-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .my-calendar .form-label { margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #364a63; }
 .my-calendar .form-control { border: 1px solid #dbdfea; border-radius: 10px; font-size: 14px; color: #1c2b46; box-shadow: none; }

@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
 using TCT.LMS.Application.Interfaces.Services;
 using TCT.LMS.Application.Services;
+using TCT.LMS.Data.Common;
 using TCT.LMS.Domain.Entities;
 using TCT.LMS.DTOs.Address;
 using TCT.LMS.DTOs.Sales;
@@ -250,10 +252,25 @@ public class SalesController : ControllerBase
     }
 
     [HttpPost("UpdateSalesDetailsStatus")]
-    public async Task<IActionResult> UpdateSalesDetailsStatus(UpdateSalesDetailsDTO salesDetailsDto)
+    public async Task<IActionResult> UpdateSalesDetailsStatus(UpdateSalesDetailsDTO salesDetailsDto,
+        [FromServices] ApplicationDbContext dbContext)
     {
-        if (salesDetailsDto.Status == (int)TCT.LMS.Domain.FollowUpStatus.DemoPendingTutorAssigned
-            || salesDetailsDto.Status == (int)TCT.LMS.Domain.FollowUpStatus.DemoPendingTutorAssignedNotApproved)
+        // Approving or rejecting a tutor assignment: Coordinator Admin only (role read from the database for the
+        // signed-in user), and the approver recorded is the signed-in user, never the UserId in the request body.
+        var statusIdCode = await dbContext.Type_Code.AsNoTracking()
+            .Where(t => t.Id == salesDetailsDto.StatusId)
+            .Select(t => (int?)t.TypeCodeValue)
+            .FirstOrDefaultAsync();
+        if (TutorAssignmentApprovalRules.IsAssignmentDecision(salesDetailsDto.Status, statusIdCode))
+        {
+            var callerId = GetCallerId();
+            if (callerId == Guid.Empty || !await IsCoordinatorAdminAsync(dbContext, callerId))
+                return StatusCode(StatusCodes.Status403Forbidden,
+                    new { succeeded = false, message = TutorAssignmentApprovalRules.NotCoordinatorAdminMessage });
+            salesDetailsDto.UserId = callerId;
+        }
+        else if (salesDetailsDto.Status == (int)TCT.LMS.Domain.FollowUpStatus.DemoPendingTutorAssigned
+                 || salesDetailsDto.Status == (int)TCT.LMS.Domain.FollowUpStatus.DemoPendingTutorAssignedNotApproved)
         {
             // Assigning a tutor: the tutor assignment rules are per assigning user, so it is the signed-in user,
             // never the UserId in the request body.
@@ -270,6 +287,12 @@ public class SalesController : ControllerBase
 
     private Guid GetCallerId() =>
         Guid.TryParse(User.FindFirst("UserId")?.Value, out var id) ? id : Guid.Empty;
+
+    private static Task<bool> IsCoordinatorAdminAsync(ApplicationDbContext dbContext, Guid userId) =>
+        dbContext.UserRole.AnyAsync(userRole =>
+            userRole.UserId == userId && userRole.IsActive
+            && userRole.RoleId == (int)TCT.LMS.Domain.UserRoleEnum.CoordinatorAdmin
+            && dbContext.Roles.Any(role => role.Id == userRole.RoleId && role.IsActive));
 
     [HttpPost("UpdateStudentDropout")]
     public async Task<IActionResult> UpdateStudentDropout(UpdateSalesDetailsDTO salesDetailsDto)

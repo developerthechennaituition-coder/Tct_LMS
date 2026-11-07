@@ -85,3 +85,195 @@
   .tct-change-requests .cr-row { flex-wrap: wrap; }
   .tct-cr-modal .cr-facts { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* ─── Student Change (tutor view) ─────────────────────────────────────────────
+   Every rule below is under .tct-change-requests.cr-student-change, which only the Student Change page renders;
+   Tutor Change and the Operations pages keep the rules above unchanged. */
+.tct-change-requests.cr-student-change .nk-block-head {
+  display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 12px 24px; padding-bottom: 20px;
+}
+.tct-change-requests.cr-student-change .nk-block-head:before { bottom: 24px; }
+.tct-change-requests.cr-student-change .nk-block-head-content { flex: 1 1 420px; min-width: 0; }
+.tct-change-requests.cr-student-change .cr-sub { line-height: 1.55; }
+.tct-change-requests.cr-student-change .cr-summary { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.tct-change-requests.cr-student-change .cr-summary li {
+  display: inline-flex; align-items: baseline; gap: 5px; padding: 6px 12px; border-radius: 999px;
+  font-size: 13px; color: #6b7a90; background: #fff; border: 1px solid #e5e9f2;
+}
+.tct-change-requests.cr-student-change .cr-summary strong { font-size: 14px; font-weight: 700; color: #6a35e8; font-variant-numeric: tabular-nums; }
+
+/* Subject cards: two columns where each card sits directly under the one above it (CSS columns, not grid rows),
+   so a short card never waits for a taller neighbour. Cards stay whole; DOM order is unchanged. */
+.tct-change-requests.cr-student-change .cr-groups { display: block; column-count: 2; column-gap: 16px; }
+.tct-change-requests.cr-student-change .cr-groups .cr-card {
+  display: block; width: 100%; margin: 0 0 14px; padding: 0; overflow: hidden;
+  break-inside: avoid; page-break-inside: avoid; -webkit-column-break-inside: avoid;
+}
+.tct-change-requests.cr-student-change .cr-card-title {
+  margin: 0; padding: 10px 14px; font-size: 14.5px; line-height: 1.35; border-bottom: 1px solid #eef0f5; background: #fcfbff; overflow-wrap: anywhere;
+}
+.tct-change-requests.cr-student-change .cr-card-title .icon { flex: none; font-size: 15px; }
+.tct-change-requests.cr-student-change .cr-card-count {
+  flex: none; margin-left: auto; min-width: 22px; padding: 1px 7px; border-radius: 999px; text-align: center;
+  font-size: 11.5px; font-weight: 700; line-height: 1.4; color: #6a35e8; background: #f1ebff; font-variant-numeric: tabular-nums;
+}
+.tct-change-requests.cr-student-change .cr-rows { gap: 0; padding: 2px 6px; }
+
+/* Student rows: avatar | name + details | action, vertically centred */
+.tct-change-requests.cr-student-change .cr-row {
+  display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; align-items: center; gap: 10px 12px;
+  padding: 8px; border: 0; border-radius: 0; transition: background-color 0.15s ease;
+}
+.tct-change-requests.cr-student-change .cr-row + .cr-row { border-top: 1px solid #f0f2f7; }
+.tct-change-requests.cr-student-change .cr-row:hover { background: #faf8ff; }
+.tct-change-requests.cr-student-change .cr-avatar { width: 34px; height: 34px; font-size: 13px; }
+.tct-change-requests.cr-student-change .cr-row-text { gap: 1px; }
+.tct-change-requests.cr-student-change .cr-row-name { line-height: 1.35; white-space: normal; overflow: visible; overflow-wrap: anywhere; }
+.tct-change-requests.cr-student-change .cr-row-meta { font-size: 12px; line-height: 1.45; color: #8094ae; overflow-wrap: anywhere; }
+
+/* Action: same height and padding everywhere, clear hover and keyboard focus */
+.tct-change-requests.cr-student-change .cr-row .btn {
+  justify-content: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 8px;
+  font-size: 13px; font-weight: 600; white-space: nowrap; box-shadow: none;
+}
+.tct-change-requests.cr-student-change .cr-row .btn .icon { font-size: 15px; }
+.tct-change-requests.cr-student-change .cr-row .btn:hover { color: #fff; background: #854fff; border-color: #854fff; }
+.tct-change-requests.cr-student-change .cr-row .btn:focus { box-shadow: none; }
+.tct-change-requests.cr-student-change .cr-row .btn:focus-visible { box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.28); }
+.tct-change-requests.cr-student-change .cr-row .cr-badge { justify-self: end; }
+
+/* ─── Student Change request dialog (.cr-sc-modal: rendered only from the Student Change page) ─── */
+.tct-cr-modal.cr-sc-modal .modal-content {
+  display: flex; flex-direction: column; max-height: calc(100vh - 3.5rem); overflow: hidden;
+  border: 0; border-radius: 16px; box-shadow: 0 24px 56px rgba(28, 43, 70, 0.2);
+}
+/* Header: icon, title, student · subject (wraps on small screens), close */
+.tct-cr-modal.cr-sc-modal .cr-modal-head { flex: none; align-items: flex-start; gap: 14px; padding: 18px 20px 16px 22px; }
+.tct-cr-modal.cr-sc-modal .cr-modal-head > div { flex: 1 1 auto; min-width: 0; }
+.tct-cr-modal.cr-sc-modal .cr-chip { width: 40px; height: 40px; border-radius: 10px; font-size: 18px; }
+.tct-cr-modal.cr-sc-modal .cr-modal-title { font-size: 1.1rem; line-height: 1.35; }
+.tct-cr-modal.cr-sc-modal .cr-modal-sub { margin-top: 3px; font-size: 13px; line-height: 1.45; color: #6b7a90; overflow-wrap: anywhere; }
+.tct-cr-modal.cr-sc-modal .cr-modal-head .close {
+  flex: none; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; margin: -2px -4px 0 0; padding: 0;
+  border-radius: 8px; font-size: 18px; color: #8094ae; opacity: 1; text-shadow: none; transition: background-color 0.15s ease, color 0.15s ease;
+}
+.tct-cr-modal.cr-sc-modal .cr-modal-head .close:hover:not(:disabled) { color: #6a35e8; background: #f5f1ff; }
+.tct-cr-modal.cr-sc-modal .cr-modal-head .close:focus { outline: none; }
+.tct-cr-modal.cr-sc-modal .cr-modal-head .close:focus-visible { box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.28); }
+
+/* Body scrolls when the dialog is taller than the screen; header and footer stay in view */
+.tct-cr-modal.cr-sc-modal .modal-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 18px 22px 20px; }
+/* Summary: aligned label / value pairs */
+.tct-cr-modal.cr-sc-modal .cr-facts {
+  grid-template-columns: 84px minmax(0, 1fr); gap: 8px 14px; margin: 0 0 18px; padding: 12px 16px;
+  background: #f8f9fc; border: 1px solid #eef0f5; border-radius: 12px;
+}
+.tct-cr-modal.cr-sc-modal .cr-facts dt { font-size: 12px; font-weight: 600; line-height: 1.6; letter-spacing: 0.04em; text-transform: uppercase; color: #8094ae; }
+.tct-cr-modal.cr-sc-modal .cr-facts dd { font-size: 14px; font-weight: 600; line-height: 1.5; color: #1c2b46; }
+
+/* Fields */
+.tct-cr-modal.cr-sc-modal .cr-field { gap: 6px; margin-bottom: 16px; }
+.tct-cr-modal.cr-sc-modal .cr-field .form-label { margin: 0; font-size: 13.5px; font-weight: 600; color: #364a63; }
+.tct-cr-modal.cr-sc-modal .cr-field .form-control {
+  font-size: 14px; color: #1c2b46; background-color: #fff; border: 1px solid #dbdfea; border-radius: 10px; box-shadow: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+/* Reason (native select, kept for keyboard / screen-reader behaviour): closed control with a purple chevron.
+   The placeholder ("Select a reason", empty value) reads as muted text until a reason is chosen. */
+.tct-cr-modal.cr-sc-modal .cr-field select.form-control {
+  -webkit-appearance: none; -moz-appearance: none; appearance: none;
+  height: 42px; padding: 0 40px 0 14px; cursor: pointer; text-overflow: ellipsis;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23854fff' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 14px center / 14px 14px;
+}
+.tct-cr-modal.cr-sc-modal .cr-field select.form-control:has(option[value=""]:checked) { color: #8094ae; }
+.tct-cr-modal.cr-sc-modal .cr-field select.form-control option { color: #364a63; }
+.tct-cr-modal.cr-sc-modal .cr-field select.form-control:disabled { background-color: #f5f6fa; }
+
+/* Browsers with customizable <select> (Chrome / Edge 135+): the open list is styled too. Others ignore this block
+   and keep their native option list. Same element, options, values and events either way. */
+@supports (appearance: base-select) {
+  .tct-cr-modal.cr-sc-modal .cr-field select.form-control,
+  .tct-cr-modal.cr-sc-modal .cr-field select.form-control::picker(select) { appearance: base-select; }
+  .tct-cr-modal.cr-sc-modal .cr-field select.form-control { display: flex; align-items: center; background-image: none; padding-right: 14px; }
+  .tct-cr-modal.cr-sc-modal .cr-field select.form-control::picker-icon {
+    margin-left: auto; color: #854fff; transition: rotate 0.15s ease;
+  }
+  .tct-cr-modal.cr-sc-modal .cr-field select.form-control:open { border-color: #854fff; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.16); }
+  .tct-cr-modal.cr-sc-modal .cr-field select.form-control:open::picker-icon { rotate: 180deg; }
+  /* Open list: same width as the control, never taller than the space available; flips above when needed */
+  .tct-cr-modal.cr-sc-modal .cr-field select.form-control::picker(select) {
+    margin-block: 6px; padding: 6px; max-height: min(320px, 50vh); overflow-y: auto;
+    background: #fff; border: 1px solid #e5e9f2; border-radius: 12px; box-shadow: 0 12px 30px rgba(31, 43, 58, 0.16);
+  }
+  .tct-cr-modal.cr-sc-modal .cr-field select.form-control option {
+    display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px;
+    font-size: 14px; line-height: 1.4; color: #364a63; white-space: normal; overflow-wrap: anywhere; cursor: pointer;
+  }
+  .tct-cr-modal.cr-sc-modal .cr-field select.form-control option + option { margin-top: 2px; }
+  .tct-cr-modal.cr-sc-modal .cr-field select.form-control option[value=""] { color: #8094ae; }
+  .tct-cr-modal.cr-sc-modal .cr-field select.form-control option:hover,
+  .tct-cr-modal.cr-sc-modal .cr-field select.form-control option:focus-visible { background: #f5f1ff; color: #4c1fd0; outline: none; }
+  .tct-cr-modal.cr-sc-modal .cr-field select.form-control option:focus-visible { box-shadow: inset 0 0 0 2px rgba(133, 79, 255, 0.4); }
+  .tct-cr-modal.cr-sc-modal .cr-field select.form-control option:checked { background: #f1ebff; color: #4c1fd0; font-weight: 600; }
+  /* Check mark on the selected reason, at the right end */
+  .tct-cr-modal.cr-sc-modal .cr-field select.form-control option::checkmark { order: 1; margin-left: auto; color: #854fff; }
+}
+.tct-cr-modal.cr-sc-modal .cr-field textarea.form-control { min-height: 116px; padding: 10px 14px; line-height: 1.55; resize: vertical; }
+.tct-cr-modal.cr-sc-modal .cr-field .form-control::placeholder { color: #98a4b6; }
+.tct-cr-modal.cr-sc-modal .cr-field .form-control:hover:not(:disabled) { border-color: #c4b0ff; }
+.tct-cr-modal.cr-sc-modal .cr-field .form-control:focus { border-color: #854fff; box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.16); outline: none; }
+.tct-cr-modal.cr-sc-modal .cr-field .form-control:disabled { background-color: #f5f6fa; cursor: not-allowed; }
+/* Character count: right under the description, right-aligned */
+.tct-cr-modal.cr-sc-modal .cr-hint { align-self: flex-end; margin-top: -2px; font-size: 12px; color: #6b7a90; font-variant-numeric: tabular-nums; }
+.tct-cr-modal.cr-sc-modal .cr-error { font-size: 12.5px; font-style: normal; font-weight: 500; }
+
+/* Informational note: soft panel, readable contrast */
+.tct-cr-modal.cr-sc-modal .cr-note {
+  align-items: flex-start; gap: 8px; padding: 10px 12px; font-size: 13px; line-height: 1.5; color: #4b3a8f;
+  background: #f7f3ff; border: 1px solid #ebe3ff; border-radius: 10px;
+}
+.tct-cr-modal.cr-sc-modal .cr-note .icon { flex: none; margin-top: 2px; font-size: 15px; color: #854fff; }
+.tct-cr-modal.cr-sc-modal .cr-state.is-error { margin-top: 12px; padding: 10px 12px; background: #fdecea; border-radius: 10px; }
+
+/* Footer: Cancel (secondary) · Send request (primary) */
+.tct-cr-modal.cr-sc-modal .modal-footer {
+  flex: none; display: flex; justify-content: flex-end; gap: 10px; padding: 14px 22px; border-top: 1px solid #eef0f5; background: #fcfcfe;
+}
+.tct-cr-modal.cr-sc-modal .modal-footer > * { margin: 0; }
+.tct-cr-modal.cr-sc-modal .modal-footer .btn { justify-content: center; height: 40px; padding: 0 18px; border-radius: 10px; font-size: 14px; font-weight: 600; box-shadow: none; }
+.tct-cr-modal.cr-sc-modal .modal-footer .btn-light { color: #526484; background: #fff; border: 1px solid #dbdfea; }
+.tct-cr-modal.cr-sc-modal .modal-footer .btn-light:hover:not(:disabled) { color: #364a63; background: #f5f6fa; border-color: #c9d0dd; }
+.tct-cr-modal.cr-sc-modal .modal-footer .btn-primary { min-width: 150px; background: #854fff; border-color: #854fff; }
+.tct-cr-modal.cr-sc-modal .modal-footer .btn-primary:hover:not(:disabled) { background: #7339f0; border-color: #7339f0; }
+.tct-cr-modal.cr-sc-modal .modal-footer .btn:disabled { opacity: 0.65; cursor: progress; }
+.tct-cr-modal.cr-sc-modal .modal-footer .btn:focus { box-shadow: none; }
+.tct-cr-modal.cr-sc-modal .modal-footer .btn:focus-visible { box-shadow: 0 0 0 3px rgba(133, 79, 255, 0.3); }
+
+@media (max-width: 575px) {
+  /* Fits the screen: small outer margin, body scrolls, actions stay visible at the bottom */
+  .tct-cr-modal.cr-sc-modal.modal-dialog { margin: 8px; max-width: none; min-height: calc(100% - 16px); }
+  .tct-cr-modal.cr-sc-modal .modal-content { max-height: calc(100vh - 16px); max-height: calc(100dvh - 16px); border-radius: 14px; }
+  .tct-cr-modal.cr-sc-modal .cr-modal-head { gap: 12px; padding: 14px 14px 12px 16px; }
+  .tct-cr-modal.cr-sc-modal .cr-chip { width: 36px; height: 36px; font-size: 16px; }
+  .tct-cr-modal.cr-sc-modal .modal-body { padding: 14px 16px 16px; }
+  .tct-cr-modal.cr-sc-modal .cr-facts { grid-template-columns: minmax(0, 1fr); gap: 2px; padding: 10px 12px; }
+  .tct-cr-modal.cr-sc-modal .cr-facts dd + dt { margin-top: 6px; }
+  .tct-cr-modal.cr-sc-modal .modal-footer { padding: 12px 16px; }
+  .tct-cr-modal.cr-sc-modal .modal-footer .btn { flex: 1 1 0; min-width: 0; height: 44px; padding: 0 12px; }
+}
+
+/* One column below 992px (same breakpoint as the base layout) */
+@media (max-width: 991px) {
+  .tct-change-requests.cr-student-change .cr-groups { column-count: 1; }
+}
+@media (max-width: 575px) {
+  .tct-change-requests.cr-student-change .nk-block-head { align-items: flex-start; padding-bottom: 16px; }
+  .tct-change-requests.cr-student-change .cr-groups .cr-card { margin-bottom: 12px; }
+  .tct-change-requests.cr-student-change .cr-rows { padding: 2px 4px 4px; }
+  /* Stacked row: avatar + text, then a full-width action that is easy to tap */
+  .tct-change-requests.cr-student-change .cr-row { grid-template-columns: 34px minmax(0, 1fr); gap: 8px 10px; padding: 10px 8px; }
+  .tct-change-requests.cr-student-change .cr-row .btn,
+  .tct-change-requests.cr-student-change .cr-row .cr-badge { grid-column: 1 / -1; justify-self: stretch; }
+  .tct-change-requests.cr-student-change .cr-row .btn { width: 100%; height: 44px; }
+  .tct-change-requests.cr-student-change .cr-row .cr-badge { text-align: center; padding: 8px 10px; white-space: normal; }
+}

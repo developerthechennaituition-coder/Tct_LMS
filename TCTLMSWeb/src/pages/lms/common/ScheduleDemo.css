@@ -1,0 +1,192 @@
+/* Schedule Demo modal (ScheduleDemo.jsx, ScheduleDemoTimeZones.jsx). Layout and look only; every rule is scoped to
+   .tct-schedule-demo or its own .tct-sd-* classes so the other .custom-modal popups are unchanged.
+   The modal is `scrollable`, so the header (title, Save, close) stays in place while the body scrolls. */
+
+.tct-schedule-demo .modal-header {
+  align-items: center;
+  padding: 0.75rem 1.25rem;
+}
+.tct-sd-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.tct-schedule-demo .modal-body {
+  padding: 1rem 1.25rem;
+}
+.tct-schedule-demo .form-group {
+  margin-bottom: 0.75rem;
+}
+.tct-schedule-demo .form-label {
+  margin-bottom: 0.25rem;
+}
+
+/* Section titles (selected time, availability) */
+.tct-sd-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin: 0 0 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #526484;
+}
+
+/* Coordinator / Tutor / Board / Grade */
+.tct-sd-info {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem 1rem;
+  margin: 0 0 0.75rem;
+  padding: 0.625rem 0.875rem;
+  border: 1px solid #e5e9f2;
+  border-radius: 6px;
+}
+.tct-sd-info dt {
+  margin: 0;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8094ae;
+}
+.tct-sd-info dd {
+  margin: 0.125rem 0 0;
+  font-weight: 500;
+  color: #364a63;
+  overflow-wrap: anywhere;
+}
+
+/* Time zone chips */
+.tct-sd-zones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.tct-sd-zones-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-right: 0.25rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8094ae;
+}
+.tct-sd-chip {
+  display: inline-flex;
+  flex: 1 1 200px;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  padding: 0.25rem 0.75rem 0.25rem 0.3rem;
+  border: 1px solid #e5e9f2;
+  border-radius: 999px;
+  background: #f5f6fa;
+  font-size: 0.8125rem;
+}
+.tct-sd-chip-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* "Date and time slots are in …" under the date */
+.tct-sd-hint {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 0.75rem;
+  color: #8094ae;
+}
+
+/* One day's time-slot picker */
+.tct-sd-slot {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  border: 1px solid rgba(101, 118, 255, 0.45);
+  border-radius: 6px;
+  background: #fff;
+}
+.tct-sd-slot-day {
+  flex: 0 0 96px;
+  font-weight: 600;
+  color: #364a63;
+}
+.tct-sd-slot-picker {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Selected time in each participant's timezone */
+.tct-sd-local {
+  margin-bottom: 0.75rem;
+  padding: 0.625rem 0.875rem;
+  border: 1px solid #e5e9f2;
+  border-radius: 6px;
+  background: #fafbfd;
+}
+.tct-sd-local-list {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0;
+}
+.tct-sd-local-row {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  gap: 0.75rem;
+  align-items: baseline;
+  padding: 0.25rem 0.5rem;
+  border-left: 3px solid #e5e9f2;
+  border-radius: 3px;
+  background: #fff;
+  font-size: 0.8125rem;
+}
+.tct-sd-local-row dt {
+  margin: 0;
+  font-weight: 600;
+  color: #526484;
+}
+.tct-sd-local-row dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+.tct-sd-tone-info { border-left-color: #09c2de; }
+.tct-sd-tone-primary { border-left-color: #6576ff; }
+.tct-sd-tone-success { border-left-color: #1ee0ac; }
+
+/* Tutor and student availability, side by side */
+.tct-sd-availability {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 0.25rem;
+}
+.tct-sd-panel {
+  min-width: 0;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid #e5e9f2;
+  border-radius: 6px;
+}
+
+@media (max-width: 991.98px) {
+  .tct-sd-info { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 767.98px) {
+  .tct-sd-availability { grid-template-columns: minmax(0, 1fr); }
+  .tct-sd-zones-title { flex-basis: 100%; }
+}
+@media (max-width: 575.98px) {
+  .tct-schedule-demo .modal-body { padding: 0.75rem; }
+  .tct-sd-info { grid-template-columns: minmax(0, 1fr); }
+  .tct-sd-slot { flex-direction: column; align-items: stretch; gap: 0.25rem; }
+  .tct-sd-slot-day { flex-basis: auto; }
+  .tct-sd-local-row { grid-template-columns: minmax(0, 1fr); gap: 0.125rem; }
+}

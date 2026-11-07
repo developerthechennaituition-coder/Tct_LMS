@@ -3,6 +3,7 @@ import { act, render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Switch, useLocation } from "react-router-dom";
 import MyCalendar, { MyTasks } from "./MyCalendar";
 import * as api from "../../../apiservices/MyCalendarService";
+import { GetMenuByUser } from "../../../apiservices/AuthenticateService";
 
 jest.mock("../../../apiservices/MyCalendarService", () => ({
   ...Object.fromEntries(
@@ -13,6 +14,8 @@ jest.mock("../../../apiservices/MyCalendarService", () => ({
   ),
   myCalendarErrorMessage: (_error, fallback) => fallback,
 }));
+// Settings → Role Permission: the menu API returns the menus granted to the role.
+jest.mock("../../../apiservices/AuthenticateService", () => ({ GetMenuByUser: jest.fn() }));
 jest.mock("../../../components/partials/calender/Calender", () => () => <div>Demo calendar grid</div>);
 jest.mock("../../../layout/content/Content", () => ({ children }) => <div>{children}</div>);
 // Other services reached through shared imports (timezone labels) are not called by these screens.
@@ -37,8 +40,13 @@ const settle = async () => {
   }
 };
 
-const renderAt = async (url, role = "Coordinator") => {
+const GRANTED_MENU = [{ text: "Students", link: "/lms/students", subMenu: [] }, { text: "Tasks", link: "/lms/tasks", subMenu: [] }];
+
+const renderAt = async (url, role = "Coordinator", menu = GRANTED_MENU) => {
+  localStorage.setItem("roleId", "6");
   localStorage.setItem("userRole", role);
+  if (menu instanceof Error) GetMenuByUser.mockRejectedValue(menu);
+  else GetMenuByUser.mockResolvedValue(menu);
   localStorage.setItem("userId", ME);
   api.getTaskAssignees.mockResolvedValue({ data: [] });
   api.getMyTasks.mockResolvedValue({
@@ -103,6 +111,33 @@ describe("Tasks page", () => {
     await renderAt("/lms/my-calendar?tab=tasks");
     expect(screen.getByTestId("where")).toHaveTextContent(/^\/lms\/tasks$/);
     expect(screen.getByRole("tab", { name: /Assigned to me/ })).toHaveAttribute("aria-selected", "true");
+  });
+
+  test("role without the Tasks permission: typed URL shows the permission message and loads no tasks", async () => {
+    await renderAt("/lms/tasks", "Coordinator", [{ text: "Students", link: "/lms/students", subMenu: [] }]);
+    expect(screen.getByText(/You do not have permission to view Tasks/)).toBeInTheDocument();
+    expect(screen.queryByText("Assign a task")).toBeNull();
+    expect(api.getMyTasks).not.toHaveBeenCalled();
+    expect(api.getTaskAssignees).not.toHaveBeenCalled();
+    expect(GetMenuByUser).toHaveBeenCalledWith("6");
+  });
+
+  test("old notification link for a role without permission ends on the permission message", async () => {
+    await renderAt("/lms/my-calendar?tab=tasks&list=mine", "Coordinator", []);
+    expect(screen.getByTestId("where")).toHaveTextContent("/lms/tasks?list=mine");
+    expect(screen.getByText(/You do not have permission to view Tasks/)).toBeInTheDocument();
+    expect(api.getMyTasks).not.toHaveBeenCalled();
+  });
+
+  test("menu API failure denies access (fails closed)", async () => {
+    await renderAt("/lms/tasks", "Coordinator", new Error("offline"));
+    expect(screen.getByText(/You do not have permission to view Tasks/)).toBeInTheDocument();
+    expect(api.getMyTasks).not.toHaveBeenCalled();
+  });
+
+  test("Tasks granted inside a parent menu still counts", async () => {
+    await renderAt("/lms/tasks", "Coordinator", [{ text: "Work", link: "", subMenu: [{ text: "Tasks", link: "/lms/tasks", subMenu: [] }] }]);
+    expect(screen.getByText("Assign a task")).toBeInTheDocument();
   });
 
   test.each(["Tutor", "Student"])("not available for %s", async (role) => {

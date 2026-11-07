@@ -2,11 +2,13 @@
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using System.Collections;
 using System.Text.RegularExpressions;
 using TCT.LMS.Application.Interfaces.Repositories;
 using TCT.LMS.Application.Interfaces.Services;
 using TCT.LMS.Application.Services;
+using TCT.LMS.Data.Common;
 using TCT.LMS.Domain.Entities;
 using TCT.LMS.DTOs.Invoice;
 using TCT.LMS.DTOs.Payment;
@@ -152,8 +154,13 @@ namespace TCT.LMS.API.Controllers
         }
 
         [HttpPost("Saveschedule")]
-        public async Task<IActionResult> AddSchedule(ScheduleDTO schedule)
+        public async Task<IActionResult> AddSchedule(ScheduleDTO schedule, [FromServices] ApplicationDbContext dbContext)
         {
+            // Saving here always marks the enrollment Demo Scheduled, so it waits for the tutor assignment approval.
+            var demoError = await GetDemoScheduleErrorAsync(dbContext, schedule.SalesDetailsId, schedule.TutorId);
+            if (demoError != null)
+                return BadRequest(new { succeeded = false, message = demoError });
+
             var result = await _scheduleService.AddSchedule(schedule);
             return Ok(result);
 
@@ -183,18 +190,38 @@ namespace TCT.LMS.API.Controllers
         }
 
         [HttpPost("AddOrUpdateSchedule")]
-        public async Task<IActionResult> AddOrUpdateSchedule(Schedule1Dto schedule)
+        public async Task<IActionResult> AddOrUpdateSchedule(Schedule1Dto schedule, [FromServices] ApplicationDbContext dbContext)
         {
+            // The posted StatusCode is saved on the enrollment, so it may not assign, approve or reject a tutor;
+            // a demo follows the same approval and approved-tutor rules as ScheduleEvent / Saveschedule.
+            var isDemo = TutorAssignmentApprovalRules.IsDemoScheduleType(schedule.ScheduleType);
+            if (!TutorAssignmentApprovalRules.IsScheduleStatusAllowed(isDemo, schedule.StatusCode))
+                return BadRequest(new { succeeded = false, message = TutorAssignmentApprovalRules.ScheduleStatusNotAllowedMessage });
+            if (isDemo)
+            {
+                var demoError = await GetDemoScheduleErrorAsync(dbContext, schedule.SalesDetailsId, schedule.TutorId);
+                if (demoError != null)
+                    return BadRequest(new { succeeded = false, message = demoError });
+            }
+
             var result = await _scheduleService.AddOrUpdateSchedule(schedule);
             return Ok(result);
         }
 
         [HttpPost("ScheduleEvent")]
         [TypeFilter(typeof(TCT.LMS.API.Filters.ClassActionAuthorizationFilter))]
-        public async Task<IActionResult> ScheduleEvent([FromBody] TimeSlotsGroup input)
+        public async Task<IActionResult> ScheduleEvent([FromBody] TimeSlotsGroup input, [FromServices] ApplicationDbContext dbContext)
         {
             try
             {
+                // A demo is scheduled only after the tutor assignment is approved; classes are unchanged.
+                if (input.ScheduleType == TCT.LMS.Domain.ScheduleType.Demo)
+                {
+                    var demoError = await GetDemoScheduleErrorAsync(dbContext, input.SalesDetailsId, input.TutorId);
+                    if (demoError != null)
+                        return BadRequest(new { succeeded = false, message = demoError });
+                }
+
                 var result = await _scheduleService.ScheduleNewEvent(input);
                 return Ok(result);
             }
@@ -206,6 +233,25 @@ namespace TCT.LMS.API.Controllers
             {
                 return BadRequest(new { succeeded = false, message = ex.Message });
             }
+        }
+
+        // A demo needs an approved tutor assignment and must use that approved tutor; null when it may be saved.
+        private static async Task<string?> GetDemoScheduleErrorAsync(ApplicationDbContext dbContext, Guid? salesDetailsId, Guid? tutorId)
+        {
+            var enrollment = await (from salesDetails in dbContext.SalesDetails.AsNoTracking()
+                                    join typeCode in dbContext.Type_Code.AsNoTracking() on salesDetails.Status equals typeCode.Id
+                                    where salesDetails.Id == salesDetailsId
+                                    select new { StatusCode = (int?)typeCode.TypeCodeValue, salesDetails.TutorId }).FirstOrDefaultAsync();
+            if (TutorAssignmentApprovalRules.BlocksDemoScheduling(enrollment?.StatusCode))
+                return TutorAssignmentApprovalRules.DemoBeforeApprovalMessage;
+
+            var approvedTutor = await dbContext.Tutor.AsNoTracking()
+                .Where(t => t.Id == enrollment.TutorId || t.UserId == enrollment.TutorId)
+                .Select(t => new { t.Id, t.UserId })
+                .FirstOrDefaultAsync();
+            return TutorAssignmentApprovalRules.IsApprovedTutor(tutorId, approvedTutor?.Id ?? enrollment.TutorId, approvedTutor?.UserId)
+                ? null
+                : TutorAssignmentApprovalRules.TutorNotApprovedMessage;
         }
 
 
